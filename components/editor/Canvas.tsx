@@ -50,7 +50,7 @@ const Canvas: React.FC<ICanvas> = props=> {
             
             App.zoom -= delta.y / 1000 * App.zoom;
             
-            const min = 1 / App.renderer.pixelSizeFactor - .025;
+            const min = 1 / (App.canvasHeight / 32) - .025;
             const max = config.MAX_ZOOM;
 
             App.zoom = +clamp(App.zoom, min*2, max*2).toFixed(3);
