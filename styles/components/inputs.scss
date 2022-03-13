@@ -1,0 +1,128 @@
+$checkbox-icon-offset: 2px;
+
+// Text inputs
+.input {
+    width: 100%;
+    padding: 0 5px;
+    height: 30px;
+
+    background: transparent;
+    border: 2px solid $dark-grey;
+    border-radius: $border-radius;
+
+    transition: .1s;
+
+    @include ff;
+
+    &:not(:hover).ghost {
+        border: 2px solid transparent !important;
+    }
+    &.ghost {
+        &::-webkit-outer-spin-button,
+        &::-webkit-inner-spin-button {
+            appearance: none;
+            margin: 0;
+        }
+    }
+    &:focus {
+        border: 2px solid $blue;
+    }
+}
+
+// Checkboxes
+.checkbox-wrapper {
+    cursor: pointer;
+    
+    .checkbox {
+        width: 16px;
+        height: 16px;
+        
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        
+        background: transparent;
+        border-radius: $border-radius;
+        border: 2px solid $dark-grey;
+        color: #fff;
+
+        cursor: pointer;
+    
+        .icon {
+            opacity: 0;
+            transform: scale(.8) translate($checkbox-icon-offset, 3px);
+        }
+    
+        &.checked {
+            background: $blue;
+            border: 2px solid $blue;
+    
+            .icon {
+                opacity: 1;
+                transform: scale(1) translate($checkbox-icon-offset, 1px);
+                transition: .1s;
+            }
+            
+        }
+        
+    }
+}
+
+// Inputs
+.rename-input-wrapper {
+    .rename-input {
+        width: 100%;
+        // height: 30px;
+        padding: 2px 4px;
+        margin: 0 -7px;
+
+        border-radius: $border-radius;
+        border: 2px dotted $dark-grey;
+        background: transparent;
+        
+        @include ff;
+    }
+}
+.renamable-text {
+    width: 100%;
+    max-width: 100%;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+// Range
+.range-input {
+    appearance: none;
+
+    height: 6px;
+    
+    background: rgba(255,255,255,.05);
+    border-radius: $border-radius;
+
+    cursor: pointer;
+    
+    &::-webkit-slider-thumb {
+        appearance: none;
+        
+        width: 6px;
+        height: 20px;
+
+        border-radius: $border-radius;
+        background: #323232;
+
+        transition: .1s;
+    }
+
+    &:hover {
+        &::-webkit-slider-thumb {
+            background: #484848;
+        }
+    }
+    &:active {
+        &::-webkit-slider-thumb {
+            background: $blue;
+        }
+    }
+    
+}

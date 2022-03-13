@@ -1,0 +1,24 @@
+{
+    "cSpell.words": [
+        "arrowdown",
+        "draggable",
+        "inited",
+        "notif",
+        "Renamable",
+        "subpanel",
+        "unlisten"
+    ],
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": true,
+        // ".next": true,
+        ".eslintrc.json": true,
+        "yarn.lock": true,
+        "next-env.d.ts": true,
+        "node_modules": true,
+    },
+}

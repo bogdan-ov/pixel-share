@@ -1,0 +1,32 @@
+$toolbar-width: 60px;
+$toolbar-padding: 5px;
+$toolbar-border-width: 2px;
+
+.toolbar {
+    width: $toolbar-width;
+    padding: $toolbar-padding;
+
+    // border-right: $toolbar-border-width solid $bg;
+
+    .toolbar-tools {
+        display: flex;
+        flex-direction: column;
+        
+        .toolbar-tool {
+            width: $toolbar-width - $toolbar-padding * 2;
+            height: $toolbar-width - $toolbar-padding * 2;
+            padding: 0;
+            border-radius: inherit;
+            transition: .1s transform !important;
+        }
+    }
+    
+}
+
+.tool-settings {
+    height: $subpanel-height;
+    min-height: $subpanel-height;
+    padding: 0 20px;
+    
+    border-bottom: $toolbar-border-width solid $bg;
+}

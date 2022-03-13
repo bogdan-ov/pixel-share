@@ -1,0 +1,41 @@
+$animation-timeline-height: 160px;
+
+.animation-timeline {
+    width: 100%;
+    max-width: 100%;
+    min-height: $animation-timeline-height;
+    height: $animation-timeline-height;
+
+    display: flex;
+    flex-direction: column;
+
+    background: $panel-bg;
+
+    .animation-timeline-content {
+        // max-width: 100%;
+        // width: 100%;
+        height: 100%;
+        
+        display: flex;
+        flex-direction: column;
+
+        overflow-x: scroll;
+    }
+
+    .frames-count {
+        .frame-count {
+            text-align: center;
+            color: $grey;
+        }
+    }
+
+    .frames-count {
+        width: 100%;
+        display: flex;
+
+        .field {
+            width: 50px;
+        }
+    }
+    
+}

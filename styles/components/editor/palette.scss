@@ -1,0 +1,101 @@
+$palette-width: 60px;
+$grid-size: 30px;
+
+.palette {
+    width: $palette-width;
+    min-width: max-content;
+    height: 100%;
+    
+    border-left-width: 2px solid $bg;
+
+    .panel-header {
+        min-height: $subpanel-height;
+        margin-bottom: 0 !important;
+        padding: 0 !important;
+    }
+    
+    .tooltip-wrapper {
+        // max-height: 130px;
+        animation: palette-color ease .1s;
+    }
+    .palette-color-wrapper {
+        width: 100%;
+        height: 100%;
+
+        border-radius: inherit;
+        
+        &.active, &:hover {
+            .palette-color {
+                z-index: 2;
+                &::after {
+                    outline-width: 3px;
+                }
+            }
+        }
+    }
+    .palette-colors-list {
+        width: 100%;
+        height: 100%;
+        padding-bottom: 4px;
+        
+        .palette-color {
+            width: 100%;
+            height: 100%;
+
+            border-radius: inherit;
+            
+            cursor: pointer;
+            
+            &::after {
+                content: "";
+
+                width: 100%;
+                height: 100%;
+
+                position: absolute;
+                left: 0;
+                top: 0;
+
+                background: transparent;
+                outline: 0px solid #fff;
+                border-radius: inherit;
+                
+                transition: .05s outline;
+            }
+        }
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
+        
+    }
+
+    //
+
+    &.grid-view {
+        .palette-colors-list {
+            display: grid;
+            grid-template-columns: $grid-size $grid-size;
+            grid-template-rows: repeat(auto-fill, $grid-size);
+            grid-gap: 5px;
+        }
+        .palette-color {
+            border-radius: $border-radius;
+        }
+    }
+    &.list-view .palette-colors-list {
+        display: grid;
+        grid-template-columns: 44px;
+        grid-template-rows: auto;
+    }
+    
+}
+
+@keyframes palette-color {
+    from {
+        height: 0%;
+    }
+    to {
+        height: 100%;
+    }
+}

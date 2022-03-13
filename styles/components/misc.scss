@@ -1,0 +1,37 @@
+.key {
+    padding: 2px 4px;
+    font-family: monospace !important;
+    
+    background: lighten($bg, 10);
+    border-radius: calc($border-radius/2);
+    color: $grey;
+    white-space: nowrap;
+    font-size: 12px;
+}
+.group-box {
+    &::after {
+        content: "";
+
+        width: calc(100% + 10px);
+        height: calc(100% + 10px);
+
+        position: absolute;
+        left: -6px;
+        top: -7px;
+
+        border: 2px solid transparentize($grey, .25);
+        border-radius: $border-radius + 4px;
+        background: transparent;
+        opacity: 0;
+        pointer-events: none;
+
+        transition: .5s;
+    }
+    &:hover {
+        &::after {
+            opacity: 1;
+            transition-delay: .4s;
+            transition-duration: .2s;
+        }
+    }
+}

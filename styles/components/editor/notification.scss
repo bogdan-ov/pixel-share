@@ -1,0 +1,19 @@
+.notification {
+    max-width: 280px;
+    min-width: 200px;
+    padding: 12px 20px;
+    
+    background: transparentize($panel-bg, .2);
+    border-radius: $border-radius;
+    backdrop-filter: blur(15px);
+}
+
+.notifications-list {
+    width: max-content;
+    
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    margin: 20px;
+    z-index: 999;
+}

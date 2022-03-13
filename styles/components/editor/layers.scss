@@ -1,0 +1,101 @@
+$width: 260px;
+$layer-blob-height: 64px;
+
+.layers-panel {
+    width: $width;
+    min-width: $width;
+    border-left: 2px solid $bg;
+
+    .layers-panel-content {
+        height: 100%;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
+    }
+    .layers-list {
+        width: 100%;
+
+        .layer {
+            max-width: 100%;
+            padding: 0 5px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2px;
+            
+            border-radius: $border-radius;
+            background: $panel-bg;
+            border: 2px solid transparent;
+
+            transition: .1s transform;
+            cursor: pointer;
+            pointer-events: all !important;
+            
+            .layer-blob-wrapper {
+                width: max-content;
+                min-width: 64px;
+                max-width: 72px;
+                height: max-content;
+                min-height: $layer-blob-height;
+                
+                display: flex;
+                justify-content: center;
+                overflow: hidden;
+
+                border-radius: calc($border-radius - 4px);
+                background: transparentize(lighten($bg, 6), .6);
+
+                transition: .1s;
+
+                .layer-blob {
+                    height: $layer-blob-height;
+                    
+                    object-fit: cover;
+                    image-rendering: pixelated;
+                }
+            }
+            .layer-action-buttons {
+                pointer-events: none;
+
+                > .button {
+                    transition: .1s transform;
+                }
+                > .button:not(.show) {
+                    opacity: 0;
+                }
+                
+            }
+            .layer-content {
+                max-width: calc(100% - 30px);
+                padding: 5px 0;
+                
+                &:active {
+                    .layer-blob-wrapper {
+                        transform: scale(.95);
+                    }
+                }
+            }
+            
+            &.active {
+                border: 2px solid $grey;
+            }
+            &:hover {
+                background: $bg;
+                .layer-action-buttons {
+                    pointer-events: all;
+                    > .button {
+                        opacity: 1;
+                        &:disabled {
+                            opacity: .4;
+                        }
+                    }
+                }
+            }
+            
+        }
+        
+    }
+    
+}

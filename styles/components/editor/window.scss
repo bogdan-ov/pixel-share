@@ -1,0 +1,182 @@
+.window-draggable-wrapper {
+    padding: 10px;
+    position: fixed;
+    left: 100px;
+    top: 100px;
+    z-index: 999;
+}
+.window {
+    min-width: 200px;
+    padding: 4px;
+
+    .window-header {
+        width: 100%;
+        padding: 4px 8px;
+        padding-bottom: 0;
+        color: $grey;
+
+        cursor: grab;
+
+        &:active {
+            cursor: grabbing;
+        }
+        
+    }
+    .window-content {
+        width: 100%;
+        padding: 8px;
+    }
+    
+}
+.opacity-box {
+    background: transparentize($panel-bg, .1);
+    backdrop-filter: blur(15px);
+    border-radius: $border-radius;
+    // border: 2px solid $panel-bg;
+}
+
+// Popover
+.popover-wrapper {
+    position: fixed;
+    z-index: 999;
+    
+    pointer-events: none;
+    
+    &.active {
+        pointer-events: all;
+
+        .popover {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+
+            transition: .1s ease-out;
+        }
+        
+    }
+
+    .popover {
+        opacity: 0;
+        transform: translateY(20px) scale(.95);
+        .popover-content {
+            display: flex;
+            flex-direction: column;
+        }
+    }
+}
+
+// Tooltip
+$tooltip-margin: 20px;
+$tooltip-translate: 4px;
+$tooltip-scale: .8;
+
+.tooltip-wrapper {
+    &:not(:active):hover {
+        .tooltip {
+            opacity: 1;
+        }
+    }
+    &:not(:hover), &:active {
+        .tooltip {
+            transition-delay: 0s !important;
+        }
+    }
+    
+    .tooltip-children {
+        height: 100%;
+        border-radius: inherit;
+    }
+    .tooltip {
+        width: max-content;
+        padding: 10px 15px;
+
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: 888;
+        
+        background: lighten($bg, 3);
+        border-radius: $border-radius;
+        box-shadow: 0 12px 25px -8px rgba(0,0,0, .4);
+        opacity: 0;
+
+        transition: .05s;
+        pointer-events: none;
+        
+        &::after {
+            content: "";
+            
+            width: 10px;
+            height: 10px;
+            
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translate(-50%, -50%) rotate(45deg);
+            
+            background: inherit;
+            border-radius: 2px;
+        }
+    }
+
+    &[data-placement="right"] {
+        .tooltip {
+            left: 100%;
+            top: 50%;
+            transform: translate(0, calc(-50% + $tooltip-translate)) scale($tooltip-scale);
+
+            &::after {
+                left: 0;
+                top: 50%;
+            }
+        }
+        &:not(:active):hover .tooltip {
+            transform: translate(0, -50%) scale(1);
+        }
+    }
+    &[data-placement="left"] {
+        .tooltip {
+            left: initial;
+            right: 100%;
+            top: 50%;
+            transform: translate(0, calc(-50% + $tooltip-translate)) scale($tooltip-scale);
+            
+            &::after {
+                left: 100%;
+                top: 50%;
+            }
+        }
+        &:not(:active):hover .tooltip {
+            transform: translate(0, -50%) scale(1);
+        }
+    }
+    &[data-placement="top"] {
+        .tooltip {
+            left: 50%;
+            top: 0;
+            transform: translate(-50%, calc(-100% + $tooltip-translate)) scale($tooltip-scale);
+
+            &::after {
+                left: 50%;
+                top: 100%;
+            }
+        }
+        &:not(:active):hover .tooltip {
+            transform: translate(-50%, calc(-100%)) scale(1);
+        }
+    }
+    &[data-placement="bottom"] {
+        .tooltip {
+            left: 50%;
+            top: 100%;
+            transform: translate(-50%, calc($tooltip-translate)) scale($tooltip-scale);
+
+            &::after {
+                left: 50%;
+                top: 0;
+            }
+        }
+        &:not(:active):hover .tooltip {
+            transform: translate(-50%, 0) scale(1);
+        }
+    }
+}
