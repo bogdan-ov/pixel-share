@@ -34,4 +34,5 @@ const ClickOutside = React.forwardRef<HTMLDivElement, React.PropsWithChildren<IC
     );
 });
 
+ClickOutside.displayName = "ClickOutside"
 export default ClickOutside;

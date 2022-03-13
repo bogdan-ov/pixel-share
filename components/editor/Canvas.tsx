@@ -74,7 +74,7 @@ const Canvas: React.FC<ICanvas> = props=> {
             removeWheelListener();
             removeMoveListener();
         }
-    }, [workspaceRef]);
+    }, [workspaceRef, layersRef]);
     
     return (
         <div className="workspace" ref={ workspaceRef }>

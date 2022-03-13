@@ -75,7 +75,7 @@ const Editor: React.FC = ()=> {
             removeWheelListener();
             removeMoveListener();
         }
-    }, [workspaceRef]);
+    }, [workspaceRef, layersRef]);
     useEffect(
         ProjectWorker.Name.listen(name=> {
 

@@ -136,4 +136,5 @@ const MenubarButton: React.FC<IMenubarButton> = props=> {
     );
 };
 
+Menubar.displayName = "Menubar";
 export default Menubar;

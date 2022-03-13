@@ -20,4 +20,5 @@ const RectangleToolSettings: React.FC<IToolSettingsContainer> = React.memo(props
     );
 });
 
+RectangleToolSettings.displayName = "RectangleToolSettings";
 export default RectangleToolSettings;

@@ -74,4 +74,5 @@ export const Settings: React.FC<{ currentToolType: ToolType, empty?: React.React
     }</>;
 });
 
+ToolSettings.displayName = "ToolSettings";
 export default ToolSettings;

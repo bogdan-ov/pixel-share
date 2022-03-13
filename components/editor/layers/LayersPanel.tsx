@@ -93,4 +93,5 @@ const LayersPanelFooter: React.FC = ()=> {
     );
 };
 
+LayersPanel.displayName = "LayersPanel";
 export default LayersPanel;
