@@ -39,4 +39,5 @@ const PenToolSettings: React.FC<IToolSettingsContainer> = React.memo(()=> {
     );
 });
 
+PenToolSettings.displayName = "PenToolSettings";
 export default PenToolSettings;

@@ -37,7 +37,7 @@ const ToolSettings: React.FC = (()=> {
     );
 });
 
-export const Settings: React.FC<{ currentToolType: ToolType, empty?: React.ReactElement }> = React.memo(props=> {
+const Settings: React.FC<{ currentToolType: ToolType, empty?: React.ReactElement }> = React.memo(props=> {
 
     const settingsComponents = [
         //? Resizable tools
@@ -75,4 +75,6 @@ export const Settings: React.FC<{ currentToolType: ToolType, empty?: React.React
 });
 
 ToolSettings.displayName = "ToolSettings";
+Settings.displayName = "Settings";
+export { Settings }
 export default ToolSettings;
