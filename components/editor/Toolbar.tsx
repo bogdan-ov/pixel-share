@@ -25,7 +25,7 @@ const Toolbar: React.FC = ()=> {
                 ) }
             </div>
 
-            <a href="https://vk.com/bbog908" target="_blank" className="link">
+            <a href="https://vk.com/bbog908" target="_blank" rel="noreferrer" className="link">
                 <Button
                     tooltip={ <span>Bogdanov did it! :D<br /><i className="text-muted">бигбоб</i></span> }
                     tooltipColor="blue"
