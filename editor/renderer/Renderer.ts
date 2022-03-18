@@ -19,7 +19,7 @@ export class Renderer {
         if (!LayersWorker.currentLayer?.editable) return 0;
         
         if (props.clearPreview)
-        LayersWorker.previewLayer?.clearPixels();
+            LayersWorker.previewLayer?.clearPixels();
 
         const layer = props.allowPreview ? LayersWorker.previewLayer : LayersWorker.currentLayer;
         return layer?.drawLine(props) || 0;

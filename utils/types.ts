@@ -9,7 +9,9 @@ export enum Direction {
     UP, DOWN
 }
 export enum ViewMode {
-    GRID, LIST
+    GRID,
+    LIST,
+    SHORT_LIST
 }
 
 export type RGBA = [red: number, green: number, blue: number, alpha: number];

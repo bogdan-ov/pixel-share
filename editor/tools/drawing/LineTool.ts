@@ -11,6 +11,7 @@ export default class LineTool extends ShapeTool {
         super(ToolType.LINE);
 
         this.resizable = true;
+        this.allowNormalize = false;
     }
 
     onDraw(renderer: Renderer): void {
@@ -18,7 +19,7 @@ export default class LineTool extends ShapeTool {
         if (!LayersWorker.currentLayer?.editable || !this.allowUse) return;
 
         const lineLength = renderer.drawLine({
-            points: [this.start, this.end],
+            points: [this.from, this.to],
             color: PaletteWorker.currentPaletteColor.hexColor,
             allowPreview: true,
             clearPreview: true,

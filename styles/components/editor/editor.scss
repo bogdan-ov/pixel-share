@@ -36,37 +36,6 @@ $subpanel-height: 60px;
         }
     }
 }
-.panel {
-    height: 100%;
-    background: $panel-bg;
-    .panel-header {
-        padding: 10px;
-        color: rgba(255, 255, 255, .2);
-        margin-bottom: 5px;
-    }
-    .panel-footer {
-        min-height: max-content;
-        padding: 10px;
-    }
-
-    * {
-        &::-webkit-scrollbar {
-            width: 10px;
-            height: 10px;
-        }
-        &::-webkit-scrollbar-thumb {
-            background: lighten($bg, 6);
-            border-radius: 8px;
-            border: 3px solid $panel-bg;
-            &:active {
-                background: lighten($bg, 10);
-            }
-        }
-        &::-webkit-scrollbar-track {
-            background: transparent;
-        }
-    }
-}
 .scrollable {
     overflow-y: auto;
 }

@@ -1,4 +1,4 @@
-$context-menu-bg: lighten($bg, 4);
+$context-menu-bg: lighten($bg, 2);
 $context-menu-padding: 5px;
 
 .context-menu-wrapper {
@@ -28,7 +28,7 @@ $context-menu-padding: 5px;
     transform: translateY(10px);
     opacity: 0;
     
-    background: transparentize($context-menu-bg, .1);
+    background: transparentize($context-menu-bg, .05);
     backdrop-filter: blur(15px);
     border-radius: calc($border-radius + $context-menu-padding);
 

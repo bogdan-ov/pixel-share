@@ -18,10 +18,11 @@ class HotkeysWorker {
             "pen-switch": { variants: ["P", "digit1"] },
             "erase-switch": { variants: ["E", "digit2"] },
             "line-switch": { variants: ["L", "digit3"] },
-            "selection-switch": { variants: ["S", "digit4"] },
-            "fill-switch": { variants: ["F", "digit5"] },
-            "rectangle-switch": { variants: ["R", "digit6"] },
-            "checkerboard-switch": { variants: ["digit7"] },
+            "rectangle-switch": { variants: ["R", "digit4"] },
+            "ellipse-switch": { variants: ["O", "digit5"] },
+            "fill-switch": { variants: ["F", "digit6"] },
+            "selection-switch": { variants: ["S", "digit7"] },
+            "checkerboard-switch": { variants: ["digit8"] },
 
             // Layers
             "rename-layer-trigger": { variants: ["f2"] },
@@ -34,6 +35,11 @@ class HotkeysWorker {
             "copy-image-data": { variants: ["ctrl+c"] },
             "paste-image-data": { variants: ["ctrl+v"] },
             "cut-image-data": { variants: ["ctrl+x"] },
+
+            // Projects
+            "export-image-trigger": { variants: ["ctrl+E"] },
+            "save-project": { variants: ["ctrl+S"] },
+            "open-project": { variants: ["ctrl+O"] },
 
             // Mics
             "pick-color": { variants: ["ctrl+m0"] },

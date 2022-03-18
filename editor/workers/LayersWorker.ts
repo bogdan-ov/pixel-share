@@ -158,7 +158,7 @@ class LayersWorker {
 
     pushToHistory() {
         // EditorTriggers.History.trigger(HistoryItemType.LAYERS, "layer-worker");
-        HistoryWorker.save(HistoryItemType.LAYERS);
+        HistoryWorker.pushType(HistoryItemType.LAYERS);
     }
 
     makeBlobFromAllLayers(scale: number=1): Promise<string> {

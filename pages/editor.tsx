@@ -2,6 +2,7 @@ import React, { createRef, useEffect } from "react";
 import ContextMenu from "../components/context-menu/ContextMenu";
 import Helper from "../components/editor/Helper";
 import LayersPanel from "../components/editor/layers/LayersPanel";
+import Menubar from "../components/editor/menubar/Menubar";
 import NotificationsList from "../components/editor/notification/Notification";
 import ColorPickerPopover from "../components/editor/palette/ColorPickerPopover";
 import PalettePanel from "../components/editor/palette/PalettePanel";
@@ -94,6 +95,7 @@ const Editor: React.FC = ()=> {
         <Page title="Editor" className="editor-page">
 
             <div className="flex flex-column" style={ { height: "100vh" } }>
+                {/* <Menubar /> */}
 
                 <div className="flex width-fill height-fill">
                     <Toolbar />

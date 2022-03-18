@@ -1,5 +1,6 @@
 import { EditorTriggers } from "../../states/editor-states";
 import State, { state } from "../../states/State";
+import config from "../../utils/config";
 import App from "../App";
 import LayersWorker from "./LayersWorker";
 import PaletteWorker from "./PaletteWorker";
@@ -72,8 +73,11 @@ class ProjectWorker {
 
         localStorage[projectName] = JSON.stringify(data);
     }
-    loadProject() {
-        const namePrompt = prompt("💾 Load project:");
+    saveProjectAs(name: string) {
+        // if ()
+    }
+    openProject() {
+        const namePrompt = prompt("💾 Open project:");
         if (!namePrompt)
             return;
         const projectName = namePrompt.toString();
@@ -97,9 +101,13 @@ class ProjectWorker {
         LayersWorker.updateLayersAspect();
         
         EditorTriggers.Notification.trigger({
-            content: `💾 Project loaded!`,
+            content: `💾 Project opened!`,
             type: "success"
         });
+    }
+
+    projectExists(name: string): boolean {
+        return localStorage[config.PROJECT_NAME_PREFIX + name];
     }
 }
 export default new ProjectWorker();

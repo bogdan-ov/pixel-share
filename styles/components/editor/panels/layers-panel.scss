@@ -81,8 +81,9 @@ $layer-blob-height: 64px;
             &.active {
                 border: 2px solid $grey;
             }
-            &:hover {
+            &:hover, &.selected {
                 background: $bg;
+                
                 .layer-action-buttons {
                     pointer-events: all;
                     > .button {
@@ -96,6 +97,27 @@ $layer-blob-height: 64px;
             
         }
         
+    }
+
+    // View modes
+    &.view-short-list {
+        .layer {
+            padding: 4px 10px;
+            border: none;
+            margin-bottom: 5px;
+            
+            &.active {
+                border: none;
+                background: $blue;
+            }
+            
+            .layer-blob-wrapper {
+                display: none;
+            }
+            .layer-action-buttons {
+                flex-direction: row;
+            }
+        }
     }
     
 }

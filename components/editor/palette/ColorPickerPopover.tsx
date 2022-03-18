@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from "react";
-import App from "../../../editor/App";
+import React, { useState } from "react";
 import PaletteColor from "../../../editor/renderer/PaletteColor";
 import PaletteWorker from "../../../editor/workers/PaletteWorker";
 import { EditorWindowType } from "../../../states/editor-states";
 import { HSLA } from "../../../utils/types";
 import { hexToHsl, hslToHex } from "../../../utils/utils";
-import ColorPicker from "../../ui/ColorPicker";
+import ColorPicker from "../../ui/utils/ColorPicker";
 import Popover from "../../ui/windows/Popover";
 
 interface IColorPickerPopover {
@@ -64,7 +63,6 @@ const ColorPickerPopover: React.FC<IColorPickerPopover> = props=> {
                         onClick={ ()=> setActive(false) }
                     >Cancel</button>
                 </div>
-                <span className="beta self-end mt-2">(beta)</span>
             </div>
             
         </Popover>

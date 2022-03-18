@@ -1,6 +1,6 @@
 import Layer from "./layers/Layer";
 import HistoryWorker, { HistoryItemType } from "../components/editor/history/HistoryWorker";
-import { EditorActionType, EditorStates, EditorTriggers, EditorWrongActionType, IEditorAction } from "../states/editor-states";
+import { EditorActionType, EditorStates, EditorTriggers, EditorWrongActionType, IEditorActionTrigger } from "../states/editor-states";
 import State, { state } from "../states/State";
 import config from "../utils/config";
 import { clamp, Vector2 } from "../utils/math";
@@ -17,6 +17,13 @@ import LayersWorker from "./workers/LayersWorker";
 import PaletteWorker from "./workers/PaletteWorker";
 import ProjectWorker from "./workers/ProjectWorker";
 import SelectionWorker from "./workers/SelectionWorker";
+
+const cursors = {
+    "default": "initial",
+    "move": "move",
+    "not-allowed": "not-allowed",
+    "pointer": "pointer",
+}
 
 export class Application {
     CurrentToolType: State<ToolType>
@@ -73,13 +80,13 @@ export class Application {
         this.inited = true;
     }
 
-    setCursor(type: "pointer" | "initial" | "grab" | "grabbing" | "not-allowed") {
-        document.body.style.cursor = type;
+    setCursor(type: keyof typeof cursors) {
+        document.body.style.cursor = cursors[type];
     }
     
     currentToolStartDraw() {
         if (this.currentTool.allowAutoHistory)
-            HistoryWorker.save(HistoryItemType.LAYERS);
+            HistoryWorker.pushType(HistoryItemType.LAYERS);
             // EditorTriggers.History.trigger(HistoryItemType.LAYERS, "app");
         
         if (this.canUseCurrentTool)
@@ -113,7 +120,7 @@ export class Application {
 
             // Layer locked or hidden
             if (!currentLayer.editable) {
-                EditorTriggers.WrongAction.trigger(EditorWrongActionType.LOCKED_LAYER);
+                EditorTriggers.WrongAction.trigger({ type: EditorWrongActionType.LOCKED_LAYER });
                 return;
             }
 
@@ -132,7 +139,7 @@ export class Application {
             LayersWorker.uiLayer?.render();
         }, this.workspaceElement);
         this.workspaceElement.addEventListener("mouseout", ()=> {
-            this.setCursor("initial");
+            this.setCursor("default");
         });
 
         Mouse.onWheel(delta => {
@@ -144,28 +151,32 @@ export class Application {
             }
         })
         
+        setInterval(()=> {
+            LayersWorker.uiLayer?.render();
+        }, 24);
+        
         // Notify states listeners
-        EditorTriggers.Edit.trigger(true, "app");
-        HistoryWorker.save(HistoryItemType.LAYERS);
+        EditorTriggers.Edited.trigger(true, "app");
+        HistoryWorker.pushType(HistoryItemType.LAYERS);
         // EditorTriggers.History.trigger(HistoryItemType.LAYERS, "app");
     }
 
     layersListener(layers: Layer[]) {
         layers.map(layer => !layer.inited && layer.init())
-        EditorTriggers.Edit.trigger(true);
+        EditorTriggers.Edited.trigger(true);
     }
-    actionListener(action: IEditorAction) {
+    actionListener(action: IEditorActionTrigger) {
         switch (action.type) {
             case EditorActionType.CLEAR_LAYER_CANVAS:
                 LayersWorker.getLayer(action.targetId)?.clearCanvas();
-                EditorTriggers.Edit.trigger(true);
+                EditorTriggers.Edited.trigger(true);
                 break;
             case EditorActionType.DELETE_LAYER:
                 LayersWorker.deleteLayer(action.targetId);
                 break;
             case EditorActionType.CLEAR_SELECTION:
                 LayersWorker.getLayer(action.targetId)?.clearBySelection();
-                EditorTriggers.Edit.trigger(true);
+                EditorTriggers.Edited.trigger(true);
                 break;
         }
     }

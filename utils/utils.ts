@@ -14,6 +14,9 @@ export function capitalize(string: string): string {
 export function safeValue<T>(value: T | undefined | null, safe: T): T {
     return (value === undefined || value === null) ? safe : value;
 }
+export function isNull(value: any): boolean {
+    return value === null || value === undefined;
+}
 
 export function rgbToHex(rgba: RGBA): string {
     return "#" + converter.rgb.hex([rgba[0], rgba[1], rgba[2]]);

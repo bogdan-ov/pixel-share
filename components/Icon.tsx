@@ -37,6 +37,10 @@ export const icons = {
     "fill": <svg width="19" height="18" viewBox="0 0 19 18" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect x="1" y="9" width="12" height="12" rx="2" transform="rotate(-45 1 9)" stroke="currentColor" strokeWidth="2"/>
     </svg>,
+    "ellipse": <svg width="16" height="14" viewBox="0 0 16 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="13" cy="7" r="2" stroke="currentColor" strokeWidth="2"/>
+        <path d="M13 5.27557C12.2433 2.80236 9.90085 1 7.12844 1C3.7438 1 1 3.68629 1 7C1 10.3137 3.7438 13 7.12844 13C9.90085 13 12.2433 11.1976 13 8.72443" stroke="currentColor" strokeWidth="2"/>
+    </svg>,
 
     "add": <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M1 7C0.447715 7 0 7.44772 0 8C0 8.55228 0.447715 9 1 9V7ZM15 9C15.5523 9 16 8.55228 16 8C16 7.44772 15.5523 7 15 7V9ZM9 1C9 0.447715 8.55228 0 8 0C7.44772 0 7 0.447715 7 1H9ZM7 15C7 15.5523 7.44772 16 8 16C8.55228 16 9 15.5523 9 15H7ZM1 9H8V7H1V9ZM8 9H15V7H8V9ZM9 8V1H7V8H9ZM7 8V15H9V8H7Z" fill="currentColor"/>
@@ -77,16 +81,21 @@ export const icons = {
         <path d="M7 11V8.49509C7 7.96466 7.21071 7.45595 7.58579 7.08088L12.2525 2.41421C13.0335 1.63316 14.2998 1.63317 15.0809 2.41421L15.5858 2.91912C16.3668 3.70017 16.3668 4.9665 15.5858 5.74755L10.9191 10.4142C10.544 10.7893 10.0353 11 9.50491 11H7Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
         <path d="M10 15H3C1.89543 15 1 14.1046 1 13V9C1 7.89543 1.89543 7 3 7H4" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
     </svg>,
-    "grid-view": <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    "view-grid": <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect x="1" y="1" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="2"/>
         <rect x="1" y="10" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="2"/>
         <rect x="10" y="1" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="2"/>
         <rect x="10" y="10" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="2"/>
     </svg>,
-    "list-view": <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    "view-list": <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect x="1" y="1" width="14" height="5" rx="1" stroke="currentColor" strokeWidth="2"/>
         <rect x="1" y="10" width="14" height="5" rx="1" stroke="currentColor" strokeWidth="2"/>
     </svg>,
+    "view-short-list": <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="1" y="1" width="14" height="4" rx="1" stroke="currentColor" strokeWidth="2"/>
+        <path d="M15 13V14C15 14.5523 14.5523 15 14 15H2C1.44772 15 1 14.5523 1 14V13" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+        <path d="M15 8V9C15 9.55228 14.5523 10 14 10H2C1.44772 10 1 9.55228 1 9V8" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+    </svg>,    
     "arrow-down": <svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M1 1L7 7L13 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>,
@@ -103,10 +112,22 @@ export const icons = {
         <path d="M7 1V8M7 8L10 4.88889M7 8L4 4.88889" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
         <path d="M1 8V9C1 11.2091 2.79086 13 5 13H9C11.2091 13 13 11.2091 13 9V8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>,
-    "load": <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+    "open": <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M7 8V1M7 1L10 4.11111M7 1L4 4.11111" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
         <path d="M1 8V9C1 11.2091 2.79086 13 5 13H9C11.2091 13 13 11.2091 13 9V8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>     
+    </svg>,    
+    "undo": <svg width="14" height="12" viewBox="0 0 14 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0.999999 6L10 6C11.6569 6 13 7.34315 13 9L13 11M0.999999 6L6.33333 0.999999M0.999999 6L6.33333 11" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>,
+    "file": <svg width="15" height="16" viewBox="0 0 15 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M1 5C1 2.79086 2.79086 1 5 1H8.17157C8.70201 1 9.21071 1.21071 9.58579 1.58579L13.4142 5.41421C13.7893 5.78929 14 6.29799 14 6.82843V11C14 13.2091 12.2091 15 10 15H5C2.79086 15 1 13.2091 1 11V5Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
+        <path d="M8 1V5C8 6.10457 8.89543 7 10 7H14" stroke="currentColor" strokeWidth="2"/>
+    </svg>,
+    "file-export": <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8 15H5C2.79086 15 1 13.2091 1 11V5C1 2.79086 2.79086 1 5 1H8.17157C8.70201 1 9.21071 1.21071 9.58579 1.58579L11 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M8 1V4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+        <path d="M8 10H15M15 10L11.8889 7M15 10L11.8889 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>        
 };
 
 const Icon: React.FC<{ icon: keyof typeof icons }> = ({ icon })=>

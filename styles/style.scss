@@ -3,7 +3,7 @@
 
 $bg: #101013;
 $panel-bg: darken($bg, 2);
-$blue: #1C6DD0;
+$blue: #137dff;
 $red: #e71818;
 $grey: transparentize(#fff, .7);
 $dark-grey: transparentize(#fff, .9);
@@ -32,9 +32,12 @@ body {
 @import "./pages/welcome.scss";
 // Editor
 @import "./components/editor/editor.scss";
+
+@import "./components/editor/panels/panel.scss";
+@import "./components/editor/panels/palette-panel.scss";
+@import "./components/editor/panels/layers-panel.scss";
 @import "./components/editor/toolbar.scss";
-@import "./components/editor/palette.scss";
-@import "./components/editor/layers.scss";
+
 @import "./components/editor/notification.scss";
 @import "./components/editor/window.scss";
 @import "./components/editor/color-picker.scss";
@@ -42,6 +45,7 @@ body {
 @import "./components/editor/windows/tool-settings-popover.scss";
 @import "./components/editor/windows/export-image-window.scss";
 @import "./components/editor/timeline/animation-timeline.scss";
+@import "./components/editor/drop-down-menu.scss";
 
 .page {
     width: 100%;

@@ -117,20 +117,20 @@ export default class Layer {
             return;
         
         const size = props.size || 1;
+        const x = Math.floor(props.position.x);
+        const y = Math.floor(props.position.y);
         
         if (props.color == config.EMPTY_PIXEL_COLOR) {
             // Erase
             this.context.clearRect(
-                Math.floor(props.position.x),
-                Math.floor(props.position.y),
+                x, y,
                 size, size
             );
         } else {
             // Draw
             this.context.fillStyle = props.color;
             this.context.fillRect(
-                Math.floor(props.position.x),
-                Math.floor(props.position.y),
+                x, y,
                 size, size
             );
         }
@@ -166,9 +166,6 @@ export default class Layer {
         this.canvas.width = App.canvasWidth;
         this.canvas.height = App.canvasHeight;
     }
-    // removeDOM() {
-    //     this.canvas.remove();
-    // }
     toggleVisible(visible?: boolean) {
         this.visible = safeValue(visible, !this.visible);
         
@@ -238,5 +235,3 @@ export default class Layer {
 
     }
 }
-//
-// export 

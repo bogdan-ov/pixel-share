@@ -4,8 +4,8 @@ import Layer from "../../../editor/layers/Layer";
 import ActionWorker from "../../../editor/workers/ActionWorker";
 import LayersWorker from "../../../editor/workers/LayersWorker";
 import createClassName from "../../../src/hooks/createClassName";
-import { EditorWrongActionType, EditorActionType, EditorTriggers } from "../../../states/editor-states";
-import { ActionButton } from "../../buttons/Buttons";
+import { EditorWrongActionType, EditorActionType, EditorTriggers, EditorStates, IEditorWrongActionTrigger } from "../../../states/editor-states";
+import Button from "../../ui/buttons/Button";
 import Icon from "../../Icon";
 import RenamableText from "../../ui/inputs/RenamableText";
 import HistoryWorker, { HistoryItemType } from "../history/HistoryWorker";
@@ -32,28 +32,34 @@ const variants: Variants = {
 };
 
 const LayerComponent: React.FC<ILayerComponent> = props=> {
-    const [blob, setBlob] = useState<string>("");
     const animation = useAnimation();
+    const [blob, setBlob] = useState<string>("");
     const [pointerPressed, setPointerPressed] = useState<boolean>(false);
+    const [selected, setSelected] = useState<boolean>(false);
     
     const className = createClassName([
         "layer",
-        LayersWorker.layerIsCurrent(props.id) ? "active" : "",
+        LayersWorker.layerIsCurrent(props.id) && "active",
+        selected && "selected"
     ]);
     
     useEffect(()=> {
 
-        editListener();
-        const unlistenEdit = EditorTriggers.Edit.listen(editListener, `layer-component-edit-${ props.id }`);
+        editedListener();
+        const unlistenEdit = EditorTriggers.Edited.listen(editedListener, `layer-component-edited-${ props.id }`);
         const unlistenWrongAction = EditorTriggers.WrongAction.listen(wrongActionListener, `layer-component-wrong-action-${ props.id }`);
+        const unlistenContextIsActive = EditorStates.ContextMenuIsActive.listen(active=> {
+            if (!active)
+                setSelected(false);
+        })
         
         //
         createAnimation();
 
         return ()=> {
-            // unlistenAction();
             unlistenWrongAction();
             unlistenEdit();
+            unlistenContextIsActive();
         };
     }, []);
     useEffect(()=> {
@@ -90,13 +96,13 @@ const LayerComponent: React.FC<ILayerComponent> = props=> {
         else
             shakeAnimation();
     }
-    function wrongActionListener(wrongAction: EditorWrongActionType) {
+    function wrongActionListener(wrongAction: IEditorWrongActionTrigger) {
         // Cannot edit this layer
-        if (wrongAction == EditorWrongActionType.LOCKED_LAYER && LayersWorker.layerIsCurrent(props.id)) {
+        if (wrongAction.type == EditorWrongActionType.LOCKED_LAYER && LayersWorker.layerIsCurrent(props.id)) {
             shakeAnimation();
         }
     }
-    function editListener() {
+    function editedListener() {
         LayersWorker.getLayer(props.id)?.makeBlob()
             .then(res=> setBlob(res));
     }
@@ -105,18 +111,20 @@ const LayerComponent: React.FC<ILayerComponent> = props=> {
         LayersWorker.CurrentLayerId.value = props.id;
     }
     function onContextHandler(e: React.MouseEvent) {
+        setSelected(true);
+        
         EditorTriggers.ContextMenu.trigger({
             title: <div className="slot justify-between">
                 <span className="text-muted p-1">{ props.name }</span>
                 <div className="slot">
-                    <ActionButton 
+                    <Button
                         ghost
                         title="Move up"
                         size="small"
                         icon="small-arrow-up"
                         onClick={ ()=> moveHandler(-1) }
                     />
-                    <ActionButton 
+                    <Button 
                         ghost
                         title="Move down"
                         size="small"
@@ -158,7 +166,7 @@ const LayerComponent: React.FC<ILayerComponent> = props=> {
                     content: <span>Toggle visible</span>,
                     handler: ()=> toggleVisibleHandler(),
                 },
-            ]]
+            ]],
         });
     }
     function toggleVisibleHandler() {
@@ -168,7 +176,7 @@ const LayerComponent: React.FC<ILayerComponent> = props=> {
         LayersWorker.toggleLayerLock(props.id);
     }
     function renameHandler(newName: string) {
-        HistoryWorker.save(HistoryItemType.LAYERS);
+        HistoryWorker.pushType(HistoryItemType.LAYERS);
         // EditorTriggers.History.trigger(HistoryItemType.LAYERS, "layer-worker")
 
         LayersWorker.renameLayer(props.id, newName);

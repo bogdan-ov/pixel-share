@@ -4,7 +4,6 @@ import config from "../../utils/config";
 import { pointInsideArea, vec, Vector2 } from "../../utils/math";
 import App from "../App";
 import Keyboard from "../managers/Keyboard";
-import Mouse from "../managers/Mouse";
 import LayersWorker from "./LayersWorker";
 
 class SelectionWorker {
@@ -46,6 +45,10 @@ class SelectionWorker {
 
     init() {
         Keyboard.onKeyDown(e=> {
+            if (!this.selection.active) {
+                return;
+            }
+            
             if (e.code == "Enter" || e.code == "Escape") {
                 this.endMoveSelection();
             }
@@ -63,7 +66,19 @@ class SelectionWorker {
 
             LayersWorker.uiLayer?.render();
             LayersWorker.previewLayer?.render();
-        }, "selection-worker");
+        }, "selection-worker-key-down");
+        Keyboard.onKeyUpDown(e=> {
+            if (!this.selection.active) {
+                App.setCursor("default");
+                return;
+            }
+
+            if (Keyboard.isShift)
+                App.setCursor("move");
+            else
+                App.setCursor("default");
+            
+        }, "selection-worker-key-up-down");
     }
 
     // Selection
@@ -89,28 +104,6 @@ class SelectionWorker {
         
         sel.from = from.apply(Math.floor);
         sel.to = to.addNum(dir.x > 0 ? 1 : 0, dir.y > 0 ? 1 : 0).apply(Math.floor);
-        
-        if (sel.startTo.x < sel.startFrom.x) {
-            const f = sel.startFrom.x
-            sel.startFrom.x = sel.startTo.x;
-            sel.startTo.x = f;
-        }
-        if (sel.startTo.y < sel.startFrom.y) {
-            const f = sel.startFrom.y
-            sel.startFrom.y = sel.startTo.y;
-            sel.startTo.y = f;
-        }
-
-        if (dir.x < 0) {
-            const f = sel.from.x
-            sel.from.x = sel.to.x;
-            sel.to.x = f;
-        }
-        if (dir.y < 0) {
-            const f = sel.from.y
-            sel.from.y = sel.to.y;
-            sel.to.y = f;
-        }
         
         LayersWorker.uiLayer?.render();
     }
@@ -159,6 +152,16 @@ class SelectionWorker {
     }
     selectAll() {
         this.setSelection(vec(0, 0), vec(App.canvasWidth-1, App.canvasHeight-1));
+    }
+    getSelection(): SelectionWorker["selection"] | Pick<SelectionWorker["selection"], "from" | "to"> {
+        if (this.selection.active) {
+            return this.selection;
+        } else {
+            return {
+                from: vec(0, 0),
+                to: vec(App.canvasWidth, App.canvasHeight),
+            }
+        }
     }
 
     // Image data
@@ -250,8 +253,7 @@ class SelectionWorker {
     }
 
     pushToHistory() {
-        HistoryWorker.save(HistoryItemType.LAYERS);
-        // EditorTriggers.History.trigger(HistoryItemType.LAYERS, "selection-worker");
+        HistoryWorker.pushType(HistoryItemType.LAYERS);
     }
     pointInsideSelection(point: Vector2, allowBehind: boolean=false): boolean {
         return (!allowBehind && this.selection.active) ? pointInsideArea(point, this.selection.from, this.selection.width-1, this.selection.height-1) : true;

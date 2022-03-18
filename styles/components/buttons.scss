@@ -41,7 +41,7 @@
     &.active, &.color-blue {
         background: $blue;
         &:not(:disabled):hover {
-            background: lighten($blue, 8);
+            background: lighten($blue, 4);
         }
     }
 
@@ -57,6 +57,17 @@
         min-width: 34px;
         height: 34px;
     }
+    &.fit {
+        width: max-content;
+    }
+    &.fab {
+        width: 40px;
+        min-width: 40px;
+        height: 40px;
+        padding: 0;
+        border-radius: 50%;
+    }
+    
     &.p-0 {
         padding: 0;
     }

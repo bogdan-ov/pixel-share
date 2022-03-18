@@ -1,4 +1,5 @@
 import CheckerboardTool from "./drawing/CheckerboardTool";
+import EllipseTool from "./drawing/EllipseTool";
 import EraseTool from "./drawing/EraseTool";
 import FillTool from "./drawing/FillTool";
 import LineTool from "./drawing/LineTool";
@@ -11,6 +12,7 @@ export enum ToolType {
     ERASE,
     LINE,
     RECTANGLE,
+    ELLIPSE,
     FILL,
     SELECTION,
     CHECKERBOARD,
@@ -23,5 +25,6 @@ export default {
     [ToolType.SELECTION]: new SelectionTool(),
     [ToolType.FILL]: new FillTool(),
     [ToolType.RECTANGLE]: new RectangleTool(),
+    [ToolType.ELLIPSE]: new EllipseTool(),
     [ToolType.CHECKERBOARD]: new CheckerboardTool(),
 }

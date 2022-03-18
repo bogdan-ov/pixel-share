@@ -14,7 +14,7 @@ export default {
     MIN_TOOL_SIZE: 1,
 
     IMAGE_DATA_PREFIX: "<IMAGE_DATA>",
-    PROJECT_NAME_PREFIX: "pjt:",
+    PROJECT_NAME_PREFIX: "project:",
 
     MIN_PALETTE_COLORS: 3,
     MAX_PALETTE_COLORS: 56,

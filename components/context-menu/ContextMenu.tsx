@@ -1,10 +1,12 @@
 import React, { createRef, useEffect, useState } from "react";
-import ClickOutside from "../ui/ClickOutside";
+import ClickOutside from "../ui/utils/ClickOutside";
 import Icon, { icons } from "../Icon";
-import { EditorTriggers, IEditorContextMenuTrigger } from "../../states/editor-states";
+import { EditorStates, EditorTriggers, IEditorContextMenuTrigger } from "../../states/editor-states";
 import { vec } from "../../utils/math";
 import Keyboard from "../../editor/managers/Keyboard";
 import { HotkeysBuilder } from "../ui/Misc";
+import ActionWorker from "../../editor/workers/ActionWorker";
+import useStateListener from "../../src/hooks/useStateListener";
 
 interface IContextMenu {
     
@@ -17,12 +19,13 @@ export interface IContextMenuButton {
     icon?: keyof typeof icons
     disabled?: boolean
     handler?: ()=> void
+    actionName?: string
 }
 export type IContextMenuButtonsGroup = IContextMenuButton[]
 
 const ContextMenu: React.FC<IContextMenu> = ()=> {
     const ref = createRef<HTMLDivElement>();
-    const [active, setActive] = useState<boolean>(false);
+    const [active, activeState] = useStateListener(EditorStates.ContextMenuIsActive);
     const [buttonsGroups, setButtonsGroups] = useState<IContextMenuButtonsGroup[]>([]);
     const [title, setTitle] = useState<React.ReactElement>(<></>);
     const [minWidth, setMinWidth] = useState<number>(220);
@@ -30,25 +33,24 @@ const ContextMenu: React.FC<IContextMenu> = ()=> {
     const className = ["context-menu-wrapper", active ? "active" : ""].join(" ");
 
     useEffect(()=> {
-        const unlistenContext = EditorTriggers.ContextMenu.listen(action=> {
-            action.event.preventDefault();
-            setButtonsGroups(action.buttonsGroups);
-            setTitle(action.title || <></>);
-            const width = action.minWidth || 220;
+        const unlistenContext = EditorTriggers.ContextMenu.listen(context=> {
+            
+            context.event.preventDefault();
+            setButtonsGroups(context.buttonsGroups);
+            setTitle(context.title || <></>);
+            const width = context.minWidth || 220;
             setMinWidth(width);
             
-            setActive(true);
+            activeState.value = true;
             
-            place(action.event, width);
+            place(context.event, width);
         });
 
         return unlistenContext;
         
     }, [ref]);
     useEffect(()=>
-        Keyboard.onEscape(()=> {
-            setActive(false);
-        }),
+        Keyboard.onEscape(closeHandler),
     []);
 
     function place(e: IEditorContextMenuTrigger["event"], width?: number) {
@@ -70,18 +72,20 @@ const ContextMenu: React.FC<IContextMenu> = ()=> {
 
         node.style.left = pos.x + "px";
         node.style.top = pos.y + "px";
-
-        console.log(bounds.height);
+    }
+    function closeHandler() {
+        if (activeState.value)
+            activeState.value = false;
     }
     
     return (
         <ClickOutside
             ref={ ref }
-            onClickOutside={ ()=> setActive(false) }
+            onClickOutside={ closeHandler }
             className={ className }
         >
             <div
-                onContextMenu={ e=> { e.preventDefault(); setActive(false)} }
+                onContextMenu={ e=> { e.preventDefault(); closeHandler} }
                 className="context-menu flex flex-column gap-1"
                 style={ { minWidth } }
             >
@@ -91,7 +95,7 @@ const ContextMenu: React.FC<IContextMenu> = ()=> {
                     { buttonsGroups.map((group, gIndex)=> 
                         <div className="context-menu-buttons-group flex flex-column" key={ gIndex }>
                             { group.map((button, bIndex)=>
-                                <ContextMenuButton setActive={ setActive } key={ bIndex } { ...button } />
+                                <ContextMenuButton setActive={ v=> activeState.value = v } key={ bIndex } { ...button } />
                             ) }
                         </div>    
                     ) }
@@ -107,6 +111,7 @@ const ContextMenuButton: React.FC<IContextMenuButton & { setActive: (v: boolean)
         <button
             onClick={ ()=> {
                 props.handler && props.handler();
+                props.actionName && ActionWorker.registered[props.actionName]();
                 props.setActive(false);
             } }
             disabled={ props.disabled }
@@ -118,8 +123,8 @@ const ContextMenuButton: React.FC<IContextMenuButton & { setActive: (v: boolean)
             <div className="width-fill slot justify-between">
                 { props.content }
                 { props.sub && <span className="text-muted">{ props.sub }</span> }
-                { props.hotkeysName && <span className="text-muted">
-                    <HotkeysBuilder justText variants={ props.hotkeysName } />
+                { (props.hotkeysName || props.actionName) && <span className="text-muted">
+                    <HotkeysBuilder justText variants={ props.actionName || props.hotkeysName || "" } />
                 </span> }
             </div>
         </button>

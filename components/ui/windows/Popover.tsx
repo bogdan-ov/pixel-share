@@ -1,14 +1,12 @@
-import { motion, Variants } from "framer-motion";
 import React, { createRef, useEffect, useState } from "react";
 import Keyboard from "../../../editor/managers/Keyboard";
 import Mouse from "../../../editor/managers/Mouse";
 import createClassName from "../../../src/hooks/createClassName";
 import { EditorTriggers, EditorWindowType } from "../../../states/editor-states";
 import { vec } from "../../../utils/math";
-import { Keys, MyComponent } from "../../../utils/types";
-import { safeValue } from "../../../utils/utils";
+import { MyComponent } from "../../../utils/types";
 import Icon from "../../Icon";
-import ClickOutside from "../ClickOutside";
+import ClickOutside from "../utils/ClickOutside";
 
 interface IPopover {
     custom?: boolean

@@ -1,15 +1,11 @@
 import HistoryWorker from "../../components/editor/history/HistoryWorker";
-import { EditorActionType, EditorTriggers } from "../../states/editor-states";
-import config from "../../utils/config";
-import messages from "../../utils/messages";
-import { rgbToHex } from "../../utils/utils";
+import { EditorActionType, EditorTriggers, EditorWindowType } from "../../states/editor-states";
 import App from "../App";
-import Mouse from "../managers/Mouse";
 import Layer from "../layers/Layer";
 import { ToolType } from "../tools";
 import LayersWorker from "./LayersWorker";
-import PaletteWorker from "./PaletteWorker";
 import SelectionWorker from "./SelectionWorker";
+import ProjectWorker from "./ProjectWorker";
 
 class ActionWorker {
     registered: { [key: string]: Function }
@@ -23,6 +19,7 @@ class ActionWorker {
             "selection-switch":  ()=> App.CurrentToolType.value = ToolType.SELECTION,
             "line-switch":  ()=> App.CurrentToolType.value = ToolType.LINE,
             "rectangle-switch":  ()=> App.CurrentToolType.value = ToolType.RECTANGLE,
+            "ellipse-switch":  ()=> App.CurrentToolType.value = ToolType.ELLIPSE,
             "checkerboard-switch":  ()=> App.CurrentToolType.value = ToolType.CHECKERBOARD,
             
             // Layers
@@ -34,6 +31,11 @@ class ActionWorker {
             "select-all": ()=> SelectionWorker.selectAll(),
             "deselect-all": ()=> SelectionWorker.endMoveSelection(),
 
+            // Project
+            "export-image-trigger": ()=> EditorTriggers.Window.trigger({ type: EditorWindowType.EXPORT_IMAGE }),
+            "save-project": ()=> ProjectWorker.saveProject(),
+            "open-project": ()=> ProjectWorker.openProject(),
+            
             // Image data
             "copy-image-data": (layerId?: number)=> SelectionWorker.copyImageData(layerId),
             "paste-image-data": (layerId?: number)=> SelectionWorker.pasteImageData(layerId),

@@ -6,16 +6,18 @@ import Icon from "../../Icon";
 import config from "../../../utils/config";
 import { ViewMode } from "../../../utils/types";
 import PaletteWorker from "../../../editor/workers/PaletteWorker";
+import Panel, { SwitchViewModeButton } from "../../ui/panels/Panel";
+import createClassName from "../../../src/hooks/createClassName";
+import Button from "../../ui/buttons/Button";
 
 const PalettePanel: React.FC = ()=> {
     const [palette, paletteState] = useStateListener(PaletteWorker.Palette, "palette-panel-palette");
     const [viewMode, setViewMode] = useState<ViewMode>(ViewMode.LIST);
     useJustStatesListener([PaletteWorker.CurrentPaletteColorId], "palette-panel-just");
 
-    const className = [
-        "palette panel flex flex-column gap-2",
-        viewMode == ViewMode.LIST ? "list-view" : "grid-view"
-    ].join(" ");
+    const className = createClassName([
+        "palette-panel flex flex-column gap-2"
+    ]);
     
     function addHandler() {
         paletteState.set(v=> v.length < config.MAX_PALETTE_COLORS ? [
@@ -31,12 +33,17 @@ const PalettePanel: React.FC = ()=> {
     }
     
     return (
-        <div className={ className }>
+        <Panel className={ className } viewMode={ viewMode }>
 
             <header className="panel-header centered">
-                <button title={ viewMode == ViewMode.LIST ? "Switch to grid view" : "Switch to list view"} onClick={ toggleViewMode } className="button small ghost">
-                    <Icon icon={ viewMode == ViewMode.LIST ? "grid-view" : "list-view" } />
-                </button>
+                <SwitchViewModeButton
+                    viewMode={ viewMode }
+                    setViewMode={ setViewMode }
+                    rules={ {
+                        [ViewMode.GRID]: ViewMode.LIST,
+                        [ViewMode.LIST]: ViewMode.GRID,
+                    } }
+                />
             </header>
 
             <div className="palette-colors-list auto-borders ph-1">
@@ -50,12 +57,15 @@ const PalettePanel: React.FC = ()=> {
             </div>
 
             <footer className="ph-1 pb-1">
-                <button className="button color-transparent p-0 width-fill" onClick={ addHandler }>
-                    <Icon icon="add" />
-                </button>
+                <Button 
+                    className="p-0 width-fill"
+                    color="transparent"
+                    onClick={ addHandler }
+                    icon="add"
+                />
             </footer>
             
-        </div>
+        </Panel>
     );
 };
 

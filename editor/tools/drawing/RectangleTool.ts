@@ -23,8 +23,8 @@ export default class RectangleTool extends ShapeTool {
         if (!LayersWorker.currentLayer?.editable || !this.allowUse) return;
         
         const dir = vec(
-            this.shapeWidth == 0 ? 0 : (this.shapeWidth > 0 ? 1 : -1),
-            this.shapeHeight == 0 ? 0 : (this.shapeHeight > 0 ? 1 : -1)
+            this.shapeWidth <= 1 ? 0 : 1,
+            this.shapeHeight <= 1 ? 0 : 1
         );
 
         const rounded = this.RoundedCorners.value;
@@ -40,8 +40,8 @@ export default class RectangleTool extends ShapeTool {
         renderer.drawLine({
             ...line as Required<typeof line>,
             points: [
-                vec(this.start.x + +rounded*dir.x, this.start.y),
-                vec(this.end.x - +rounded*dir.x, this.start.y),
+                vec(this.from.x + +rounded*dir.x, this.from.y),
+                vec(this.to.x - +rounded*dir.x, this.from.y),
             ],
             clearPreview: true
         })
@@ -49,27 +49,27 @@ export default class RectangleTool extends ShapeTool {
         renderer.drawLine({
             ...line as Required<typeof line>,
             points: [
-                vec(this.end.x, this.start.y + +rounded*dir.y),
-                vec(this.end.x, this.end.y - +rounded*dir.y),
+                vec(this.to.x, this.from.y + +rounded*dir.y),
+                vec(this.to.x, this.to.y - +rounded*dir.y),
             ],
         })
         // Bottom
         renderer.drawLine({
             ...line as Required<typeof line>,
             points: [
-                vec(this.start.x + +rounded*dir.x, this.end.y),
-                vec(this.end.x - +rounded*dir.x, this.end.y),
+                vec(this.from.x + +rounded*dir.x, this.to.y),
+                vec(this.to.x - +rounded*dir.x, this.to.y),
             ],
         })
         // Left
         renderer.drawLine({
             ...line as Required<typeof line>,
             points: [
-                vec(this.start.x, this.start.y + +rounded*dir.y),
-                vec(this.start.x, this.end.y - +rounded*dir.y),
+                vec(this.from.x, this.from.y + +rounded*dir.y),
+                vec(this.from.x, this.to.y - +rounded*dir.y),
             ],
         })
 
-        EditorStates.HelperText.value = `W ${Math.abs(this.shapeWidth) + 1} H ${Math.abs(this.shapeHeight) + 1}`;
+        EditorStates.HelperText.value = `x ${ this.start.x }, y ${ this.start.y }<br>w ${ Math.abs(this.shapeWidth)+1 }, h ${ Math.abs(this.shapeHeight)+1 }`;
     }
 }

@@ -1,5 +1,5 @@
 import React, { createRef, useEffect, useMemo, useState } from "react";
-import { MyComponent } from "../../utils/types";
+import { MyComponent } from "../../../utils/types";
 
 interface IClickOutside {
     onClickOutside?: ()=> void

@@ -1,7 +1,7 @@
 $palette-width: 60px;
 $grid-size: 30px;
 
-.palette {
+.palette-panel {
     width: $palette-width;
     min-width: max-content;
     height: 100%;
@@ -72,7 +72,7 @@ $grid-size: 30px;
 
     //
 
-    &.grid-view {
+    &.view-grid {
         .palette-colors-list {
             display: grid;
             grid-template-columns: $grid-size $grid-size;
@@ -83,7 +83,7 @@ $grid-size: 30px;
             border-radius: $border-radius;
         }
     }
-    &.list-view .palette-colors-list {
+    &.view-list .palette-colors-list {
         display: grid;
         grid-template-columns: 44px;
         grid-template-rows: auto;

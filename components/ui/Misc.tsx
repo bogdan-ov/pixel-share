@@ -13,9 +13,11 @@ export const Key: React.FC<{ keys: string[] } & MyComponent> = props=> (
         capitalize(keyName)
     ).join("+") }</span>
 );
-export const HotkeysBuilder: React.FC<IHotkeysBuilder> = props=> {
-    const variants: string[] = typeof props.variants == "string" ? HotkeysWorker.keysBinds[props.variants].variants : props.variants;
+export const HotkeysBuilder: React.FC<IHotkeysBuilder & MyComponent> = props=> {
+    const variants: string[] = typeof props.variants == "string" ? HotkeysWorker.keysBinds[props.variants]?.variants || null : props.variants;
     
+    if (!variants)
+        return <></>;
     return <>{
         variants.map((variant, i)=> {
             const text = variant.split("+").map(key=> {
@@ -24,8 +26,8 @@ export const HotkeysBuilder: React.FC<IHotkeysBuilder> = props=> {
             }).join("+");
             
             if (props.justText)
-                return text;
-            return <Key key={ i } keys={ [ text ] } />
+                return <span key={ i } style={ props.style } className={ props.className }>{ text }</span>;
+            return <Key style={ props.style } className={ props.className } key={ i } keys={ [ text ] } />
         })
     }</>;
 };

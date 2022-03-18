@@ -61,7 +61,7 @@ export default class SelectionTool extends ShapeTool {
             LayersWorker.previewLayer?.render();
         } else {
             // Select area
-            SelectionWorker.setSelection(this.start, this.end);
+            SelectionWorker.setSelection(this.from, this.to);
             
             const sel = SelectionWorker.selection;
             EditorStates.HelperText.value = `x ${ sel.from.x }, y ${ sel.from.y }<br>w ${ Math.abs(sel.width) }, h ${ Math.abs(sel.height) }`;
@@ -71,10 +71,5 @@ export default class SelectionTool extends ShapeTool {
     onMove(renderer: Renderer): void {
         super.onMove(renderer);
 
-        if (Keyboard.isShift) {
-            App.setCursor("grab")
-        } else {
-            App.setCursor("initial");
-        }
     }
 }

@@ -1,9 +1,9 @@
 import React, { createRef, useEffect, useState } from "react";
-import { vec, Vector2 } from "../../utils/math";
-import { HSLA } from "../../utils/types";
-import { hexToHsl, hslaToString, hslToHex } from "../../utils/utils";
-import Input from "./inputs/Input";
-import Tooltip from "./windows/Tooltip";
+import { vec, Vector2 } from "../../../utils/math";
+import { HSLA } from "../../../utils/types";
+import { hexToHsl, hslaToString, hslToHex } from "../../../utils/utils";
+import Input from "../inputs/Input";
+import Tooltip from "../windows/Tooltip";
 
 interface IColorPicker {
     newColor: HSLA

@@ -2,6 +2,7 @@ import { ToolType } from ".";
 import { EditorStates, EditorTriggers } from "../../states/editor-states";
 import App from "../App";
 import { Renderer } from "../renderer/Renderer";
+import LayersWorker from "../workers/LayersWorker";
 
 export default class Tool {
     type: ToolType
@@ -49,7 +50,7 @@ export default class Tool {
         if (EditorStates.MovingSelection.value && !this.allowUseWhenMoveSelection) {
             App.setCursor("not-allowed");
         } else {
-            App.setCursor("initial");
+            App.setCursor("default");
         }
     }
     onEndDraw(renderer: Renderer) {
@@ -57,7 +58,7 @@ export default class Tool {
             renderer.updatePreview();
         
         EditorStates.IsDrawing.value = false;
-        EditorTriggers.Edit.trigger(true);
+        EditorTriggers.Edited.trigger(true);
 
         this.isUsing = false;
     }

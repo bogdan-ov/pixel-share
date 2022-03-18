@@ -1,8 +1,13 @@
 import React, { RefObject } from "react";
 import { IContextMenuButtonsGroup } from "../components/context-menu/ContextMenu";
+import { HistoryItemType } from "../components/editor/history/HistoryWorker";
 import { INotification } from "../components/editor/notification/Notification";
 import { state, trigger } from "./State";
 
+export enum EditorEditedType {
+    NONE,
+    UNDO
+}
 export enum EditorWrongActionType {
     LOCKED_LAYER
 }
@@ -11,14 +16,10 @@ export enum EditorActionType {
     DELETE_LAYER,
     CLEAR_LAYER_CANVAS,
     CLEAR_SELECTION,
+
     COPY_IMAGE_DATA,
     PASTE_IMAGE_DATA,
     CUT_IMAGE_DATA,
-    UNDO
-}
-export interface IEditorAction {
-    targetId: number
-    type: EditorActionType
 }
 export enum EditorWindowType {
     TEST_WINDOW,
@@ -28,6 +29,9 @@ export enum EditorWindowType {
     EXPORT_IMAGE
 }
 
+export interface IEditorEditedTrigger {
+    type: EditorEditedType
+}
 export interface IEditorWindowTrigger {
     type: EditorWindowType
     targetId?: number
@@ -36,19 +40,34 @@ export interface IEditorWindowTrigger {
 export interface IEditorContextMenuTrigger {
     event: MouseEvent | PointerEvent | React.MouseEvent
     buttonsGroups: IContextMenuButtonsGroup[]
+    
     title?: React.ReactElement
     minWidth?: number
+    onClose?: ()=> void
+}
+export interface IEditorActionTrigger {
+    type: EditorActionType
+    targetId?: number
+}
+export interface IEditorWrongActionTrigger {
+    type: EditorWrongActionType
 }
 
 export const EditorTriggers = {
-    Edit: trigger<boolean>("editor-edit"),
+    // Was done
+    Edited: trigger<IEditorEditedTrigger | true>("editor-edited"),
 
+    // To call notification
     Notification: trigger<Omit<INotification, "id">>("editor-notification"),
+    // To call window
     Window: trigger<IEditorWindowTrigger>("editor-window"),
+    // To call context menu
     ContextMenu: trigger<IEditorContextMenuTrigger>("editor-context-menu"),
 
-    WrongAction: trigger<EditorWrongActionType>("editor-wrong-action"),
-    Action: trigger<IEditorAction>("editor-action"),
+    // Was wrong...
+    WrongAction: trigger<IEditorWrongActionTrigger>("editor-wrong-action"),
+    // Will be done
+    Action: trigger<IEditorActionTrigger>("editor-action"),
 
     // History: trigger<HistoryItemType>("editor-history-trigger"),
 }
@@ -57,5 +76,6 @@ export const EditorStates = {
 
     InputIsFocused: state<boolean>(false, "editor-input-focused"),
     IsDrawing: state<boolean>(false, "editor-is-drawing"),
-    MovingSelection: state<boolean>(false, "editor-moving-selection")
+    MovingSelection: state<boolean>(false, "editor-moving-selection"),
+    ContextMenuIsActive: state<boolean>(false, "editor-context-menu-is-active")
 }

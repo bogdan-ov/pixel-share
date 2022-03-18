@@ -1,8 +1,7 @@
 import Layer from "../../../editor/layers/Layer";
-import PaletteColor from "../../../editor/renderer/PaletteColor";
 import LayersWorker from "../../../editor/workers/LayersWorker";
 import PaletteWorker from "../../../editor/workers/PaletteWorker";
-import { EditorActionType, EditorStates, EditorTriggers } from "../../../states/editor-states";
+import { EditorEditedType, EditorStates, EditorTriggers } from "../../../states/editor-states";
 import config from "../../../utils/config";
 import { HSLA } from "../../../utils/types";
 
@@ -33,10 +32,7 @@ class HistoryWorker {
     }
 
     init() {
-        // EditorTriggers.History.listen((type, from)=> {
-            
-            
-        // }, "history");
+        
     }
     
     undo() {
@@ -48,11 +44,6 @@ class HistoryWorker {
             config.DEBUG && console.error("Last history items doesn't exit!");
             return;
         }
-
-        EditorTriggers.Action.trigger({
-            targetId: 0,
-            type: EditorActionType.UNDO
-        }, "history");
 
         for (const item of lastHistoryItems) {
             switch (item.type) {
@@ -81,30 +72,16 @@ class HistoryWorker {
                     
                     break;
 
-                // Palette
-                // case HistoryItemType.PALETTE:
-                //     const data: IPaletteColorData[] = item.data;
-
-                //     const newPalette = [];
-
-                //     for (const paletteColor of data) {
-                //         const newPaletteColor = new PaletteColor(paletteColor.id, paletteColor.hslaColor);
-
-                //         PaletteWorker.
-                //     }
-                //     // PaletteWorker.Palette.value = item.data;
-                    
-                //     break;
-
-
             }
         }
 
         this.history.pop();
-        EditorTriggers.Edit.trigger(true);
+        EditorTriggers.Edited.trigger({
+            type: EditorEditedType.UNDO
+        }, "history");
     }
 
-    save(type: HistoryItemType) {
+    pushType(type: HistoryItemType) {
         switch (type) {
 
             // Layers

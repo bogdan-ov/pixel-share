@@ -9,24 +9,30 @@ import Tool from "../Tool";
 export default class ShapeTool extends Tool {
     from: Vector2
     start: Vector2
-    end: Vector2
+    to: Vector2
+    dir: Vector2
     shapeWidth: number
     shapeHeight: number
 
     drawFromCenter: boolean
     aspectRatio: boolean
+
+    allowNormalize: boolean
     
     constructor(type: ToolType) {
         super(type);
 
         this.from = vec();
+        this.to = vec();
         this.start = vec();
-        this.end = vec();
+        this.dir = vec();
         this.shapeWidth = 0;
         this.shapeHeight = 0;
 
         this.drawFromCenter = false;
         this.aspectRatio = false;
+
+        this.allowNormalize = true;
     }
 
     onStartDraw(renderer: Renderer): void {
@@ -38,7 +44,7 @@ export default class ShapeTool extends Tool {
         this.drawFromCenter = Keyboard.isCtrl;
         this.aspectRatio = Keyboard.isShift;
         
-        this.from.copy(Mouse.startPos);
+        this.start = Mouse.startPos.expand();
 
         if (this.aspectRatio) {
             // Save aspect ratio
@@ -53,20 +59,24 @@ export default class ShapeTool extends Tool {
                 Math.abs(y)
             );
 
-            this.end.copy(vec(max * dir.x, max * dir.y).add(Mouse.startPos));
+            this.to.copy(vec(max * dir.x, max * dir.y).add(Mouse.startPos));
         } else
             // Not
-            this.end.copy(Mouse.pos);
+            this.to.copy(Mouse.pos);
 
         if (this.drawFromCenter) {
             // Draw from center
-            this.start.copy(this.from.add(this.from.sub(this.end)));
+            this.from.copy(this.start.sub(this.to.sub(this.start)));
         } else
             // Normal draw
-            this.start.copy(this.from);
+            this.from.copy(this.start);
 
-        const width = (this.end.x - this.start.x)
-        const height = (this.end.y - this.start.y);
+        // Normalize
+        if (this.allowNormalize)
+            this.normalize();
+        
+        const width = (this.to.x - this.from.x)
+        const height = (this.to.y - this.from.y);
         this.shapeWidth = width;
         this.shapeHeight = height;
     }
@@ -75,5 +85,29 @@ export default class ShapeTool extends Tool {
 
         this.aspectRatio = false;
         this.drawFromCenter = false;
+    }
+
+    private normalize() {
+        this.dir = vec(
+            this.from.x < this.to.x ? 1 : -1,
+            this.from.y < this.to.y ? 1 : -1
+        );
+            
+        if (this.dir.x < 0) {
+            const f = this.from.x
+            this.from.x = this.to.x;
+            this.to.x = f;
+        } else {
+            this.from.x = this.from.x;
+            this.to.x = this.to.x;
+        }
+        if (this.dir.y < 0) {
+            const f = this.from.y
+            this.from.y = this.to.y;
+            this.to.y = f;
+        } else {
+            this.from.y = this.from.y;
+            this.to.y = this.to.y;
+        }
     }
 }

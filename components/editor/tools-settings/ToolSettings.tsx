@@ -30,8 +30,6 @@ const ToolSettings: React.FC = (()=> {
                 />
                 <Settings currentToolType={ currentToolType } />
             </main>
-
-            <Menubar />
             
         </header>
     );

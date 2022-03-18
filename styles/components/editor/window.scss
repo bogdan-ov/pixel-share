@@ -85,22 +85,25 @@ $tooltip-scale: .8;
         height: 100%;
         border-radius: inherit;
     }
+    .tooltip-pos {
+        z-index: 888;
+    
+        position: fixed;
+        left: 0;
+        top: 0;
+
+        pointer-events: none;
+    }
     .tooltip {
         width: max-content;
         padding: 10px 15px;
-
-        position: absolute;
-        left: 0;
-        top: 0;
-        z-index: 888;
-        
+    
         background: lighten($bg, 3);
         border-radius: $border-radius;
         box-shadow: 0 12px 25px -8px rgba(0,0,0, .4);
         opacity: 0;
 
         transition: .05s;
-        pointer-events: none;
         
         &::after {
             content: "";
@@ -114,69 +117,79 @@ $tooltip-scale: .8;
             transform: translate(-50%, -50%) rotate(45deg);
             
             background: inherit;
-            border-radius: 2px;
+        }
+        &.color-blue {
+            background: $blue;
+            .key {
+                background: rgba(255, 255, 255, .2);
+                color: rgba(255, 255, 255, .8);
+            }
+            .text-muted {
+                color: rgba(255, 255, 255, .6) !important;
+            }
         }
     }
 
     &[data-placement="right"] {
         .tooltip {
-            left: 100%;
-            top: 50%;
-            transform: translate(0, calc(-50% + $tooltip-translate)) scale($tooltip-scale);
+            transform: translate(0, calc($tooltip-translate)) scale($tooltip-scale);
 
             &::after {
                 left: 0;
                 top: 50%;
+                border-bottom-left-radius: 2px;
             }
         }
         &:not(:active):hover .tooltip {
-            transform: translate(0, -50%) scale(1);
+            transform: translate(0, 0) scale(1);
         }
     }
     &[data-placement="left"] {
+        .tooltip-pos {
+            transform: translate(-100%, 0);
+        }
         .tooltip {
-            left: initial;
-            right: 100%;
-            top: 50%;
-            transform: translate(0, calc(-50% + $tooltip-translate)) scale($tooltip-scale);
+            transform: translate(0, calc($tooltip-translate)) scale($tooltip-scale);
             
             &::after {
                 left: 100%;
                 top: 50%;
+                border-top-right-radius: 2px;
             }
         }
         &:not(:active):hover .tooltip {
-            transform: translate(0, -50%) scale(1);
+            transform: translate(0, 0) scale(1);
         }
     }
     &[data-placement="top"] {
+        .tooltip-pos {
+            transform: translate(0, -100%);
+        }
         .tooltip {
-            left: 50%;
-            top: 0;
-            transform: translate(-50%, calc(-100% + $tooltip-translate)) scale($tooltip-scale);
+            transform: translate(0, calc($tooltip-translate)) scale($tooltip-scale);
 
             &::after {
                 left: 50%;
                 top: 100%;
+                border-bottom-right-radius: 2px;
             }
         }
         &:not(:active):hover .tooltip {
-            transform: translate(-50%, calc(-100%)) scale(1);
+            transform: translate(0, 0) scale(1);
         }
     }
     &[data-placement="bottom"] {
         .tooltip {
-            left: 50%;
-            top: 100%;
-            transform: translate(-50%, calc($tooltip-translate)) scale($tooltip-scale);
+            transform: translate(0, $tooltip-translate) scale($tooltip-scale);
 
             &::after {
                 left: 50%;
                 top: 0;
+                border-top-left-radius: 2px;
             }
         }
         &:not(:active):hover .tooltip {
-            transform: translate(-50%, 0) scale(1);
+            transform: translate(0, 0) scale(1);
         }
     }
 }

@@ -144,7 +144,7 @@ class PaletteWorker {
     }
 
     pushToHistory() {
-        HistoryWorker.save(HistoryItemType.PALETTE);
+        HistoryWorker.pushType(HistoryItemType.PALETTE);
     }
 }
 

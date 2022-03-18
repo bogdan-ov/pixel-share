@@ -1,18 +1,19 @@
-import { motion, useAnimation } from "framer-motion";
-import React, { useEffect } from "react";
+import React from "react";
 import App from "../../../editor/App";
 import ActionWorker from "../../../editor/workers/ActionWorker";
 import ProjectWorker from "../../../editor/workers/ProjectWorker";
-import { EditorActionType, EditorTriggers, EditorWindowType } from "../../../states/editor-states";
-import Icon, { icons } from "../../Icon";
-import Tooltip from "../../ui/windows/Tooltip";
+import { EditorTriggers, EditorWindowType } from "../../../states/editor-states";
+import { IContextMenuButtonsGroup } from "../../context-menu/ContextMenu";
 
 interface IMenubarButton {
-    icon: keyof typeof icons
-    onClick: ()=> void
-    tooltip: React.ReactElement
+    title: string
+    contextButtonsGroups: IContextMenuButtonsGroup[]
+    
+    // icon: keyof typeof icons
+    // onClick: ()=> void
+    // tooltip?: React.ReactElement
 
-    trigger?: EditorActionType
+    // trigger?: EditorActionType
 };
 
 const Menubar: React.FC = React.memo(()=> {
@@ -27,7 +28,7 @@ const Menubar: React.FC = React.memo(()=> {
     }
 
     function loadProjectHandler() {
-        ProjectWorker.loadProject();
+        ProjectWorker.openProject();
     }
     function saveProjectHandler() {
         ProjectWorker.saveProject();
@@ -54,37 +55,63 @@ const Menubar: React.FC = React.memo(()=> {
 
             <div className="menubar-buttons slot height-fill gap-1">
 
-                {/* // ? Resize canvas */}
+                <MenubarButton
+                    title="Project"
+                    contextButtonsGroups={ [[
+                        {
+                            content: "Save",
+                            icon: "save",
+                            actionName: "save-project",
+                        },
+                        {
+                            content: "Open",
+                            icon: "open",
+                            actionName: "open-project"
+                        },
+                    ]] }
+                />
+                <MenubarButton
+                    title="Edit"
+                    contextButtonsGroups={ [[
+                        {
+                            content: "Undo",
+                            icon: "undo",
+                            actionName: "undo",
+                        }
+                    ]] }
+                />
+
+                {/* // ? Resize canvas
                 <MenubarButton
                     icon="rectangle"
                     tooltip={ <span>Resize canvas</span> }
                     onClick={ resizeCanvas }
                 />
-                {/* // ? Open project */}
+                // ? Open project
                 <MenubarButton
                     icon="load"
                     tooltip={ <span>Load project</span> }
                     onClick={ loadProjectHandler }
                 />
-                {/* // ? Save project */}
+                // ? Save project
                 <MenubarButton
                     icon="save"
                     tooltip={ <span>Save project</span> }
                     onClick={ saveProjectHandler }
                 />
-                {/* // ? Undo */}
+                // ? Undo
                 <MenubarButton
                     icon="cross"
                     tooltip={ <span>Undo</span> }
                     onClick={ undoHandler }
                     trigger={ EditorActionType.UNDO }
                 />
-                {/* // ? Export */}
+                // ? Export
                 <MenubarButton
                     icon="checkmark"
                     tooltip={ <span>Export PNG</span> }
                     onClick={ pngExportHandler }
-                />
+                /> */}
 
             </div>
 
@@ -94,45 +121,41 @@ const Menubar: React.FC = React.memo(()=> {
 
 const MenubarButton: React.FC<IMenubarButton> = props=> {
 
-    const controls = useAnimation();
+    // const controls = useAnimation();
 
-    useEffect(()=> {
-        if (!props.trigger) return;
+    // useEffect(()=> {
+    //     if (!props.trigger) return;
 
-        EditorTriggers.Action.listen(action=> {
+    //     EditorTriggers.Action.listen(action=> {
             
-            if (action.type == props.trigger)
-                controls.start({
-                    y: [0, -2, 1, 0],
-                    transition: {
-                        ease: "easeInOut",
-                        duration: .3
-                    }
-                });
+    //         if (action.type == props.trigger)
+    //             controls.start({
+    //                 y: [0, -2, 1, 0],
+    //                 transition: {
+    //                     ease: "easeInOut",
+    //                     duration: .3
+    //                 }
+    //             });
 
-        });
+    //     });
         
-    }, []);
+    // }, []);
+
+    function onClickHandler(e: React.MouseEvent) {
+        EditorTriggers.ContextMenu.trigger({
+            title: <span className="text-muted p-1">{ props.title }</span>,
+            event: e,
+            buttonsGroups: props.contextButtonsGroups
+        });
+    }
     
     return (
-        <Tooltip
-            placement="bottom"
-            tooltip={ props.tooltip }
+        <button
+            onClick={ onClickHandler }
+            className="menubar-button button color-transparent"
         >
-
-            <motion.div
-                initial={ { y: 0 } }
-                animate={ controls }
-            >
-                <button
-                    onClick={ props.onClick }
-                    className="menubar-button button ghost middle"
-                >
-                    <Icon icon={ props.icon } />
-                </button>
-            </motion.div>
-
-        </Tooltip>
+            { props.children || props.title }
+        </button>
     );
 };
 

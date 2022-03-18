@@ -1,10 +1,19 @@
+.text-blue {
+    color: $blue !important;
+}
+// .text-muted {
+//     color: rgb(124, 124, 124) !important;
+// }
 .text-muted {
-    color: rgba(255, 255, 255, .4);
+    color: $grey !important;
+}
+.icon-muted {
+    color: rgb(124, 124, 124) !important;
 }
 .text-center {
     text-align: center;
 }
-.font-500 {
+.fw-500 {
     font-weight: 500;
 }
 .fs-medium {
@@ -15,6 +24,11 @@
 }
 .no-wrap {
     white-space: nowrap;
+}
+
+.link {
+    text-decoration: none;
+    color: inherit;
 }
 
 label {

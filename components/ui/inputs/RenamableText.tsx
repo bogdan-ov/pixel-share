@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import Keyboard from "../../../editor/managers/Keyboard";
-import { EditorStates, EditorTriggers, IEditorAction } from "../../../states/editor-states";
+import { EditorStates, EditorTriggers, IEditorActionTrigger } from "../../../states/editor-states";
 
 interface IRenamableText {
     value: string
     onSubmit: (value: string)=> void
-    allow: (action: IEditorAction)=> boolean 
+    allow: (action: IEditorActionTrigger)=> boolean 
     
     maxLength?: number
     onEdit?: ()=> void
@@ -21,7 +21,7 @@ const RenamableText: React.FC<IRenamableText> = props=> {
                 setIsRenaming(true);
         });
         const unlistenKeyboard = Keyboard.onEscape(()=> {
-            setIsRenaming(false);
+            closeHandler()
         });
 
         return ()=> {
@@ -41,11 +41,14 @@ const RenamableText: React.FC<IRenamableText> = props=> {
         const result = newName.trim();
         props.onSubmit(result ? result : props.value);
 
-        setIsRenaming(false);
-        EditorStates.InputIsFocused.value = false;
+        closeHandler()
     }
     function onFocusHandler() {
         EditorStates.InputIsFocused.value = true;
+    }
+    function closeHandler() {
+        setIsRenaming(false);
+        EditorStates.InputIsFocused.value = false;
     }
 
     return isRenaming ? (

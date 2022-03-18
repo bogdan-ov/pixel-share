@@ -4,6 +4,7 @@ import { vec, Vector2 } from "../../../utils/math";
 import { RGBA } from "../../../utils/types";
 import { hslaToString, rgbToHex } from "../../../utils/utils";
 import App from "../../App";
+import Keyboard from "../../managers/Keyboard";
 import Mouse from "../../managers/Mouse";
 import { Renderer } from "../../renderer/Renderer";
 import LayersWorker from "../../workers/LayersWorker";
@@ -22,6 +23,21 @@ export default class FillTool extends PickerTool {
         const currentLayer = LayersWorker.currentLayer;
         if (!currentLayer?.editable || !this.allowUse) return;
 
+        if (Keyboard.isShift) {
+            // Fill all selection
+            const sel = SelectionWorker.getSelection();
+            const curLayer = LayersWorker.currentLayer;
+            if (!curLayer) return;
+
+            curLayer.context.fillStyle = PaletteWorker.currentPaletteColor.hexColor;
+            curLayer.context.fillRect(sel.from.x, sel.from.y, sel.to.x - sel.from.x, sel.to.y - sel.from.y)
+            
+            EditorStates.HelperText.value = "Full filled!";
+            
+            return;
+        }
+        // Normal selection
+
         EditorStates.HelperText.value = "Filling...";
 
         const canvasWidth = App.canvasWidth;
@@ -30,8 +46,6 @@ export default class FillTool extends PickerTool {
         const imageData = currentLayer.context.getImageData(0, 0, canvasWidth, canvasHeight);
         const startPixelPos = Mouse.pos.expand();
         const startPixelColor = pickColorAt(startPixelPos.toIndex(canvasWidth));
-
-        console.log(startPixelColor);
 
         const startFillingDate = Date.now();
 
@@ -80,8 +94,7 @@ export default class FillTool extends PickerTool {
         }
         function stop() {
             EditorStates.HelperText.value = `Filled in ${ Date.now() - startFillingDate }ms`;
-            EditorTriggers.Edit.trigger(true);
-            // clearInterval(inter);
+            EditorTriggers.Edited.trigger(true);
         }
 
         const queue: Vector2[] = [startPixelPos.expand()];
@@ -89,10 +102,6 @@ export default class FillTool extends PickerTool {
         let i = 0;
 
         while (queue.length > 0 && i < imageData.data.length) {
-            // const inter = setInterval(()=> {
-            // if (queue.length <= 0)
-            //     stop();
-
             const currentPos = queue[queue.length - 1];
             if (!currentPos) {
                 stop();
@@ -107,7 +116,6 @@ export default class FillTool extends PickerTool {
 
             i++;
         }
-        // }, 10)
         stop();
 
     }
