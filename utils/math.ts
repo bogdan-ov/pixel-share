@@ -89,7 +89,7 @@ export function random(min: number, max: number): number {
     return Math.random() * (max - min) + min;
 }
 export function randomInt(min: number, max: number): number {
-    return Math.round(random(min, max));
+    return Math.floor(random(min, max));
 }
 export function randomId(): string {
     return `${ randomInt(0, 9) }${ randomInt(0, 9) }${ randomInt(0, 9) }${ randomInt(0, 9) }`;

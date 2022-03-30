@@ -14,13 +14,12 @@ export default class RectangleTool extends ShapeTool {
     constructor() {
         super(ToolType.RECTANGLE);
 
-        this.resizable = true;
         this.RoundedCorners = state<boolean>(false, "rectangle-tool-rounded-corners");
     }
 
     onDraw(renderer: Renderer): void {
         super.onDraw(renderer);
-        if (!LayersWorker.currentLayer?.editable || !this.allowUse) return;
+        if (!this.canBeUsed) return;
         
         const dir = vec(
             this.shapeWidth <= 1 ? 0 : 1,

@@ -32,10 +32,10 @@ export default class State<T = any> {
             this.notify();
     }
 
-    listen(listener: State<T>["listeners"][1], customId?: string) {
+    listen(listener: State<T>["listeners"][1], customId?: string, overwrite?: boolean) {
         const id = createId(this.key, customId);
 
-        if (!this.listeners[id]) {
+        if (overwrite ? true : !this.listeners[id]) {
             this.listeners[id] = listener;
         } else
             config.DEBUG && console.error("This id is already used! (State)", id);
@@ -44,7 +44,7 @@ export default class State<T = any> {
     }
     unlisten(id: string) {
         delete this.listeners[id];
-        // config.DEBUG && console.log(id, "State unlisten!");
+        config.DEBUG && console.log(id, "State unlisten!");
     }
 
     notify() {
@@ -53,7 +53,7 @@ export default class State<T = any> {
             this.listeners[keys[i]](this._value)
         }
 
-        config.DEBUG && console.log(`State "${ this.key }" notify all!`);
+        config.DEBUG && config.LOG_STATES && console.log(`🟢 State "${ this.key }" notify all! ${ keys.length } listeners`);
     }
 }
 export class Trigger<T = any, A = any> {
@@ -73,7 +73,7 @@ export class Trigger<T = any, A = any> {
         if (!this.listeners[id]) {
             this.listeners[id] = listener;
         } else
-            console.error("This id is already used! (Trigger)", id);
+            config.DEBUG && console.error("This id is already used! (Trigger)", id);
 
         return () => this.unlisten(id);
     }
@@ -82,14 +82,18 @@ export class Trigger<T = any, A = any> {
     }
 
     trigger(value: T, from?: string) {
+        const start = Date.now();
+        
         const keys = Object.keys(this.listeners);
         for (let i = 0; i < keys.length; i++) {
             const listener = this.listeners[keys[i]];
             if (listener)
                 listener(value, from || "");
             else
-                config.DEBUG && console.error(`Cannot find listener! "${ keys[i] }"`);
+                config.DEBUG && console.error(`Cannot find listener! "${ keys[i] }" (Trigger)`);
         }
+
+        config.DEBUG && config.LOG_TRIGGERS && console.log(`🔵 Trigger "${ this.key }" notified all in ${ Date.now() - start }ms! ${ keys.length } listeners`);
     }
 }
 

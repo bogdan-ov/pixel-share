@@ -1,32 +1,42 @@
 import React, { RefObject } from "react";
-import { IContextMenuButtonsGroup } from "../components/context-menu/ContextMenu";
-import { HistoryItemType } from "../components/editor/history/HistoryWorker";
 import { INotification } from "../components/editor/notification/Notification";
+import { IDropdownMenuButtonsGroup } from "../components/ui/windows/DropdownMenu";
 import { state, trigger } from "./State";
 
 export enum EditorEditedType {
     NONE,
-    UNDO
+    UNDO,
+    REDO,
+    CANVAS_RESIZED,
+    LAYERS_EDITED,
+    PALETTE_EDITED
 }
 export enum EditorWrongActionType {
-    LOCKED_LAYER
+    UNEDITABLE_LAYER
 }
 export enum EditorActionType {
+    ADD_LAYER,
     RENAME_LAYER,
     DELETE_LAYER,
+    DUPLICATE_LAYER,
     CLEAR_LAYER_CANVAS,
     CLEAR_SELECTION,
+    MERGE_VISIBLE_LAYERS,
 
     COPY_IMAGE_DATA,
     PASTE_IMAGE_DATA,
     CUT_IMAGE_DATA,
 }
 export enum EditorWindowType {
-    TEST_WINDOW,
+    COLOR_PICKER_POPOVER,
+    TOOL_SETTINGS_POPOVER,
+    EXPORT_IMAGE_WINDOW,
+    RESIZE_CANVAS_WINDOW,
 
-    EDIT_COLOR,
-    TOOL_SETTINGS,
-    EXPORT_IMAGE
+    GRID_CONFIG_WINDOW,
+
+    OPEN_PROJECT_WINDOW,
+    SAVE_PROJECT_WINDOW
 }
 
 export interface IEditorEditedTrigger {
@@ -38,10 +48,11 @@ export interface IEditorWindowTrigger {
     targetRef?: RefObject<HTMLDivElement>
 }
 export interface IEditorContextMenuTrigger {
+    targetId?: number
     event: MouseEvent | PointerEvent | React.MouseEvent
-    buttonsGroups: IContextMenuButtonsGroup[]
+    buttonsGroups: IDropdownMenuButtonsGroup[]
     
-    title?: React.ReactElement
+    header?: React.ReactElement
     minWidth?: number
     onClose?: ()=> void
 }
@@ -73,6 +84,7 @@ export const EditorTriggers = {
 }
 export const EditorStates = {
     HelperText: state<string>("", "editor-helper-text"),
+    PipetteColor: state<string | false>(false, "editor-pipette-color"),
 
     InputIsFocused: state<boolean>(false, "editor-input-focused"),
     IsDrawing: state<boolean>(false, "editor-is-drawing"),

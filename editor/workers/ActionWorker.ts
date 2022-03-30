@@ -6,6 +6,8 @@ import { ToolType } from "../tools";
 import LayersWorker from "./LayersWorker";
 import SelectionWorker from "./SelectionWorker";
 import ProjectWorker from "./ProjectWorker";
+import PaletteWorker from "./PaletteWorker";
+import ViewWorker from "./ViewWorker";
 
 class ActionWorker {
     registered: { [key: string]: Function }
@@ -23,8 +25,11 @@ class ActionWorker {
             "checkerboard-switch":  ()=> App.CurrentToolType.value = ToolType.CHECKERBOARD,
             
             // Layers
+            "add-layer-trigger": (belowId?: number)=> this.addLayerTrigger(belowId),
             "rename-layer-trigger": (id?: number)=> this.renameLayerTrigger(id),
             "delete-layer-trigger": (id?: number)=> this.deleteLayerTrigger(id),
+            "duplicate-layer-trigger": (id?: number)=> this.duplicateLayerTrigger(id),
+            "merge-visible-layers-trigger": ()=> this.mergeVisibleLayersTrigger(),
             "clear-layer-canvas-area-trigger": (id?: number)=> this.clearLayerCanvasAreaTrigger(id),
 
             // Selection
@@ -32,22 +37,26 @@ class ActionWorker {
             "deselect-all": ()=> SelectionWorker.endMoveSelection(),
 
             // Project
-            "export-image-trigger": ()=> EditorTriggers.Window.trigger({ type: EditorWindowType.EXPORT_IMAGE }),
-            "save-project": ()=> ProjectWorker.saveProject(),
-            "open-project": ()=> ProjectWorker.openProject(),
+            "export-image-trigger": ()=> EditorTriggers.Window.trigger({ type: EditorWindowType.EXPORT_IMAGE_WINDOW }),
+            "save-project-trigger": ()=> this.saveProjectTrigger(),
+            "save-project-as-trigger": ()=> this.saveProjectAsTrigger(),
+            "open-project-trigger": ()=> this.openProjectTrigger(),
             
             // Image data
             "copy-image-data": (layerId?: number)=> SelectionWorker.copyImageData(layerId),
             "paste-image-data": (layerId?: number)=> SelectionWorker.pasteImageData(layerId),
             "cut-image-data": (layerId?: number)=> SelectionWorker.cutImageData(layerId),
 
-            // Mics
-            "pick-color": ()=> {
-                console.log("Picked! From action!");
-            },
+            // Color
+            "switch-current-colors": ()=> PaletteWorker.switchCurrentColors(),
+            "fast-add-palette-color": ()=> PaletteWorker.fastAddPaletteColor(),
+
+            // View
+            "toggle-grid": ()=> ViewWorker.GridEnabled.set(v=> !v),
 
             // History
-            "undo": ()=> this.undo()
+            "undo": ()=> HistoryWorker.undo(),
+            "redo": ()=> HistoryWorker.redo()
         }
     }
 
@@ -56,6 +65,14 @@ class ActionWorker {
     }
 
     // ? Layers
+    // Add layer
+    addLayerTrigger(belowId?: number) {
+        EditorTriggers.Action.trigger({
+            type: EditorActionType.ADD_LAYER,
+            targetId: belowId
+        });
+        // LayersWorker.addLayer(belowId);
+    }
     // Rename
     renameLayerTrigger(layerId?: number) {
         EditorTriggers.Action.trigger({
@@ -68,6 +85,17 @@ class ActionWorker {
         EditorTriggers.Action.trigger({
             type: EditorActionType.DELETE_LAYER,
             targetId: layerId || this.curLayerId
+        });
+    }
+    duplicateLayerTrigger(layerId?: number) {
+        EditorTriggers.Action.trigger({
+            type: EditorActionType.DUPLICATE_LAYER,
+            targetId: layerId || this.curLayerId
+        });
+    }
+    mergeVisibleLayersTrigger() {
+        EditorTriggers.Action.trigger({
+            type: EditorActionType.MERGE_VISIBLE_LAYERS,
         });
     }
     // Clear
@@ -115,9 +143,19 @@ class ActionWorker {
     //     // });
     // }
 
-    // ? History
-    undo() {
-        HistoryWorker.undo();
+    // Project
+    saveProjectTrigger() {
+        ProjectWorker.tryToSave();
+    }
+    saveProjectAsTrigger() {
+        EditorTriggers.Window.trigger({
+            type: EditorWindowType.SAVE_PROJECT_WINDOW
+        });
+    }
+    openProjectTrigger() {
+        EditorTriggers.Window.trigger({
+            type: EditorWindowType.OPEN_PROJECT_WINDOW
+        });
     }
 
     get curLayerId(): Layer["id"] {

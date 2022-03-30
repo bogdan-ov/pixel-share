@@ -1,6 +1,5 @@
-import Layer from "./layers/Layer";
 import HistoryWorker, { HistoryItemType } from "../components/editor/history/HistoryWorker";
-import { EditorActionType, EditorStates, EditorTriggers, EditorWrongActionType, IEditorActionTrigger } from "../states/editor-states";
+import { EditorActionType, EditorEditedType, EditorStates, EditorTriggers, EditorWrongActionType, IEditorActionTrigger } from "../states/editor-states";
 import State, { state } from "../states/State";
 import config from "../utils/config";
 import { clamp, Vector2 } from "../utils/math";
@@ -9,7 +8,6 @@ import Keyboard from "./managers/Keyboard";
 import Mouse from "./managers/Mouse";
 import { Renderer } from "./renderer/Renderer";
 import tools, { ToolType } from "./tools";
-import PenTool from "./tools/drawing/PenTool";
 import Tool from "./tools/Tool";
 import ActionWorker from "./workers/ActionWorker";
 import HotkeysWorker from "./workers/HotkeysWorker";
@@ -17,9 +15,13 @@ import LayersWorker from "./workers/LayersWorker";
 import PaletteWorker from "./workers/PaletteWorker";
 import ProjectWorker from "./workers/ProjectWorker";
 import SelectionWorker from "./workers/SelectionWorker";
+import { Anchor } from "../utils/types";
+import ViewWorker from "./workers/ViewWorker";
 
 const cursors = {
+    "initial": "initial",
     "default": "initial",
+    "pick": "crosshair",
     "move": "move",
     "not-allowed": "not-allowed",
     "pointer": "pointer",
@@ -29,10 +31,11 @@ export class Application {
     CurrentToolType: State<ToolType>
     ToolsSize: State<number>
 
-    canvasWidth: number
-    canvasHeight: number
+    CanvasWidth: State<number>
+    CanvasHeight: State<number>
+    resizeAnchor: Anchor
     renderer: Renderer
-
+    
     workspaceElement!: HTMLDivElement
     canvasLayersElement!: HTMLDivElement
 
@@ -45,8 +48,9 @@ export class Application {
         this.CurrentToolType = state<ToolType>(ToolType.PEN, "current-tool-tile");
         this.ToolsSize = state(1, "tools-size");
 
-        this.canvasWidth = 64;
-        this.canvasHeight = 64;
+        this.CanvasWidth = state<number>(64, "app-canvas-width");
+        this.CanvasHeight = state<number>(64, "app-canvas-height");
+        this.resizeAnchor = Anchor.TOP_LEFT;
         this.renderer = new Renderer();
 
         this.zoom = 1;
@@ -60,7 +64,7 @@ export class Application {
         
         this.workspaceElement = workspace;
 
-        this.zoom = innerHeight / this.canvasHeight * .8;
+        this.zoom = innerHeight / this.CanvasHeight.value * .8;
 
         this.canvasLayersElement = canvasLayersElement;
         
@@ -71,7 +75,9 @@ export class Application {
         HistoryWorker.init();
         SelectionWorker.init();
         LayersWorker.init();
-        LayersWorker.updateLayersAspect();
+        ViewWorker.init();
+        
+        LayersWorker.resizeLayers(Anchor.TOP_LEFT);
 
         Mouse.init();
         Keyboard.init();
@@ -84,17 +90,51 @@ export class Application {
         document.body.style.cursor = cursors[type];
     }
     
-    currentToolStartDraw() {
-        if (this.currentTool.allowAutoHistory)
-            HistoryWorker.pushType(HistoryItemType.LAYERS);
-            // EditorTriggers.History.trigger(HistoryItemType.LAYERS, "app");
+    resizeCanvas(width: number, height: number, anchor: Anchor, pushToHistory: boolean): boolean {
+        width = width || 64;
+        height = height || 64;
+
+        this.resizeAnchor = anchor;
+        if (pushToHistory)
+            HistoryWorker.pushToPast(HistoryItemType.APP);
         
+        if (width <= 0 || height <= 0) {
+            EditorTriggers.Notification.trigger({
+                content: "❌ Too small!",
+                type: "danger"
+            });
+            return false;
+        }
+        if (width >= 900 || height >= 900) {
+            EditorTriggers.Notification.trigger({
+                content: "❌ Too large!",
+                type: "danger"
+            });
+            return false;
+        }
+        
+        this.CanvasWidth.value = width;
+        this.CanvasHeight.value = height;
+
+        LayersWorker.resizeLayers(anchor);
+        EditorTriggers.Edited.trigger({
+            type: EditorEditedType.CANVAS_RESIZED
+        });
+
+        return true;
+    }
+    
+    currentToolStartDraw() {
+        Mouse.oldPos.copy(Mouse.pos);
+            
         if (this.canUseCurrentTool)
             this.currentTool.onStartDraw(this.renderer);
     }
     currentToolDraw() {
         if (this.canUseCurrentTool) {
-            this.currentTool.onDraw(this.renderer);
+            this.currentTool.onUsing();
+            if (!this.currentTool.isPickingColor)
+                this.currentTool.onDraw(this.renderer);
         }
 
         Mouse.oldPos.copy(Mouse.pos);
@@ -105,12 +145,7 @@ export class Application {
     }
 
     initListeners() {
-        LayersWorker.Layers.listen(this.layersListener, "app-layers");
         EditorTriggers.Action.listen(this.actionListener, "app-action");
-
-        this.ToolsSize.listen(() => {
-            LayersWorker.previewLayer?.clearCanvas();
-        });
 
         // Mouse listeners
         Mouse.onDown(()=> {
@@ -120,7 +155,7 @@ export class Application {
 
             // Layer locked or hidden
             if (!currentLayer.editable) {
-                EditorTriggers.WrongAction.trigger({ type: EditorWrongActionType.LOCKED_LAYER });
+                EditorTriggers.WrongAction.trigger({ type: EditorWrongActionType.UNEDITABLE_LAYER });
                 return;
             }
 
@@ -134,12 +169,14 @@ export class Application {
         });
         Mouse.onMove(() => {
             this.currentTool.onMove(this.renderer);
+            this.currentTool.onUpdate();
             this.currentToolDraw();
 
             LayersWorker.uiLayer?.render();
         }, this.workspaceElement);
         this.workspaceElement.addEventListener("mouseout", ()=> {
-            this.setCursor("default");
+            this.setCursor("initial");
+            this.currentToolEndDraw();
         });
 
         Mouse.onWheel(delta => {
@@ -151,32 +188,53 @@ export class Application {
             }
         })
         
+        // Update
         setInterval(()=> {
-            LayersWorker.uiLayer?.render();
-        }, 24);
+            this.currentTool.onUpdate();
+            if (!EditorStates.IsDrawing.value)
+                LayersWorker.uiLayer?.render();
+        }, 40);
         
         // Notify states listeners
         EditorTriggers.Edited.trigger(true, "app");
-        HistoryWorker.pushType(HistoryItemType.LAYERS);
-        // EditorTriggers.History.trigger(HistoryItemType.LAYERS, "app");
+        this.initHistory();
+    }
+    initHistory() {
+        HistoryWorker.Past.value = [];
+        HistoryWorker.Future.value = [];
+        // HistoryWorker.pushToPast(HistoryItemType.ALL);
     }
 
-    layersListener(layers: Layer[]) {
-        layers.map(layer => !layer.inited && layer.init())
-        EditorTriggers.Edited.trigger(true);
-    }
     actionListener(action: IEditorActionTrigger) {
         switch (action.type) {
+            // Add layer
+            case EditorActionType.ADD_LAYER:
+                LayersWorker.addLayer(action.targetId);
+                // EditorTriggers.Edited.trigger({ type: EditorEditedType.LAYERS_EDITED1 });
+                break;
+            // Clear layer
             case EditorActionType.CLEAR_LAYER_CANVAS:
+                LayersWorker.pushToHistory();
                 LayersWorker.getLayer(action.targetId)?.clearCanvas();
-                EditorTriggers.Edited.trigger(true);
+                EditorTriggers.Edited.trigger({ type: EditorEditedType.LAYERS_EDITED });
                 break;
-            case EditorActionType.DELETE_LAYER:
-                LayersWorker.deleteLayer(action.targetId);
-                break;
+            // Clear layer selection
             case EditorActionType.CLEAR_SELECTION:
                 LayersWorker.getLayer(action.targetId)?.clearBySelection();
-                EditorTriggers.Edited.trigger(true);
+                EditorTriggers.Edited.trigger({ type: EditorEditedType.LAYERS_EDITED });
+                break;
+            // Delete layer
+            case EditorActionType.DELETE_LAYER:
+                LayersWorker.deleteLayer(action.targetId);
+                // EditorTriggers.Edited.trigger({ type: EditorEditedType.LAYERS_EDITED1 });
+                break;
+            case EditorActionType.DUPLICATE_LAYER:
+                LayersWorker.duplicateLayer(action.targetId);
+                // EditorTriggers.Edited.trigger({ type: EditorEditedType.LAYERS_EDITED1 });
+                break;
+            case EditorActionType.MERGE_VISIBLE_LAYERS:
+                LayersWorker.mergeVisibleLayers();
+                // EditorTriggers.Edited.trigger({ type: EditorEditedType.LAYERS_EDITED1 });
                 break;
         }
     }
@@ -200,8 +258,8 @@ export class Application {
         return (
             Mouse.isDown &&
             Mouse.button == 0 &&
-            (EditorStates.MovingSelection.value ? this.currentTool.allowUseWhenMoveSelection : true) &&
-            (this.currentTool instanceof PenTool ? !this.currentTool.AutoPick.value : true)
+            (EditorStates.MovingSelection.value ? this.currentTool.allowUseWhenMoveSelection : true)
+            // (this.currentTool instanceof PenTool ? !this.currentTool.AutoPick.value : true)
         );
     }
 }

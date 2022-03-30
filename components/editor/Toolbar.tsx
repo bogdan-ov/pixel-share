@@ -63,7 +63,9 @@ const Tool: React.FC<{ type: ToolType }> = props=> {
             <ToolTooltipKey keys={ ["Ctrl", "Shift", "Wheel"] }>resize tool!</ToolTooltipKey>
         </>,
         [ToolType.CHECKERBOARD]: <></>,
-        [ToolType.ERASE]: <></>,
+        [ToolType.ERASE]: <>
+            <ToolTooltipKey keys={ ["Shift"] }>to draw line</ToolTooltipKey>
+        </>,
         // Selection
         [ToolType.SELECTION]: <>
             <ToolTooltipKey keys={ ["Shift"] }>to move selection</ToolTooltipKey>

@@ -18,6 +18,7 @@ export default class SelectionTool extends ShapeTool {
     constructor() {
         super(ToolType.SELECTION);
 
+        this.resizable = false;
         this.colorable = false;
         this.allowPreview = false;
         this.allowAutoHistory = false;
@@ -31,6 +32,7 @@ export default class SelectionTool extends ShapeTool {
 
     onStartDraw(renderer: Renderer): void {
         super.onStartDraw(renderer);
+        if (!this.canBeUsed) return;
 
         const sel = SelectionWorker.selection;
         
@@ -38,7 +40,6 @@ export default class SelectionTool extends ShapeTool {
             if (Keyboard.isShift) {
                 // Move selection
                 if (!EditorStates.MovingSelection.value) {
-                    SelectionWorker.pushToHistory();
                     SelectionWorker.startMoveSelection();
                 }
                 this.dragOffset.set(
@@ -53,6 +54,7 @@ export default class SelectionTool extends ShapeTool {
     }
     onDraw(renderer: Renderer): void {
         super.onDraw(renderer);
+        if (!this.canBeUsed) return;
 
         if (EditorStates.MovingSelection.value) {
             // Move selection
@@ -71,5 +73,10 @@ export default class SelectionTool extends ShapeTool {
     onMove(renderer: Renderer): void {
         super.onMove(renderer);
 
+        // Cursor style
+        if (Keyboard.isShift)
+            App.setCursor("move");
+        else
+            App.setCursor("default");
     }
 }

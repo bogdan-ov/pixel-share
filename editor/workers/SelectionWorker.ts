@@ -44,7 +44,7 @@ class SelectionWorker {
     }
 
     init() {
-        Keyboard.onKeyDown(e=> {
+        Keyboard.onKeyPress(e=> {
             if (!this.selection.active) {
                 return;
             }
@@ -67,18 +67,6 @@ class SelectionWorker {
             LayersWorker.uiLayer?.render();
             LayersWorker.previewLayer?.render();
         }, "selection-worker-key-down");
-        Keyboard.onKeyUpDown(e=> {
-            if (!this.selection.active) {
-                App.setCursor("default");
-                return;
-            }
-
-            if (Keyboard.isShift)
-                App.setCursor("move");
-            else
-                App.setCursor("default");
-            
-        }, "selection-worker-key-up-down");
     }
 
     // Selection
@@ -116,12 +104,15 @@ class SelectionWorker {
         const previewLayer = LayersWorker.previewLayer;
         if (!curLayer || !previewLayer) return;
 
+        this.pushToHistory();
+
         const sel = this.selection;
         const imgData = imageData || curLayer.getImageData(
             sel.from,
             sel.width, sel.height
         );
 
+        previewLayer.clearPixels();
         this.setSelectionImageData(imgData);
 
         EditorStates.MovingSelection.value = true;
@@ -137,6 +128,8 @@ class SelectionWorker {
         this.clearSelectionImageData();
         this.deselectAll();
         EditorStates.MovingSelection.value = false;
+
+        EditorTriggers.Edited.trigger(true, "selection-worker");
     }
     clearSelectionImageData() {
         if (!this.selection.imageData) return;
@@ -151,7 +144,7 @@ class SelectionWorker {
         LayersWorker.uiLayer?.render();
     }
     selectAll() {
-        this.setSelection(vec(0, 0), vec(App.canvasWidth-1, App.canvasHeight-1));
+        this.setSelection(vec(0, 0), vec(App.CanvasWidth.value-1, App.CanvasHeight.value-1));
     }
     getSelection(): SelectionWorker["selection"] | Pick<SelectionWorker["selection"], "from" | "to"> {
         if (this.selection.active) {
@@ -159,7 +152,7 @@ class SelectionWorker {
         } else {
             return {
                 from: vec(0, 0),
-                to: vec(App.canvasWidth, App.canvasHeight),
+                to: vec(App.CanvasWidth.value, App.CanvasHeight.value),
             }
         }
     }
@@ -253,7 +246,7 @@ class SelectionWorker {
     }
 
     pushToHistory() {
-        HistoryWorker.pushType(HistoryItemType.LAYERS);
+        HistoryWorker.pushToPast(HistoryItemType.LAYERS);
     }
     pointInsideSelection(point: Vector2, allowBehind: boolean=false): boolean {
         return (!allowBehind && this.selection.active) ? pointInsideArea(point, this.selection.from, this.selection.width-1, this.selection.height-1) : true;

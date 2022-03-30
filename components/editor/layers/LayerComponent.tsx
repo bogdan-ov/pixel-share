@@ -1,16 +1,15 @@
-import { motion, Reorder, useAnimation, Variants } from "framer-motion";
+import { motion, useAnimation, Variants } from "framer-motion";
 import React, { useEffect, useState } from "react";
 import Layer from "../../../editor/layers/Layer";
-import ActionWorker from "../../../editor/workers/ActionWorker";
 import LayersWorker from "../../../editor/workers/LayersWorker";
 import createClassName from "../../../src/hooks/createClassName";
 import { EditorWrongActionType, EditorActionType, EditorTriggers, EditorStates, IEditorWrongActionTrigger } from "../../../states/editor-states";
-import Button from "../../ui/buttons/Button";
 import Icon from "../../Icon";
+import Button from "../../ui/buttons/Button";
 import RenamableText from "../../ui/inputs/RenamableText";
 import HistoryWorker, { HistoryItemType } from "../history/HistoryWorker";
 
-interface ILayerComponent {
+export interface ILayerComponent {
     id: Layer["id"]
     name: Layer["name"]
     visible: boolean
@@ -64,19 +63,22 @@ const LayerComponent: React.FC<ILayerComponent> = props=> {
     }, []);
     useEffect(()=> {
 
-        function pointermove(e: PointerEvent) {
-            if (!pointerPressed) return;
-            // Move layers
+        let movementY = 0;
 
-            if (e.movementY > 3) {
-                moveHandler(1);
-                setPointerPressed(false);
-            } else if (e.movementY < -3) {
-                moveHandler(-1);
-                setPointerPressed(false);
-            }
+        function pointermove(e: PointerEvent) {
+            if (!pointerPressed || e.button != 0) return;
+            movementY = e.movementY;
         }
         function pointerup() {
+            // Move layer
+            if (!pointerPressed) return;
+
+            if (movementY > 1) {
+                move(1);
+            } else if (movementY < -1) {
+                move(-1);
+            }
+            
             setPointerPressed(false);
         }
 
@@ -90,7 +92,7 @@ const LayerComponent: React.FC<ILayerComponent> = props=> {
 
     }, [pointerPressed]);
 
-    function moveHandler(dir: number) {
+    function move(dir: number) {
         if (LayersWorker.layerIsEditable(props.id))
             LayersWorker.moveLayer(props.id, dir);
         else
@@ -98,13 +100,14 @@ const LayerComponent: React.FC<ILayerComponent> = props=> {
     }
     function wrongActionListener(wrongAction: IEditorWrongActionTrigger) {
         // Cannot edit this layer
-        if (wrongAction.type == EditorWrongActionType.LOCKED_LAYER && LayersWorker.layerIsCurrent(props.id)) {
+        if (wrongAction.type == EditorWrongActionType.UNEDITABLE_LAYER && LayersWorker.layerIsCurrent(props.id)) {
             shakeAnimation();
         }
     }
     function editedListener() {
-        LayersWorker.getLayer(props.id)?.makeBlob()
-            .then(res=> setBlob(res));
+        const data = LayersWorker.getLayer(props.id)?.getDataUrl();
+        if (data)
+            setBlob(data);
     }
 
     function chooseHandler() {
@@ -114,22 +117,23 @@ const LayerComponent: React.FC<ILayerComponent> = props=> {
         setSelected(true);
         
         EditorTriggers.ContextMenu.trigger({
-            title: <div className="slot justify-between">
-                <span className="text-muted p-1">{ props.name }</span>
+            targetId: props.id,
+            header: <div className="slot justify-between p-1">
+                <span className="text-muted">{ props.name }</span>
                 <div className="slot">
                     <Button
                         ghost
                         title="Move up"
                         size="small"
                         icon="small-arrow-up"
-                        onClick={ ()=> moveHandler(-1) }
+                        onClick={ ()=> move(-1) }
                     />
                     <Button 
                         ghost
                         title="Move down"
                         size="small"
                         icon="small-arrow-down"
-                        onClick={ ()=> moveHandler(1) }
+                        onClick={ ()=> move(1) }
                     />
                 </div>
             </div>,
@@ -137,24 +141,34 @@ const LayerComponent: React.FC<ILayerComponent> = props=> {
             minWidth: 240,
             buttonsGroups: [[
                 {
+                    icon: "add-layer",
+                    content: <span>Add layer below</span>,
+                    actionName: "add-layer-trigger"
+                },
+                {
                     icon: "rename-layer",
                     content: <span>Rename layer</span>,
-                    handler: ()=> ActionWorker.renameLayerTrigger(props.id),
-                    hotkeysName: "rename-layer-trigger"
+                    actionName: "rename-layer-trigger",
                 },
                 {
                     icon: "delete-layer",
                     content: <span>Delete layer</span>,
                     disabled: LayersWorker.normalLayers.length <= 1,
-                    handler: ()=> ActionWorker.deleteLayerTrigger(props.id),
-                    hotkeysName: "delete-layer-trigger"
+                    actionName: "delete-layer-trigger",
                 },
             ],
             [
                 {
                     content: <span>Clear layer</span>,
-                    handler: ()=> ActionWorker.clearLayerCanvasTrigger(props.id),
-                    hotkeysName: "clear-layer-canvas-area-trigger"
+                    actionName: "clear-layer-canvas-area-trigger",
+                },
+                {
+                    content: <span>Duplicate layer</span>,
+                    actionName: "duplicate-layer-trigger",
+                },
+                {
+                    content: <span>Merge visible layers</span>,
+                    actionName: "merge-visible-layers-trigger",
                 },
                 {
                     icon: props.locked ? "lock" : "unlock",
@@ -176,7 +190,7 @@ const LayerComponent: React.FC<ILayerComponent> = props=> {
         LayersWorker.toggleLayerLock(props.id);
     }
     function renameHandler(newName: string) {
-        HistoryWorker.pushType(HistoryItemType.LAYERS);
+        HistoryWorker.pushToPast(HistoryItemType.LAYERS);
         // EditorTriggers.History.trigger(HistoryItemType.LAYERS, "layer-worker")
 
         LayersWorker.renameLayer(props.id, newName);

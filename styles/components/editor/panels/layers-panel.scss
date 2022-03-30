@@ -1,5 +1,6 @@
 $width: 260px;
-$layer-blob-height: 64px;
+$layer-padding: 6px;
+$layer-blob-size: 64px;
 
 .layers-panel {
     width: $width;
@@ -18,7 +19,7 @@ $layer-blob-height: 64px;
 
         .layer {
             max-width: 100%;
-            padding: 0 5px;
+            padding: 0 $layer-padding;
 
             display: flex;
             align-items: center;
@@ -27,7 +28,6 @@ $layer-blob-height: 64px;
             
             border-radius: $border-radius;
             background: $panel-bg;
-            border: 2px solid transparent;
 
             transition: .1s transform;
             cursor: pointer;
@@ -35,22 +35,22 @@ $layer-blob-height: 64px;
             
             .layer-blob-wrapper {
                 width: max-content;
-                min-width: 64px;
+                min-width: $layer-blob-size;
                 max-width: 72px;
                 height: max-content;
-                min-height: $layer-blob-height;
+                min-height: $layer-blob-size;
                 
                 display: flex;
                 justify-content: center;
                 overflow: hidden;
 
                 border-radius: calc($border-radius - 4px);
-                background: transparentize(lighten($bg, 6), .6);
+                background: lighten($bg, 3);
 
                 transition: .1s;
 
                 .layer-blob {
-                    height: $layer-blob-height;
+                    height: $layer-blob-size;
                     
                     object-fit: cover;
                     image-rendering: pixelated;
@@ -69,7 +69,7 @@ $layer-blob-height: 64px;
             }
             .layer-content {
                 max-width: calc(100% - 30px);
-                padding: 5px 0;
+                padding: $layer-padding 0;
                 
                 &:active {
                     .layer-blob-wrapper {
@@ -78,9 +78,6 @@ $layer-blob-height: 64px;
                 }
             }
             
-            &.active {
-                border: 2px solid $grey;
-            }
             &:hover, &.selected {
                 background: $bg;
                 
@@ -94,6 +91,9 @@ $layer-blob-height: 64px;
                     }
                 }
             }
+            &.active {
+                background: lighten($bg, 1);
+            }
             
         }
         
@@ -105,11 +105,6 @@ $layer-blob-height: 64px;
             padding: 4px 10px;
             border: none;
             margin-bottom: 5px;
-            
-            &.active {
-                border: none;
-                background: $blue;
-            }
             
             .layer-blob-wrapper {
                 display: none;

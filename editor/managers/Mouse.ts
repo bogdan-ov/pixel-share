@@ -50,7 +50,8 @@ export class Mouse {
         })
         window.addEventListener("mouseup", e=> {
             this.isDown = false;
-            this.lastPos.copy(this.calculatePosition(vec(e.clientX, e.clientY)));
+            if (this.button == 0)
+                this.lastPos.copy(this.calculatePosition(vec(e.clientX, e.clientY)));
         })
 
         this.inited = false;
@@ -85,8 +86,8 @@ export class Mouse {
         const bounds = App.canvasLayersElement.getBoundingClientRect();
         
         return new Vector2(
-            Math.floor((vec.x - bounds.left) / App.zoom + ((App.currentToolSize+1)%2)/2) - Math.floor(App.currentToolSize/2),
-            Math.floor((vec.y - bounds.top) / App.zoom + ((App.currentToolSize+1)%2)/2) - Math.floor(App.currentToolSize/2)
+            Math.floor( (vec.x - bounds.left) / App.zoom + ( (App.currentToolSize+1)%2 )/2) - Math.floor(App.currentToolSize/2),
+            Math.floor( (vec.y - bounds.top) / App.zoom + ( (App.currentToolSize+1)%2 )/2) - Math.floor(App.currentToolSize/2)
         );
     }
 }

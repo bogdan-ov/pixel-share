@@ -20,7 +20,7 @@ export function useJustStatesListener(states: (State | Trigger)[], customId: str
         for (const state of states)
             state.listen(()=> {
                 setValue(Date.now());
-            }, customId);
+            }, customId, true);
         return ()=> {
             for (const state of states)
                 state.unlisten(customId);

@@ -1,0 +1,13 @@
+.menubar-panel {
+    width: max-content;
+    padding: 5px;
+    padding-top: 10px;
+    padding-bottom: 0;
+
+    border-left: 2px solid $bg;
+
+    .button {
+        width: max-content;
+    }
+    
+}

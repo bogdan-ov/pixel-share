@@ -1,26 +1,30 @@
 import { motion, useDragControls } from "framer-motion";
 import React, { createRef, RefObject, useEffect, useState } from "react";
-import Mouse from "../../../editor/managers/Mouse";
+import Keyboard from "../../../editor/managers/Keyboard";
 import createClassName from "../../../src/hooks/createClassName";
 import { EditorTriggers, EditorWindowType, IEditorWindowTrigger } from "../../../states/editor-states";
-import { vec, Vector2 } from "../../../utils/math";
 import { MyComponent } from "../../../utils/types";
 import Icon from "../../Icon";
 
 export interface IWindow {
     trigger: EditorWindowType
-    constrainsRef: RefObject<HTMLDivElement>
     
     custom?: boolean
     active?: boolean
     setActive?: (value: boolean)=> void
     title?: React.ReactElement
+
+    onEnter?: ()=> void
+    onEscape?: ()=> void
     onTrigger?: (action: IEditorWindowTrigger)=> void
 
     minWidth?: number
 }
+export interface IWindowNeeds {
+    constrainsRef: RefObject<HTMLDivElement>
+}
 
-const Window: React.FC<IWindow & MyComponent> = props=> {
+const Window: React.FC<IWindow & MyComponent & IWindowNeeds> = props=> {
     const ref = createRef<HTMLDivElement>();
     const dragControls = useDragControls();
     const [active, setActive] = useState<boolean>(false);
@@ -32,7 +36,7 @@ const Window: React.FC<IWindow & MyComponent> = props=> {
     
     useEffect(()=> {
 
-        const unlisten = EditorTriggers.Window.listen((action)=> {
+        const unlistenWindow = EditorTriggers.Window.listen((action)=> {
             if (action.type != props.trigger) return;
 
             _setActive(true);
@@ -40,25 +44,22 @@ const Window: React.FC<IWindow & MyComponent> = props=> {
             if (props.onTrigger)
                 props.onTrigger(action);
         });
+        const unlistenKeyboard = Keyboard.onKeyPress(e=> {
+            if (!_active) return;
+            
+            if (e.code == "Enter")
+                props.onEnter && props.onEnter();
+            if (e.code == "Escape") {
+                props.onEscape ? props.onEscape() : _setActive(false);
+            }
+        })
 
-        return unlisten;
+        return ()=> {
+            unlistenWindow();
+            unlistenKeyboard();
+        };
         
     }, []);
-    // useEffect(()=> {
-    //     const node = ref.current;
-    //     const constrainsNode = props.constrainsRef.current;
-    //     if (!node || !constrainsNode) return;
-
-    //     const bounds = node.getBoundingClientRect();
-    //     const constrainsBounds = constrainsNode.getBoundingClientRect();
-    //     node.style.left = (constrainsBounds.left + constrainsBounds.width/2 - bounds.width/2) + "px";
-    //     node.style.top = (constrainsBounds.top + constrainsBounds.height/2 - bounds.height/2) + "px";
-    //     setPos(vec(
-    //         constrainsBounds.left + constrainsBounds.width/2 - bounds.width/2,
-    //         constrainsBounds.top + constrainsBounds.height/2 - bounds.height/2
-    //     ))
-        
-    // }, [_active]);
     
     function onHeaderPointerDownHandler(e: React.PointerEvent) {
         dragControls.start(e);
@@ -102,8 +103,12 @@ const Window: React.FC<IWindow & MyComponent> = props=> {
                 } }
             >
                 <header className="window-header slot justify-between" onPointerDown={ onHeaderPointerDownHandler }>
-                    { props.title }
-                    <button className="button ghost small" onClick={ onCloseHandler }><Icon icon="small-cross" /></button>
+                    { props.title || <span></span> }
+                    <button 
+                        style={{ transform: "translateX(8px)" }}
+                        className="button ghost small"
+                        onClick={ onCloseHandler }
+                    ><Icon icon="small-cross" /></button>
                 </header>
                 
                 <main className="window-content">

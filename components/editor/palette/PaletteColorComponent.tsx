@@ -1,6 +1,7 @@
 import React, { createRef } from "react";
 import PaletteColor from "../../../editor/renderer/PaletteColor";
 import PaletteWorker from "../../../editor/workers/PaletteWorker";
+import createClassName from "../../../src/hooks/createClassName";
 import { EditorTriggers, EditorWindowType } from "../../../states/editor-states";
 import config from "../../../utils/config";
 import { HSLA } from "../../../utils/types";
@@ -15,18 +16,20 @@ interface IPaletteColorComponent {
 const PaletteColorComponent: React.FC<IPaletteColorComponent> = props=> {
     const ref = createRef<HTMLDivElement>();
     
-    const className = ["palette-color-wrapper", PaletteWorker.currentPaletteColor.id == props.id ? "active" : ""].join(" ");
+    const className = createClassName([
+        "palette-color-wrapper",
+        PaletteWorker.colorIsCurrent(props.id) && "active"
+    ]);
 
     function selectHandler() {
-        // PaletteWorker.setFrontToolColor(props.color);
-        PaletteWorker.CurrentPaletteColorId.value = props.id;
+        PaletteWorker.setCurrentColor(props.id);
     }
     function deleteHandler() {
         PaletteWorker.deletePaletteColor(props.id);
     }
     function editHandler() {
         EditorTriggers.Window.trigger({
-            type: EditorWindowType.EDIT_COLOR,
+            type: EditorWindowType.COLOR_PICKER_POPOVER,
             targetId: props.id,
             targetRef: ref
         });
@@ -34,7 +37,7 @@ const PaletteColorComponent: React.FC<IPaletteColorComponent> = props=> {
     
     function onContextHandler(e: React.MouseEvent) {
         EditorTriggers.ContextMenu.trigger({
-            title: <div className="p-1"><div
+            header: <div className="p-1"><div
                 className="width-fill"
                 style={ {
                     height: 6,
@@ -75,8 +78,11 @@ const PaletteColorComponent: React.FC<IPaletteColorComponent> = props=> {
                     onContextMenu={ onContextHandler }
                     className="palette-color"
                     style={ { background: hslToHex(props.color) } } 
-                />
+                >
+                    <div className="last-active-indicator" />
+                </div>
             </div>
+            
         </Tooltip>
     );
 };

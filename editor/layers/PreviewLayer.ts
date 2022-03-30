@@ -78,14 +78,15 @@ export default class PreviewLayer extends Layer {
     render() {
         this.clearCanvas();
 
-        this.pixels.map(pixel=> {
-            this.context.fillStyle = pixel[2];
-            this.context.fillRect(
-                Math.floor(pixel[0]),
-                Math.floor(pixel[1]),
-                pixel[3], pixel[3]
-            );
-        });
+        if (this.pixels.length != 0)
+            this.pixels.map(pixel=> {
+                this.context.fillStyle = pixel[2];
+                this.context.fillRect(
+                    Math.floor(pixel[0]),
+                    Math.floor(pixel[1]),
+                    pixel[3], pixel[3]
+                );
+            });
 
         this.renderSelectionImage();
     }

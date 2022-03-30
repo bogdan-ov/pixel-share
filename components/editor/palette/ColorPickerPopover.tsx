@@ -35,14 +35,15 @@ const ColorPickerPopover: React.FC<IColorPickerPopover> = props=> {
             active={ active }
             setActive={ setActive }
         
-            openTrigger={ EditorWindowType.EDIT_COLOR }
+            trigger={ EditorWindowType.COLOR_PICKER_POPOVER }
             onActive={ onOpenHandler }
             className="flex flex-column gap-4"
         >
-            <div className="slot gap-2 clickable">
+            <span className="text-muted">(Dummy picker...)</span>
+            {/* <div className="slot gap-2 clickable">
                 <span>Normal color picker</span>
                 <input type="color" value={ hslToHex(newColor) } onChange={ e=> setNewColor(hexToHsl(e.target.value)) } />
-            </div>
+            </div> */}
             
             <ColorPicker 
                 lastColor={ lastColor }

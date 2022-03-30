@@ -4,8 +4,9 @@ import { MyComponent } from "../../../utils/types";
 import Icon, { icons } from "../../Icon";
 import Tooltip, { ITooltip } from "../windows/Tooltip";
 
-export interface IButton {
-    color?: "transparent" | "blue"
+export type IButton = {
+    btnType?: React.ButtonHTMLAttributes<HTMLButtonElement>["type"]
+    color?: "transparent" | "blue" | "red"
     size?: "small" | "middle"
     fab?: boolean
     ghost?: boolean
@@ -24,10 +25,11 @@ export interface IButton {
     
     onClick?: (e: React.MouseEvent)=> void
 
-    icon?: keyof typeof icons 
-}
+    icon?: keyof typeof icons | (true & {})
+    text?: string
+}  & MyComponent
 
-const Button: React.FC<IButton & MyComponent> = props=> {
+const Button: React.FC<IButton> = props=> {
     const className = createClassName([
         "button",
         props.color && `color-${ props.color }`,
@@ -37,15 +39,23 @@ const Button: React.FC<IButton & MyComponent> = props=> {
         props.className
     ]);
     
+    function onClickHandler(e: React.MouseEvent) {
+        props.onClick && props.onClick(e);
+    }
+    
     const btn = (
         <button 
+            type={ props.btnType || "button" }
             title={ props.title }
             disabled={ props.disabled }
-            onClick={ props.onClick }
+            onClick={ onClickHandler }
             className={ className }
             style={ props.style }
         >
-            { props.icon ? <Icon icon={ props.icon } /> : props.children }
+            { props.icon && <div className="icon-wrapper">
+                { props.icon !== true && <Icon icon={ props.icon } /> }
+            </div> }
+            { props.children || props.text }
         </button>
     )
     

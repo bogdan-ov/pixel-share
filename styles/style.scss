@@ -1,19 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;600&display=swap');
 @import "./erid.scss";
 
 $bg: #101013;
 $panel-bg: darken($bg, 2);
 $blue: #137dff;
-$red: #e71818;
+$red: #ff183f;
 $grey: transparentize(#fff, .7);
 $dark-grey: transparentize(#fff, .9);
 
 $border-radius: 6px;
 
 @mixin ff {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    font-size: 14px;
+    font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-size: 13px;
     color: #fff;
+}
+@mixin box-shadow {
+    box-shadow: 0 12px 25px -8px rgba(0,0,0, .4);
 }
 
 body {
@@ -26,8 +30,6 @@ body {
 @import "./typography.scss";
 @import "./components/buttons.scss";
 @import "./components/inputs.scss";
-@import "./components/misc.scss";
-@import "./components/context-menu.scss";
 // Pages
 @import "./pages/welcome.scss";
 // Editor
@@ -36,16 +38,26 @@ body {
 @import "./components/editor/panels/panel.scss";
 @import "./components/editor/panels/palette-panel.scss";
 @import "./components/editor/panels/layers-panel.scss";
-@import "./components/editor/toolbar.scss";
+@import "./components/editor/panels/menubar-panel.scss";
+@import "./components/editor/panels/toolbar.scss";
+
+@import "./components/editor/windows/drop-down-menu.scss";
+@import "./components/editor/windows/window.scss";
+@import "./components/editor/windows/tooltip.scss";
+@import "./components/editor/windows/popover.scss";
+@import "./components/editor/windows/context-menu.scss";
+@import "./components/editor/windows/full-window.scss";
+@import "./components/editor/windows/custom/tool-settings-popover.scss";
+@import "./components/editor/windows/custom/export-image-window.scss";
+@import "./components/editor/windows/custom/projects-window.scss";
+@import "./components/editor/windows/custom/resize-canvas-window.scss";
 
 @import "./components/editor/notification.scss";
-@import "./components/editor/window.scss";
 @import "./components/editor/color-picker.scss";
-@import "./components/editor/menubar.scss";
-@import "./components/editor/windows/tool-settings-popover.scss";
-@import "./components/editor/windows/export-image-window.scss";
 @import "./components/editor/timeline/animation-timeline.scss";
-@import "./components/editor/drop-down-menu.scss";
+@import "./components/editor/projects.scss";
+
+@import "./components/misc.scss";
 
 .page {
     width: 100%;
@@ -97,14 +109,14 @@ hr {
     
 }
 
-$tool-color-size: 16px;
+$color-size: 16px;
 
-.tool-colors {
-    width: $tool-color-size;
-    height: $tool-color-size;
-    .tool-color {
-        width: $tool-color-size;
-        height: $tool-color-size;
+.current-colors-indicator {
+    width: $color-size;
+    height: $color-size;
+    .color {
+        width: $color-size;
+        height: $color-size;
 
         background: #fff;
         border-radius: 50%;
@@ -116,18 +128,26 @@ $tool-color-size: 16px;
             background-image: url("../public/img/checkerboard.png");
         }
         
-        // &.front {
-        //     width: calc($tool-color-size + 4px);
-        //     height: calc($tool-color-size + 4px);
-        //     transform: translate(-5px, -5px);
-        //     border: 2px solid $panel-bg;
-        // }
-        // &.back {
-        //     transform: translate(5px, 5px);
-        // }
+        &.current {
+            width: calc($color-size + 4px);
+            height: calc($color-size + 4px);
+            transform: translate(-5px, -5px);
+            border: 2px solid $panel-bg;
+            z-index: 1;
+        }
+        &.last {
+            transform: translate(5px, 5px);
+        }
         
     }
 }
 .beta {
     color: rgba(255, 255, 255, .1);
+}
+.scrollable {
+    overflow-y: auto;
+    overflow-x: hidden;
+    &::-webkit-scrollbar {
+        display: none;
+    }
 }

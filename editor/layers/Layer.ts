@@ -1,8 +1,9 @@
 import config from "../../utils/config";
 import { vec, Vector2 } from "../../utils/math";
-import { RGBA } from "../../utils/types";
+import { Anchor, RGBA } from "../../utils/types";
 import { safeValue } from "../../utils/utils";
 import App from "../App";
+import LayersWorker from "../workers/LayersWorker";
 import SelectionWorker from "../workers/SelectionWorker";
 
 export interface IPixelData {
@@ -23,9 +24,9 @@ export default class Layer {
     context!: CanvasRenderingContext2D
 
     inited: boolean
-    initialImageData: ImageData | null
+    initialImageData: ImageData | string | null
     
-    constructor(id: number, name: string, imageData?: ImageData) {
+    constructor(id: number, name: string, imageData?: ImageData | string) {
         this.id = id;
         this.name = name;
         this.ghost = false;
@@ -45,11 +46,14 @@ export default class Layer {
         this.context = this.canvas.getContext("2d")!;
         this.context.imageSmoothingEnabled = false;
 
-        this.updateAspect();
+        this.resize(Anchor.TOP_LEFT);
         this.appendCanvas();
         
         if (this.initialImageData) {
-            this.replaceImageData(this.initialImageData);
+            if (typeof this.initialImageData == "string")
+                this.replaceDataUrl(this.initialImageData);
+            else
+                this.replaceImageData(this.initialImageData);
             this.initialImageData = null;
         }
         
@@ -120,7 +124,7 @@ export default class Layer {
         const x = Math.floor(props.position.x);
         const y = Math.floor(props.position.y);
         
-        if (props.color == config.EMPTY_PIXEL_COLOR) {
+        if (props.color == config.EMPTY_PIXEL_COLOR || props.color == config.POINTER_COLOR) {
             // Erase
             this.context.clearRect(
                 x, y,
@@ -129,10 +133,33 @@ export default class Layer {
         } else {
             // Draw
             this.context.fillStyle = props.color;
-            this.context.fillRect(
-                x, y,
-                size, size
-            );
+            if (props.size == 3) {
+                this.context.fillRect(
+                    x+1, y+1,
+                    1, 1
+                );
+                this.context.fillRect(
+                    x, y+1,
+                    1, 1
+                );
+                this.context.fillRect(
+                    x+2, y+1,
+                    1, 1
+                );
+                this.context.fillRect(
+                    x+1, y,
+                    1, 1
+                );
+                this.context.fillRect(
+                    x+1, y+2,
+                    1, 1
+                );
+            } else {
+                this.context.fillRect(
+                    x, y,
+                    size, size
+                );
+            }
         }
     }
     pixelPerfect() {}
@@ -144,27 +171,42 @@ export default class Layer {
         this.context.clearRect(pos.x, pos.y, width, height);
     }
     clearBySelection() {
+        LayersWorker.pushToHistory();
+
         const selection = SelectionWorker.selection;
         const pos = selection.from.expand();
-        let width = selection.width;
-        let height = selection.height;
-
-        if (width < 0) {
-            width -= 2;
-            pos.x += 1;
-        }
-        if (height < 0) {
-            height -= 2;
-            pos.y += 1;
-        }
         
-        this.clearRect(pos, width, height);
+        this.clearRect(pos, selection.width, selection.height);
     }
-    updateAspect() {
-        this.canvas.style.width = App.canvasWidth + "px";
-        this.canvas.style.height = App.canvasHeight + "px";
-        this.canvas.width = App.canvasWidth;
-        this.canvas.height = App.canvasHeight;
+    resize(anchor: Anchor) {
+        const dataUrl = this.getDataUrl();
+        
+        this.canvas.style.width = App.CanvasWidth.value + "px";
+        this.canvas.style.height = App.CanvasHeight.value + "px";
+
+        let x = 0;
+        let y = 0;
+
+        // Horizontal
+        if (anchor == Anchor.TOP_LEFT || anchor == Anchor.CENTER_LEFT || anchor == Anchor.BOTTOM_LEFT) {
+        }
+        else if (anchor == Anchor.TOP_CENTER || anchor == Anchor.CENTER_CENTER || anchor == Anchor.BOTTOM_CENTER)
+            x = -this.canvas.width/2 + App.CanvasWidth.value/2;
+        else if (anchor == Anchor.TOP_RIGHT || anchor == Anchor.CENTER_RIGHT || anchor == Anchor.BOTTOM_RIGHT)
+            x = -this.canvas.width + App.CanvasWidth.value;
+        
+        // Vertical
+        if (anchor == Anchor.TOP_LEFT || anchor == Anchor.TOP_CENTER || anchor == Anchor.TOP_RIGHT) {
+        }
+        else if (anchor == Anchor.CENTER_LEFT || anchor == Anchor.CENTER_CENTER || anchor == Anchor.CENTER_RIGHT)
+            y = -this.canvas.height/2 + App.CanvasHeight.value/2;
+        else if (anchor == Anchor.BOTTOM_LEFT || anchor == Anchor.BOTTOM_CENTER || anchor == Anchor.BOTTOM_RIGHT)
+            y = -this.canvas.height + App.CanvasHeight.value;
+        
+        this.canvas.width = App.CanvasWidth.value;
+        this.canvas.height = App.CanvasHeight.value;
+        
+        this.replaceDataUrl(dataUrl, Math.floor(x), Math.floor(y));
     }
     toggleVisible(visible?: boolean) {
         this.visible = safeValue(visible, !this.visible);
@@ -206,23 +248,29 @@ export default class Layer {
     getImageData(pos: Vector2=vec(), width: number=this.canvas.width, height: number=this.canvas.height): ImageData {
         return this.context.getImageData(pos.x, pos.y, width, height);
     }
-    replaceImageData(imageData: ImageData) {
+    getDataUrl(): string {
+        return this.canvas.toDataURL();
+    }
+    replaceImageData(imageData: ImageData, x: number=0, y: number=0) {
         if (!imageData) {
-            console.error("No image data");
+            console.error("No layer image data to replace");
             return;
         }
         
         this.clearCanvas();
 
-        this.context.putImageData(imageData, 0, 0);
+        this.context.putImageData(imageData, x, y);
     }
-    putImageData(imageData: ImageData, position: Vector2=vec()) {
-        if (!imageData) return;
+    putImageData(imageData: ImageData, x: number=0, y: number=0) {
+        if (!imageData) {
+            console.error("No layer image data to put");
+            return;
+        }
 
         const data = imageData.data;
 
         for (let i = 0; i < data.length; i ++) {
-            const pos = vec(i % imageData.width, Math.floor(i / imageData.width)).add(position);
+            const pos = vec(i % imageData.width, Math.floor(i / imageData.width)).add(vec(x, y));
             const color = `rgba(${ data[i*4] }, ${ data[i*4+1] }, ${ data[i*4+2] }, ${ data[i*4+3]/255 })`;
 
             this.drawPixel({
@@ -233,5 +281,29 @@ export default class Layer {
             
         }
 
+    }
+    putDataUrl(dataUrl: string, x: number=0, y: number=0) {
+        if (!dataUrl) {
+            console.error("No layer data url to put");
+            return;
+        }
+        
+        const img = new Image();
+        img.src = dataUrl;
+
+        this.context.drawImage(img, x, y);
+    }
+    replaceDataUrl(dataUrl: string, x: number=0, y: number=0) {
+        if (!dataUrl) {
+            console.error("No layer data url to replace");
+            return;
+        }
+
+        this.clearCanvas();
+        
+        const img = new Image();
+        img.src = dataUrl;
+
+        this.context.drawImage(img, x, y);
     }
 }

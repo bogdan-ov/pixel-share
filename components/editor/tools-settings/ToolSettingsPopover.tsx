@@ -17,7 +17,7 @@ const ToolSettingsPopover: React.FC = ()=> {
             active={ active }
             setActive={ setActive }
             offset={ 5 }
-            openTrigger={ EditorWindowType.TOOL_SETTINGS }
+            trigger={ EditorWindowType.TOOL_SETTINGS_POPOVER }
             className="tool-settings-popover flex flex-column gap-3 p-2"
             disableContextMenu
         >

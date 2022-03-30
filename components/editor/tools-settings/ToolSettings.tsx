@@ -2,31 +2,26 @@ import React from "react";
 import App from "../../../editor/App";
 import { ToolType } from "../../../editor/tools";
 import PaletteWorker from "../../../editor/workers/PaletteWorker";
-import useStateListener, { useJustStatesListener } from "../../../src/hooks/useStateListener";
+import useStateListener from "../../../src/hooks/useStateListener";
 import { hslaToString } from "../../../utils/utils";
-import Menubar from "../menubar/Menubar";
 import CheckerboardToolSettings from "./settings/CheckerboardToolSettings";
 import PenToolSettings from "./settings/PenToolSettings";
 import RectangleToolSettings from "./settings/RectangleToolSettings";
 import ResizableToolSettings from "./settings/ResizableToolSettings";
 import SelectionToolSettings from "./settings/SelectionToolSettings";
-import { ToolColorsIndicator } from "./ToolSettingsContainer";
+import { CurrentColorsIndicator } from "./ToolSettingsContainer";
 
 const ToolSettings: React.FC = (()=> {
 
     const [currentToolType] = useStateListener(App.CurrentToolType, "tool-settings-current-tool");
-    const [frontColor] = useStateListener(PaletteWorker.FrontToolColor);
-    const [backColor] = useStateListener(PaletteWorker.BackToolColor);
     const [currentPaletteColorId] = useStateListener(PaletteWorker.CurrentPaletteColorId);
     
     return (
         <header className="tool-settings slot justify-between panel" key={ currentToolType }>
 
             <main className="tool-settings-content slot gap-4">
-                <ToolColorsIndicator 
+                <CurrentColorsIndicator 
                     alpha={ !App.currentTool.colorable }
-                    frontColor={ hslaToString(PaletteWorker.getPaletteColor(currentPaletteColorId)?.hslaColor || [0, 0, 0, 1]) }
-                    backColor={ hslaToString(backColor.hsla) }
                 />
                 <Settings currentToolType={ currentToolType } />
             </main>

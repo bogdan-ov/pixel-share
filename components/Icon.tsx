@@ -119,6 +119,9 @@ export const icons = {
     "undo": <svg width="14" height="12" viewBox="0 0 14 12" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M0.999999 6L10 6C11.6569 6 13 7.34315 13 9L13 11M0.999999 6L6.33333 0.999999M0.999999 6L6.33333 11" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>,
+    "redo": <svg width="14" height="13" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M13 6.85785L4 6.85785C2.34315 6.85785 1 8.20099 1 9.85785L1 11.8578M13 6.85785L7.66667 1.85785M13 6.85785L7.66667 11.8578" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>,
     "file": <svg width="15" height="16" viewBox="0 0 15 16" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M1 5C1 2.79086 2.79086 1 5 1H8.17157C8.70201 1 9.21071 1.21071 9.58579 1.58579L13.4142 5.41421C13.7893 5.78929 14 6.29799 14 6.82843V11C14 13.2091 12.2091 15 10 15H5C2.79086 15 1 13.2091 1 11V5Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
         <path d="M8 1V5C8 6.10457 8.89543 7 10 7H14" stroke="currentColor" strokeWidth="2"/>
@@ -127,7 +130,53 @@ export const icons = {
         <path d="M8 15H5C2.79086 15 1 13.2091 1 11V5C1 2.79086 2.79086 1 5 1H8.17157C8.70201 1 9.21071 1.21071 9.58579 1.58579L11 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
         <path d="M8 1V4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
         <path d="M8 10H15M15 10L11.8889 7M15 10L11.8889 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>        
+    </svg>,
+    "image": <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="1" y="1" width="14" height="14" rx="4" stroke="currentColor" strokeWidth="2"/>
+        <path d="M1.5 12.5L3.9106 9.78808C4.7387 8.85647 6.20797 8.90105 6.97805 9.88116L11 15" stroke="currentColor" strokeWidth="2"/>
+        <circle cx="10" cy="6" r="2" fill="currentColor"/>
+    </svg>,
+    "keep": <svg width="18" height="10" viewBox="0 0 18 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 5H6.00001" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+        <rect x="1" y="9" width="8" height="16" rx="4" transform="rotate(-90 1.00001 9)" stroke="currentColor" strokeWidth="2"/>
+    </svg>,
+    "not-keep": <svg width="18" height="10" viewBox="0 0 18 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="1" y="9" width="8" height="16" rx="4" transform="rotate(-90 1 9)" stroke="currentColor" strokeWidth="2"/>
+    </svg>,
+    "menu-bars": <svg width="10" height="7" viewBox="0 0 10 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M1 1H9M1 6H9" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+    </svg>,
+    "trash": <svg width="16" height="18" viewBox="0 0 16 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3.625 5.71228H12.375M3.625 5.71228L4.27537 13.6928C4.40228 15.25 5.70309 16.4491 7.26546 16.4491H8.73454C10.2969 16.4491 11.5977 15.25 11.7246 13.6928L12.375 5.71228M3.625 5.71228H1.875M12.375 5.71228H14.125" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+        <path d="M6.25 1.89473H9.75" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+    </svg>,
+    "arrow-top-left": <svg width="11" height="12" viewBox="0 0 11 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M9.799 10.0208L1.31372 1.53554M1.31372 1.53554L1.54942 8.84231M1.31372 1.53554L8.62049 1.77125" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>,
+    "arrow-top-center": <svg width="13" height="15" viewBox="0 0 13 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M6.55637 13.9203L6.55636 1.92035M6.55636 1.92035L1.55636 7.25368M6.55636 1.92035L11.5564 7.25368" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>,
+    "arrow-top-right": <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M1.53554 10.0208L10.0208 1.53552M10.0208 1.53552L2.71405 1.77122M10.0208 1.53552L9.78512 8.84229" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>,
+    "arrow-center-left": <svg width="15" height="13" viewBox="0 0 15 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M13.7782 6.77817L1.77817 6.77817M1.77817 6.77817L7.1115 11.7782M1.77817 6.77817L7.1115 1.77817" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>,
+    "arrow-center-center": <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="4" cy="4" r="3" stroke="currentColor" strokeWidth="2"/>
+    </svg>,
+    "arrow-center-right": <svg width="14" height="13" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M1 6.7782L13 6.7782M13 6.7782L7.66667 1.7782M13 6.7782L7.66667 11.7782" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>,
+    "arrow-bottom-left": <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M10.2426 1.53553L1.75735 10.0208M1.75735 10.0208L9.06411 9.78511M1.75735 10.0208L1.99305 2.71405" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>,
+    "arrow-bottom-center": <svg width="13" height="15" viewBox="0 0 13 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M6.7782 1.77817L6.7782 13.7782M6.7782 13.7782L11.7782 8.44484M6.7782 13.7782L1.7782 8.44484" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>,
+    "arrow-bottom-right": <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M1.75737 1.75737L10.2426 10.2427M10.2426 10.2427L10.0069 2.93589M10.2426 10.2427L2.93588 10.007" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>    
 };
 
 const Icon: React.FC<{ icon: keyof typeof icons }> = ({ icon })=>

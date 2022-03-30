@@ -13,8 +13,8 @@ const ImagePreviewCanvas: React.FC = ()=> {
             return;
         }
 
-        const width = App.canvasWidth;
-        const height = App.canvasHeight;
+        const width = App.CanvasWidth.value;
+        const height = App.CanvasHeight.value;
         const context = canvas.getContext("2d")!;
         canvas.width = width;
         canvas.height = height;

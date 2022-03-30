@@ -1,16 +1,17 @@
 import React, { useState } from "react";
+import App from "../../../../editor/App";
 import ExportWorker from "../../../../editor/workers/ExportWorker";
 import { EditorWindowType } from "../../../../states/editor-states";
 import config from "../../../../utils/config";
 import Input from "../../../ui/inputs/Input";
-import Window from "../../../ui/windows/Window";
+import Window, { IWindowNeeds } from "../../../ui/windows/Window";
 import ImagePreviewCanvas from "./ImagePreviewCanvas";
 
 interface IExportImageWindow {
-    constrainsRef: React.RefObject<HTMLDivElement>
+    
 }
 
-const ExportImageWindow: React.FC<IExportImageWindow> = props=> {
+const ExportImageWindow: React.FC<IExportImageWindow & IWindowNeeds> = props=> {
     const [active, setActive] = useState<boolean>(false);
     const [imageScale, setImageScale] = useState<number>(1);
     
@@ -27,7 +28,7 @@ const ExportImageWindow: React.FC<IExportImageWindow> = props=> {
             active={ active }
             setActive={ setActive }
 
-            trigger={ EditorWindowType.EXPORT_IMAGE }
+            trigger={ EditorWindowType.EXPORT_IMAGE_WINDOW }
             title={ <span>Export image</span> }
             constrainsRef={ props.constrainsRef }
 
@@ -41,7 +42,8 @@ const ExportImageWindow: React.FC<IExportImageWindow> = props=> {
                 <span>Scale</span>
                 <Input 
                     value={ imageScale }
-                    onSubmit={ v=> setImageScale(+v) }
+                    onChange={ v=> setImageScale(Math.floor(+v)) }
+                    onSubmit={ v=> setImageScale(Math.floor(+v)) }
 
                     width={ 60 }
                     type="number"
@@ -49,6 +51,8 @@ const ExportImageWindow: React.FC<IExportImageWindow> = props=> {
                     max={ config.MAX_EXPORT_IMAGE_SCALE }
                 />
             </label>
+
+            <span className="text-muted">{ `${ App.CanvasWidth.value * imageScale }*${ App.CanvasHeight.value * imageScale }` }</span>
             
             <div className="slot gap-1 width-fill">
                 <button onClick={ onExportHandler } className="button color-blue">

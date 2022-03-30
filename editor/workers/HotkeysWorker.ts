@@ -25,6 +25,7 @@ class HotkeysWorker {
             "checkerboard-switch": { variants: ["digit8"] },
 
             // Layers
+            "add-layer-trigger": { variants: ["ctrl+L"] },
             "rename-layer-trigger": { variants: ["f2"] },
             "clear-layer-canvas-area-trigger": { variants: ["delete"] },
             "delete-layer-trigger": { variants: ["shift+delete"] },
@@ -38,14 +39,20 @@ class HotkeysWorker {
 
             // Projects
             "export-image-trigger": { variants: ["ctrl+E"] },
-            "save-project": { variants: ["ctrl+S"] },
-            "open-project": { variants: ["ctrl+O"] },
+            "save-project-trigger": { variants: ["ctrl+S"] },
+            "save-project-as-trigger": { variants: ["ctrl+shift+S"] },
+            "open-project-trigger": { variants: ["ctrl+O"] },
 
-            // Mics
-            "pick-color": { variants: ["ctrl+m0"] },
+            // Color
+            "switch-current-colors": { variants: ["X"] },
+            "fast-add-palette-color": { variants: ["ctrl+shift+V"] },
+
+            // View
+            "toggle-grid": { variants: ["ctrl+shift+D"] },
 
             // History
             "undo": { variants: ["ctrl+Z"] },
+            "redo": { variants: ["ctrl+shift+Z"] },
         };
     }
 
@@ -54,7 +61,7 @@ class HotkeysWorker {
         
         Keyboard.onKeyDown(e=> {
             if (!pressed) {
-                pressed = this.hotkeysInit(e);
+                pressed = this.hotkeysCheck(e);
             }
         }, "hotkeys-down")
         Keyboard.onKeyUp(e=> {
@@ -62,7 +69,7 @@ class HotkeysWorker {
         }, "hotkeys-up")
     }
 
-    hotkeysInit(e: KeyboardEvent): boolean {
+    hotkeysCheck(e: KeyboardEvent): boolean {
         if (EditorStates.InputIsFocused.value || EditorStates.IsDrawing.value)
             return false;
         

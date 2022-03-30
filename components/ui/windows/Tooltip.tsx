@@ -15,6 +15,8 @@ export interface ITooltip {
     maxWidth?: number
     minWidth?: number
     hotkeysName?: string
+
+    childrenClassName?: string
 }
 
 const Tooltip: React.FC<ITooltip & MyComponent> = props=> {
@@ -63,8 +65,8 @@ const Tooltip: React.FC<ITooltip & MyComponent> = props=> {
             vec(!isLeft ? (innerWidth - bounds.width - 10) : Infinity, !isTop ? innerHeight - bounds.height - 10 : Infinity)
         );
         
-        node.style.left = pos.x + "px";
-        node.style.top = pos.y + "px";
+        node.style.left = (pos.x - wrapperBounds.left) + "px";
+        node.style.top = (pos.y - wrapperBounds.top) + "px";
     }
 
     return (
@@ -75,7 +77,7 @@ const Tooltip: React.FC<ITooltip & MyComponent> = props=> {
             className={ wrapperClassName }
             style={ props.style }
         >
-            <div className="tooltip-children">{ props.children }</div>
+            <div className={ createClassName(["tooltip-children", props.childrenClassName]) }>{ props.children }</div>
             
             <div className="tooltip-pos" ref={ ref }>
                 <div 

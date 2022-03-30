@@ -19,8 +19,8 @@ const SelectionToolSettings: React.FC = ()=> {
                 className="tool-property"
                 tooltip={ <div className="text-center">Alpha of darkness in unselected area</div> }
             >
-                <div className="slot gap-2">
-                    <span>Dark alpha</span>
+                <label className="slot gap-2 group-box">
+                    <span>Darkness alpha</span>
                     <Range
                         min={ 0 }
                         max={ 100 }
@@ -28,8 +28,9 @@ const SelectionToolSettings: React.FC = ()=> {
                         value={ darkAlpha }
                         onChange={ v=> darkAlphaState.value = +v }
                         onInputSubmit={ v=> darkAlphaState.value = +v }
+                        removeGroupBoxClass
                     />
-                </div>
+                </label>
             </Tooltip>
             
         </ToolSettingsContainer>

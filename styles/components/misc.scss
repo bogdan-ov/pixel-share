@@ -45,3 +45,32 @@
         }
     }
 }
+.checkerboard {
+    background: url(../../public/img/checkerboard.png);
+}
+.color-bubble {
+    width: 14px;
+    height: 14px;
+
+    border-radius: 50%;
+}
+.pipette {
+    width: 78px;
+    height: 78px;
+
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 777;
+    transform: translate(-50%, -50%);
+
+    border-radius: 50%;
+    border: 6px solid #fff;
+    outline: 2px solid #fff !important;
+
+    transition: .1s border;
+    pointer-events: none;
+}
+.trans {
+    transition: .1s;
+}

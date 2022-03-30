@@ -1,67 +1,88 @@
-import { EditorTriggers } from "../../states/editor-states";
+import HistoryWorker from "../../components/editor/history/HistoryWorker";
+import { EditorTriggers, EditorWindowType } from "../../states/editor-states";
 import State, { state } from "../../states/State";
 import config from "../../utils/config";
+import { Anchor } from "../../utils/types";
 import App from "../App";
-import LayersWorker from "./LayersWorker";
-import PaletteWorker from "./PaletteWorker";
+import Layer from "../layers/Layer";
+import PaletteColor from "../renderer/PaletteColor";
+import LayersWorker, { IShortLayerData } from "./LayersWorker";
+import PaletteWorker, { IShortPaletteColorData } from "./PaletteWorker";
+
+export interface IProjectData {
+    id: number
+    name: string
+    date: string
+    
+    canvasWidth: number
+    canvasHeight: number
+    
+    palette: IShortPaletteColorData[],
+    layers: IShortLayerData[],
+    currentLayerId: Layer["id"],
+    currentPaletteColorId: PaletteColor["id"]
+    lastPaletteColorId: PaletteColor["id"]
+}
 
 class ProjectWorker {
     Name: State<string>
     Saved: State<boolean>
     
     constructor() {
-        this.Name = state<string>("pr", "project-name");
+        this.Name = state<string>("", "project-name");
         this.Saved = state<boolean>(false, "project-saved");
     }
 
     init() {
-
+        let i = 0;
+        window.addEventListener("beforeunload", (e)=> {
+            if (!this.Saved.value) {
+                e.preventDefault();
+                e.returnValue = "Close/reload page? You didn't save your changes";
+            }
+        });
+        EditorTriggers.Edited.listen((edited, from)=> {
+            this.Saved.value = false;
+            config.DEBUG && console.log(`Edited, but unsaved ${ i } ${ from }`);
+            i ++;
+        })
     }
-
-    resizeProjectCanvas(width: number, height: number) {
-        if (width <= 0 || height <= 0) {
-            EditorTriggers.Notification.trigger({
-                content: "❌ Too small!",
-                type: "danger"
+    
+    tryToSave() {
+        if (!this.Name.value) {
+            EditorTriggers.Window.trigger({
+                type: EditorWindowType.SAVE_PROJECT_WINDOW
             });
-            return;
+        } else {
+            this.saveProject(this.Name.value);
         }
-        if (width >= 900 || height >= 900) {
-            EditorTriggers.Notification.trigger({
-                content: "❌ Too large!",
-                type: "danger"
-            });
-            return;
-        }
-
-        App.canvasWidth = width;
-        App.canvasHeight = height;
-
-        LayersWorker.updateLayersAspect();
-        LayersWorker.rerenderLayersElements();
     }
-    saveProject() {
-        const namePrompt = prompt("💾 Save project as...");
-        if (!namePrompt)
-            return;
-        const projectName = namePrompt.toString();
+    
+    saveProject(name: string) {
+        const projectName = name.trim();
+        if (!projectName) return;
+
+        const storageProjectName = config.PROJECT_NAME_PREFIX + projectName.trim();
         
-        const data = {
-            canvasWidth: App.canvasWidth,
-            canvasHeight: App.canvasHeight,
+        const data: IProjectData = {
+            id: Date.now(),
             name: projectName,
+            date: Date.now().toString(),
+
+            canvasWidth: App.CanvasWidth.value,
+            canvasHeight: App.CanvasHeight.value,
+            
             palette: PaletteWorker.getShortData(),
             layers: LayersWorker.getShortData(),
             currentLayerId: LayersWorker.CurrentLayerId.value,
-            currentPaletteColorId: PaletteWorker.CurrentPaletteColorId.value
+            currentPaletteColorId: PaletteWorker.CurrentPaletteColorId.value,
+            lastPaletteColorId: PaletteWorker.LastPaletteColorId.value
         };
-        
-        this.Name.value = projectName;
 
-        if (localStorage[projectName])
-            // Overwritten
+        if (this.projectExists(projectName))
+            // Save
             EditorTriggers.Notification.trigger({
-                content: `💾 Project overwritten!`,
+                content: `💾 Project "${ projectName }" saved!`,
                 type: "success"
             });
         else
@@ -71,42 +92,101 @@ class ProjectWorker {
                 type: "success"
             });
 
-        localStorage[projectName] = JSON.stringify(data);
+        localStorage[storageProjectName] = JSON.stringify(data);
+        this.Saved.value = true;
+        this.Name.value = projectName;
     }
     saveProjectAs(name: string) {
-        // if ()
-    }
-    openProject() {
-        const namePrompt = prompt("💾 Open project:");
-        if (!namePrompt)
-            return;
-        const projectName = namePrompt.toString();
+        const projectName = name.trim();
+        if (!projectName) return;
 
-        if (!localStorage[projectName]) {
+        if (this.projectExists(projectName))
+            // Overwrite
             EditorTriggers.Notification.trigger({
-                content: `😪 Can't find project with name "${ projectName }"...`,
+                content: `💾 Project "${ projectName }" overwritten!`,
+                type: "success"
+            });
+        else
+            // Save as new
+            this.saveProject(projectName);
+    }
+    openProject(name: string) {
+        const storageProjectName = config.PROJECT_NAME_PREFIX + name.trim();
+
+        if (!this.projectExists(name.trim())) {
+            EditorTriggers.Notification.trigger({
+                content: `😪 Can't find project with name "${ name.trim() }"...`,
                 type: "danger"
             });
             return;
         }
 
-        const data = JSON.parse(localStorage[projectName]);
+        const data: IProjectData | null = JSON.parse(localStorage[storageProjectName]) || null;
+        if(!data) {
+            EditorTriggers.Notification.trigger({
+                content: `🤔 Something went wrong...`,
+                type: "danger"
+            });
 
-        App.canvasWidth = data.canvasWidth;
-        App.canvasHeight = data.canvasHeight;
+            return;
+        }
+        
+        const projectName = data.name.trim();
+
         LayersWorker.setFromShortData(data.layers);
         PaletteWorker.setFromShortData(data.palette);
         LayersWorker.CurrentLayerId.value = data.currentLayerId;
         PaletteWorker.CurrentPaletteColorId.value = data.currentPaletteColorId;
-        LayersWorker.updateLayersAspect();
+        PaletteWorker.LastPaletteColorId.value = data.lastPaletteColorId || data.palette[0].id;
+        App.resizeCanvas(data.canvasWidth, data.canvasHeight, Anchor.TOP_LEFT, false);
+
+        App.initHistory();
+        
+        this.Name.value = projectName;
+        this.Saved.value = true;
         
         EditorTriggers.Notification.trigger({
-            content: `💾 Project opened!`,
+            content: `💾 "${ projectName }" opened!`,
+            type: "success"
+        });
+    }
+    deleteProject(name: string) {
+        const allow = confirm(`Are you sure to delete "${ name }"?`);
+
+        if (allow)
+            localStorage.removeItem(config.PROJECT_NAME_PREFIX + name);
+    }
+    newProject() {
+        LayersWorker.setDefaultLayers();
+        PaletteWorker.setDefaultPalette();
+        App.resizeCanvas(config.CANVAS_WIDTH, config.CANVAS_HEIGHT, Anchor.TOP_LEFT, false);
+
+        App.initHistory();
+        
+        this.Name.value = "";
+        EditorTriggers.Notification.trigger({
+            content: `💾 New project created!`,
             type: "success"
         });
     }
 
-    projectExists(name: string): boolean {
+    fetchProjects(): IProjectData[] {
+        const projects = [];
+        
+        const keys = Object.keys(localStorage);
+        for (const key of keys) {
+            if (key.indexOf(config.PROJECT_NAME_PREFIX) >= 0) {
+                const project: IProjectData | null = JSON.parse(localStorage[key]) || null;
+                if (project) {
+                    projects.push(project);
+                }
+            }
+        }
+
+        return projects;
+    }
+    
+    private projectExists(name: string): boolean {
         return localStorage[config.PROJECT_NAME_PREFIX + name];
     }
 }

@@ -1,9 +1,12 @@
 import { EditorStates } from "../../states/editor-states";
 import config from "../../utils/config";
+import { vec, Vector2 } from "../../utils/math";
+import { Anchor } from "../../utils/types";
 import App from "../App";
 import Mouse from "../managers/Mouse";
 import tools, { ToolType } from "../tools";
 import SelectionWorker from "../workers/SelectionWorker";
+import ViewWorker from "../workers/ViewWorker";
 import Layer from "./Layer";
 
 export default class UILayer extends Layer {
@@ -19,15 +22,15 @@ export default class UILayer extends Layer {
     init() {
         super.init();
 
-        // this.canvas.width = App.canvasWidth * config.UI_SCALE;
-        // this.canvas.height = App.canvasHeight * config.UI_SCALE;
-
         tools[ToolType.SELECTION].DarkAlpha.listen(()=> {
             this.render();
         });
         EditorStates.MovingSelection.listen(()=> {
             this.render();
         });
+        ViewWorker.GridEnabled.listen(()=> {
+            this.render();
+        })
 
         return this;
     }
@@ -52,7 +55,7 @@ export default class UILayer extends Layer {
         
         if (!EditorStates.MovingSelection.value) {
             this.context.fillStyle = `rgba(0, 0, 0, ${ tools[ToolType.SELECTION].DarkAlpha.value / 100 })`;
-            this.context.fillRect(0, 0, App.canvasWidth*scale, App.canvasHeight*scale);
+            this.context.fillRect(0, 0, App.CanvasWidth.value*scale, App.CanvasHeight.value*scale);
         }
         
         this.context.clearRect(
@@ -62,20 +65,46 @@ export default class UILayer extends Layer {
             Math.floor(height*scale)
         );
 
-        // this.context.fillStyle = config.SELECTION_COLOR;
         this.context.strokeStyle = config.SELECTION_COLOR;
-        this.context.lineDashOffset = Math.round(this.elapsed / 4) % 12;
-        this.context.setLineDash([ 8, 4 ])
-        this.context.lineWidth = 4;
+        this.context.lineDashOffset = Math.round(this.elapsed / 4) % (scale + scale*2);
+        this.context.setLineDash([ scale*2, scale ])
+        this.context.lineWidth = scale;
         this.context.strokeRect(
-        // this.context.fillRect(
-            Math.floor(pos.x*scale+2),
-            Math.floor(pos.y*scale+2),
-            Math.floor(width*scale-4),
-            Math.floor(height*scale-4)
+            Math.floor(pos.x*scale+Math.round(scale/2)),
+            Math.floor(pos.y*scale+Math.round(scale/2)),
+            Math.floor(width*scale-(scale + scale%2)),
+            Math.floor(height*scale-(scale + scale%2))
         );
 
         this.context.restore();
+    }
+    renderGrid() {
+        if (!ViewWorker.GridEnabled.value) return;
+        const width = App.CanvasWidth.value;
+        const height = App.CanvasHeight.value;
+        const scale = config.UI_SCALE;
+        const cellWidth = ViewWorker.GridWidth.value;
+        const cellHeight = ViewWorker.GridHeight.value;
+
+        this.context.strokeStyle = ViewWorker.GridColor.value;
+        const lineWidth = Math.round(20/App.zoom);
+        this.context.lineWidth = lineWidth + lineWidth%2;
+
+        for (let x = 1; x < Math.floor(width/cellWidth); x ++) {
+
+            this.context.moveTo(x*scale*cellWidth, 0);
+            this.context.lineTo(x*scale*cellWidth, height*scale);
+            
+            this.context.stroke();
+            this.context.beginPath();
+        }
+        for (let y = 1; y < Math.floor(height/cellHeight); y ++) {
+            this.context.moveTo(0, y*scale*cellHeight);
+            this.context.lineTo(width*scale, y*scale*cellHeight);
+            
+            this.context.stroke();
+            this.context.beginPath();
+        }
     }
 
     render() {
@@ -84,12 +113,13 @@ export default class UILayer extends Layer {
 
         this.renderSelection();
         this.renderPointer();
+        this.renderGrid();
     }
 
-    updateAspect(): void {
-        super.updateAspect();
+    resize(anchor: Anchor): void {
+        super.resize(anchor);
 
-        this.canvas.width = App.canvasWidth * config.UI_SCALE;
-        this.canvas.height = App.canvasHeight * config.UI_SCALE;
+        this.canvas.width = App.CanvasWidth.value * config.UI_SCALE;
+        this.canvas.height = App.CanvasHeight.value * config.UI_SCALE;
     }
 }

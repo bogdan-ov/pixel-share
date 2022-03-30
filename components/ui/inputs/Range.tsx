@@ -22,13 +22,15 @@ interface IRange {
     step?: number
 
     disableInput?: boolean
+    removeGroupBoxClass?: boolean
 }
 
 const Range: React.FC<IRange & MyComponent> = props=> {
 
     const className = createClassName([
-        "group-box slot gap-2",
-        props.className || ""
+        "slot gap-2",
+        !props.removeGroupBoxClass && "group-box",
+        props.className
     ]);
     
     return (

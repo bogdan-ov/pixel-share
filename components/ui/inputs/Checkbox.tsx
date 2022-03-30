@@ -5,7 +5,7 @@ import Icon from "../../Icon";
 
 interface ICheckbox {
     checked: boolean
-    onChange: (value: boolean)=> void
+    onChange?: (value: boolean)=> void
 }
 
 const Checkbox: React.FC<ICheckbox & MyComponent> = props=> {
@@ -19,7 +19,7 @@ const Checkbox: React.FC<ICheckbox & MyComponent> = props=> {
     ]);
     
     return (
-        <div className={ wrapperClassName } onClick={ ()=> props.onChange(!props.checked) }>
+        <div className={ wrapperClassName } onClick={ ()=> props.onChange && props.onChange(!props.checked) }>
             <button className={ className }>
                 <div className="icon"><Icon icon="checkmark" /></div>
             </button>

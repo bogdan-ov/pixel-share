@@ -1,43 +1,37 @@
 import React, { createRef, useEffect, useState } from "react";
 import ClickOutside from "../ui/utils/ClickOutside";
-import Icon, { icons } from "../Icon";
 import { EditorStates, EditorTriggers, IEditorContextMenuTrigger } from "../../states/editor-states";
 import { vec } from "../../utils/math";
 import Keyboard from "../../editor/managers/Keyboard";
-import { HotkeysBuilder } from "../ui/Misc";
-import ActionWorker from "../../editor/workers/ActionWorker";
 import useStateListener from "../../src/hooks/useStateListener";
+import { DropdownMenuContent, IDropdownMenuButtonsGroup } from "../ui/windows/DropdownMenu";
+import createClassName from "../../src/hooks/createClassName";
 
 interface IContextMenu {
     
 }
-export interface IContextMenuButton {
-    content: string | React.ReactElement
-
-    sub?: string | React.ReactElement
-    hotkeysName?: string
-    icon?: keyof typeof icons
-    disabled?: boolean
-    handler?: ()=> void
-    actionName?: string
-}
-export type IContextMenuButtonsGroup = IContextMenuButton[]
 
 const ContextMenu: React.FC<IContextMenu> = ()=> {
     const ref = createRef<HTMLDivElement>();
     const [active, activeState] = useStateListener(EditorStates.ContextMenuIsActive);
-    const [buttonsGroups, setButtonsGroups] = useState<IContextMenuButtonsGroup[]>([]);
-    const [title, setTitle] = useState<React.ReactElement>(<></>);
+    const [targetId, setTargetId] = useState<number | undefined>(undefined);
+    const [buttonsGroups, setButtonsGroups] = useState<IDropdownMenuButtonsGroup[]>([]);
+    const [header, setHeader] = useState<React.ReactElement>(<></>);
     const [minWidth, setMinWidth] = useState<number>(220);
 
-    const className = ["context-menu-wrapper", active ? "active" : ""].join(" ");
+    const className = createClassName([
+        "context-menu-wrapper",
+        active && "active"
+    ]);
 
     useEffect(()=> {
         const unlistenContext = EditorTriggers.ContextMenu.listen(context=> {
             
             context.event.preventDefault();
             setButtonsGroups(context.buttonsGroups);
-            setTitle(context.title || <></>);
+            setHeader(context.header || <></>);
+            setTargetId(context.targetId);
+            
             const width = context.minWidth || 220;
             setMinWidth(width);
             
@@ -64,6 +58,9 @@ const ContextMenu: React.FC<IContextMenu> = ()=> {
         if (pos.x + w + 10 > innerWidth) {
             pos.x = e.clientX - w;
         }
+        if (pos.y + bounds.height + 10 > innerHeight) {
+            pos.y = e.clientY - bounds.height;
+        }
         
         pos.copy(pos.clamp(
             vec(10, 10),
@@ -84,50 +81,16 @@ const ContextMenu: React.FC<IContextMenu> = ()=> {
             onClickOutside={ closeHandler }
             className={ className }
         >
-            <div
-                onContextMenu={ e=> { e.preventDefault(); closeHandler} }
-                className="context-menu flex flex-column gap-1"
-                style={ { minWidth } }
-            >
-                { title }
+            <DropdownMenuContent
+                active={ active }
+                setActive={ v=> activeState.value = v }
 
-                <main className="context-menu-content flex flex-column gap-2">
-                    { buttonsGroups.map((group, gIndex)=> 
-                        <div className="context-menu-buttons-group flex flex-column" key={ gIndex }>
-                            { group.map((button, bIndex)=>
-                                <ContextMenuButton setActive={ v=> activeState.value = v } key={ bIndex } { ...button } />
-                            ) }
-                        </div>    
-                    ) }
-                </main>
-                
-            </div>
+                header={ header }
+                buttonsGroups={ buttonsGroups }
+                minWidth={ minWidth }
+                targetId={ targetId }
+            />
         </ClickOutside>
-    );
-};
-
-const ContextMenuButton: React.FC<IContextMenuButton & { setActive: (v: boolean)=> void }> = props=> {
-    return (
-        <button
-            onClick={ ()=> {
-                props.handler && props.handler();
-                props.actionName && ActionWorker.registered[props.actionName]();
-                props.setActive(false);
-            } }
-            disabled={ props.disabled }
-            className="button color-transparent context-menu-button"
-        >
-            <div className="icon-wrapper">
-                { props.icon && <Icon icon={ props.icon } /> }
-            </div>
-            <div className="width-fill slot justify-between">
-                { props.content }
-                { props.sub && <span className="text-muted">{ props.sub }</span> }
-                { (props.hotkeysName || props.actionName) && <span className="text-muted">
-                    <HotkeysBuilder justText variants={ props.actionName || props.hotkeysName || "" } />
-                </span> }
-            </div>
-        </button>
     );
 };
 

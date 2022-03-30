@@ -1,5 +1,6 @@
 $palette-width: 60px;
 $grid-size: 30px;
+$list-size: 44px;
 
 .palette-panel {
     width: $palette-width;
@@ -24,10 +25,16 @@ $grid-size: 30px;
 
         border-radius: inherit;
         
+        &.last-active {
+            .palette-color::before {
+                border-width: 3px;
+            }
+        }
         &.active, &:hover {
             .palette-color {
                 z-index: 2;
                 &::after {
+                    opacity: 1;
                     outline-width: 3px;
                 }
             }
@@ -62,6 +69,26 @@ $grid-size: 30px;
                 
                 transition: .05s outline;
             }
+            &::before {
+                content: "";
+
+                width: calc(100% - 6px);
+                height: calc(100% - 6px);
+
+                position: absolute;
+                left: 0;
+                top: 0;
+
+                border: 0px solid #fff;
+                border-radius: inherit;
+            }
+            .last-active-indicator {
+                width: 100%;
+                height: 100%;
+                padding: 5px;
+
+                overflow: hidden;
+            }
         }
 
         &::-webkit-scrollbar {
@@ -70,22 +97,34 @@ $grid-size: 30px;
         
     }
 
-    //
-
+    .palette-panel-scroll {
+        height: 100%;
+        &::-webkit-scrollbar {
+            display: none;
+        }
+    }
+    
+    // View modes
     &.view-grid {
+        .palette-panel-scroll {
+            overflow-y: scroll;
+        }
         .palette-colors-list {
+            padding-top: 3px;
             display: grid;
             grid-template-columns: $grid-size $grid-size;
             grid-template-rows: repeat(auto-fill, $grid-size);
             grid-gap: 5px;
         }
         .palette-color {
+            width: $grid-size;
+            height: $grid-size;
             border-radius: $border-radius;
         }
     }
     &.view-list .palette-colors-list {
         display: grid;
-        grid-template-columns: 44px;
+        grid-template-columns: $list-size;
         grid-template-rows: auto;
     }
     

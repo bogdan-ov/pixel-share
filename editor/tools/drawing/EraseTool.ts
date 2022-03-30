@@ -4,9 +4,9 @@ import App from "../../App";
 import Mouse from "../../managers/Mouse";
 import { Renderer } from "../../renderer/Renderer";
 import LayersWorker from "../../workers/LayersWorker";
-import Tool from "../Tool";
+import FastLineTool from "../parent/FastLineTool";
 
-export default class EraseTool extends Tool {
+export default class EraseTool extends FastLineTool {
     constructor() {
         super(ToolType.ERASE);
         

@@ -7,16 +7,18 @@ import { MyComponent } from "../../../utils/types";
 interface IInput {
     value: string | number
     onChange?: (value: string | number)=> void
+    onSubmit?: (v: string | number)=> void
+    onSubmitChange?: (v: string | number)=> void
 
     type?: "text" | "number"
     maxLength?: number
     minLength?: number
     max?: number
     min?: number
-    onSubmit?: (v: string | number)=> void
 
     width?: number
     inputClassName?: string
+    placeholder?: string
 }
 
 const Input: React.FC<IInput & MyComponent> = props=> {
@@ -28,6 +30,7 @@ const Input: React.FC<IInput & MyComponent> = props=> {
 
     function onChangeHandler(e: React.ChangeEvent<HTMLInputElement>) {
         props.onChange && props.onChange(clampValue(e.target.value));
+        props.onSubmitChange && props.onSubmitChange(clampValue(e.target.value));
 
         setNewValue(e.target.value);
     }
@@ -36,19 +39,23 @@ const Input: React.FC<IInput & MyComponent> = props=> {
     }
     function onSubmitHandler() {
         props.onSubmit && props.onSubmit(clampValue(newValue));   
+        props.onSubmitChange && props.onSubmitChange(clampValue(newValue));
         setNewValue(props.value);
         EditorStates.InputIsFocused.value = false;
     }
 
     function clampValue(val: IInput["value"]): IInput["value"] {
-        if (props.type == "number")
+        if (props.type == "number" && (props.min || props.max))
             return clamp(+val, props.min || 0, props.max || Infinity)
         
         return val;
     }
     
     return (
-        <form className={ createClassName(["input-wrapper", props.className || ""]) } onSubmit={ e=> { e.preventDefault(); onSubmitHandler() } }>
+        <form
+            className={ createClassName(["input-wrapper", props.className || ""]) }
+            onSubmit={ e=> { e.preventDefault(); onSubmitHandler() } }
+        >
             <input 
                 className={ createClassName(["input", props.inputClassName || ""]) }
                 style={ {
@@ -57,8 +64,11 @@ const Input: React.FC<IInput & MyComponent> = props=> {
                 } } 
                 
                 type={ props.type || "text" }
+                min={ props.min }
+                max={ props.max }
                 minLength={ props.minLength }
                 maxLength={ props.maxLength }
+                placeholder={ props.placeholder }
                 
                 value={ newValue }
                 onChange={ onChangeHandler }

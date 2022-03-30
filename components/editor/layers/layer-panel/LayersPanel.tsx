@@ -1,11 +1,11 @@
 import { AnimateSharedLayout, motion } from "framer-motion";
 import React, { useState } from "react";
-import Layer from "../../../editor/layers/Layer";
-import LayersWorker from "../../../editor/workers/LayersWorker";
-import useStateListener, { useJustStatesListener } from "../../../src/hooks/useStateListener";
-import { ViewMode } from "../../../utils/types";
-import Panel, { SwitchViewModeButton } from "../../ui/panels/Panel";
-import LayerComponent from "./LayerComponent";
+import Layer from "../../../../editor/layers/Layer";
+import LayersWorker from "../../../../editor/workers/LayersWorker";
+import useStateListener, { useJustStatesListener } from "../../../../src/hooks/useStateListener";
+import { ViewMode } from "../../../../utils/types";
+import Panel, { SwitchViewModeButton } from "../../../ui/panels/Panel";
+import LayerComponent from "../LayerComponent";
 import LayersPanelFooter from "./LayersPanelFooter";
 import LayersPanelHeader from "./LayersPanelHeader";
 
@@ -22,7 +22,9 @@ const LayersPanel: React.FC = React.memo(()=> {
             <main className="layers-panel-content flex flex-column scrollable height-fill">
 
                 <header className="panel-header slot justify-between show-on-hover-trigger">
-                    <span className="text-muted">Layers</span>
+                    <span className="text-muted">
+                        Layers <span className="show-on-hover trans">({ LayersWorker.normalLayers.length })</span>
+                    </span>
                     <SwitchViewModeButton
                         className="show-on-hover"
                         viewMode={ viewMode }

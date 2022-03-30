@@ -16,6 +16,7 @@ const Canvas: React.FC<ICanvas> = props=> {
     const workspaceRef = createRef<HTMLDivElement>();
     const layersRef = createRef<HTMLDivElement>();
 
+    /*
     useEffect(()=> {
         if (!workspaceRef.current || !layersRef.current) return;
         // props.workspaceRef(workspaceRef.current);
@@ -31,6 +32,7 @@ const Canvas: React.FC<ICanvas> = props=> {
         function onWheel(delta: Vector2, e: WheelEvent) {
             e.preventDefault();
             
+            // Return if resizing tool
             if (Keyboard.isCtrl && Keyboard.isShift) {
                 return;
             }
@@ -48,12 +50,15 @@ const Canvas: React.FC<ICanvas> = props=> {
             }
             // Zoom
             
-            App.zoom -= delta.y / 1000 * App.zoom;
+            // App.zoom -= delta.y / 1000 * App.zoom;
             
             const min = 1 / (App.canvasHeight / 32) - .025;
             const max = config.MAX_ZOOM;
 
-            App.zoom = +clamp(App.zoom, min*2, max*2).toFixed(3);
+            App.pan.x += innerWidth/2 -  Mouse.screenPos.x;
+            App.pan.y += innerHeight/2 -  Mouse.screenPos.y;
+            // App.zoom = +clamp(App.zoom, min*2, max*2).toFixed(3);
+            console.log(App.pan);
 
             updateCanvasTransform();
         }
@@ -75,6 +80,7 @@ const Canvas: React.FC<ICanvas> = props=> {
             removeMoveListener();
         }
     }, [workspaceRef, layersRef]);
+    */
     
     return (
         <div className="workspace" ref={ workspaceRef }>

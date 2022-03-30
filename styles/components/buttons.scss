@@ -25,6 +25,20 @@
         background: lighten($bg, 6);
     }
 
+    // Children
+    .icon-wrapper {
+        width: 18px;
+        height: 18px;
+        
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &:not(:last-child) {
+            margin-right: 10px;
+        }
+    }
+
     // Colors
     &.color-transparent {
         background: transparent;
@@ -36,6 +50,12 @@
         background: transparent !important;
         &:not(:disabled):hover {
             opacity: .8;
+        }
+    }
+    &.color-red {
+        background: $red;
+        &:not(:disabled):hover {
+            background: lighten($red, 4);
         }
     }
     &.active, &.color-blue {
@@ -66,6 +86,13 @@
         height: 40px;
         padding: 0;
         border-radius: 50%;
+
+        &.middle {
+            width: 32px;
+            min-width: 32px;
+            height: 32px;
+        }
+        
     }
     
     &.p-0 {
@@ -73,6 +100,6 @@
     }
     
     &:disabled {
-        opacity: .4;
+        opacity: .2;
     }
 }

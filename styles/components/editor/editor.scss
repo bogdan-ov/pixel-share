@@ -12,12 +12,14 @@ $subpanel-height: 60px;
 .workspace {
     width: 100%;
     height: 100%;
+
     
     .canvas-layers {
         image-rendering: pixelated;
         position: absolute;
         z-index: -999;
-
+        
+        transform-origin: 50% 50%;
         background-image: url("../../../public/img/checkerboard.png");
         background-repeat: repeat;
         background-size: 8px;

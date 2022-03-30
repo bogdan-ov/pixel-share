@@ -1,0 +1,9 @@
+$project-padding: 8px;
+
+.projects-window {
+    .projects-window-scrollable {
+        max-height: 100%;
+
+        overflow-y: auto;
+    }
+}

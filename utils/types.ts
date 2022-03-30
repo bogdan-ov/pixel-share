@@ -13,6 +13,21 @@ export enum ViewMode {
     LIST,
     SHORT_LIST
 }
+export enum Anchor {
+    TOP_LEFT,
+    TOP_CENTER,
+    TOP_RIGHT,
+
+    CENTER_LEFT,
+    CENTER_CENTER,
+    CENTER_RIGHT,
+
+    BOTTOM_LEFT,
+    BOTTOM_CENTER,
+    BOTTOM_RIGHT,
+}
+
+export type ReactState<T> = React.Dispatch<React.SetStateAction<T>>
 
 export type RGBA = [red: number, green: number, blue: number, alpha: number];
 export type HSLA = [hue: number, saturation: number, lightness: number, alpha: number];

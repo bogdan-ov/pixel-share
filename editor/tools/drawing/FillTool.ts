@@ -2,7 +2,7 @@ import { ToolType } from "..";
 import { EditorStates, EditorTriggers } from "../../../states/editor-states";
 import { vec, Vector2 } from "../../../utils/math";
 import { RGBA } from "../../../utils/types";
-import { hslaToString, rgbToHex } from "../../../utils/utils";
+import { rgbToHex } from "../../../utils/utils";
 import App from "../../App";
 import Keyboard from "../../managers/Keyboard";
 import Mouse from "../../managers/Mouse";
@@ -15,13 +15,14 @@ import PickerTool from "../parent/PickerTool";
 export default class FillTool extends PickerTool {
     constructor() {
         super(ToolType.FILL);
+
+        this.resizable = false;
     }
 
     onStartDraw(renderer: Renderer): void {
         super.onStartDraw(renderer);
-
-        const currentLayer = LayersWorker.currentLayer;
-        if (!currentLayer?.editable || !this.allowUse) return;
+        if (!this.canBeUsed || this.isPickingColor) return;
+        const currentLayer = LayersWorker.currentLayer!;
 
         if (Keyboard.isShift) {
             // Fill all selection
@@ -40,8 +41,8 @@ export default class FillTool extends PickerTool {
 
         EditorStates.HelperText.value = "Filling...";
 
-        const canvasWidth = App.canvasWidth;
-        const canvasHeight = App.canvasHeight;
+        const canvasWidth = App.CanvasWidth.value;
+        const canvasHeight = App.CanvasHeight.value;
 
         const imageData = currentLayer.context.getImageData(0, 0, canvasWidth, canvasHeight);
         const startPixelPos = Mouse.pos.expand();
@@ -93,8 +94,10 @@ export default class FillTool extends PickerTool {
             }
         }
         function stop() {
+            
             EditorStates.HelperText.value = `Filled in ${ Date.now() - startFillingDate }ms`;
             EditorTriggers.Edited.trigger(true);
+            // clearInterval(inter);
         }
 
         const queue: Vector2[] = [startPixelPos.expand()];
@@ -102,10 +105,16 @@ export default class FillTool extends PickerTool {
         let i = 0;
 
         while (queue.length > 0 && i < imageData.data.length) {
+        // const inter = setInterval(()=> {
+            if (!(queue.length > 0 && i < imageData.data.length && visited.length != App.CanvasWidth.value*App.CanvasHeight.value)) {
+                stop();
+                return;
+            }
+            
             const currentPos = queue[queue.length - 1];
             if (!currentPos) {
                 stop();
-                break;
+                // break;
             }
             queue.pop();
 
@@ -115,6 +124,7 @@ export default class FillTool extends PickerTool {
             tryFillPixel(currentPos, vec(0, -1))
 
             i++;
+        // });
         }
         stop();
 

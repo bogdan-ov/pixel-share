@@ -16,10 +16,11 @@ export default class EllipseTool extends ShapeTool {
     }
 
     // Algorithm source: https://www.geeksforgeeks.org/midpoint-ellipse-drawing-algorithm/
+    // (Yes, I'm just copy and paste code...)
     onDraw(renderer: Renderer): void {
         super.onDraw(renderer);
         const previewLayer = LayersWorker.previewLayer;
-        if (!previewLayer) return;
+        if (!previewLayer || !this.canBeUsed) return;
         
         const width = Math.floor(Math.abs(this.shapeWidth)/2 + .5);
         const height = Math.floor(Math.abs(this.shapeHeight)/2 + .5);
@@ -43,10 +44,10 @@ export default class EllipseTool extends ShapeTool {
         while (dx < dy)
         {
             
-            drawPixel(x + this.start.x + offset.x, y + this.start.y + offset.y);
-            drawPixel(-x + this.start.x + offset.x, y + this.start.y + offset.y);
-            drawPixel(x + this.start.x + offset.x, -y + this.start.y + offset.y);
-            drawPixel(-x + this.start.x + offset.x, -y + this.start.y + offset.y);
+            this.drawPixel(x + this.start.x + offset.x, y + this.start.y + offset.y);
+            this.drawPixel(-x + this.start.x + offset.x, y + this.start.y + offset.y);
+            this.drawPixel(x + this.start.x + offset.x, -y + this.start.y + offset.y);
+            this.drawPixel(-x + this.start.x + offset.x, -y + this.start.y + offset.y);
     
             // Checking and updating value of
             // decision parameter based on algorithm
@@ -74,10 +75,10 @@ export default class EllipseTool extends ShapeTool {
         // Plotting points of region 2
         while (y >= 0)
         {
-            drawPixel(x + this.start.x + offset.x, y + this.start.y + offset.y);
-            drawPixel(-x + this.start.x + offset.x, y + this.start.y + offset.y);
-            drawPixel(x + this.start.x + offset.x, -y + this.start.y + offset.y);
-            drawPixel(-x + this.start.x + offset.x, -y + this.start.y + offset.y);
+            this.drawPixel(x + this.start.x + offset.x, y + this.start.y + offset.y);
+            this.drawPixel(-x + this.start.x + offset.x, y + this.start.y + offset.y);
+            this.drawPixel(x + this.start.x + offset.x, -y + this.start.y + offset.y);
+            this.drawPixel(-x + this.start.x + offset.x, -y + this.start.y + offset.y);
     
             // Checking and updating parameter
             // value based on algorithm
@@ -99,17 +100,17 @@ export default class EllipseTool extends ShapeTool {
 
         previewLayer.render();
 
-        function drawPixel(x: number, y: number) {
-            if (!previewLayer) return;
-
-            previewLayer.drawPixel({
-                position: vec(x, y),
-                allowPreview: true,
-                size: App.ToolsSize.value,
-                color: PaletteWorker.currentPaletteColor.hexColor,
-            });
-        }
-
         EditorStates.HelperText.value = `x ${ this.start.x }, y ${ this.start.y }<br>w ${ Math.abs(this.shapeWidth)+1 }, h ${ Math.abs(this.shapeHeight)+1 }`;
+    }
+
+    drawPixel(x: number, y: number) {
+        if (!LayersWorker.previewLayer) return;
+
+        LayersWorker.previewLayer.drawPixel({
+            position: vec(x, y),
+            allowPreview: true,
+            size: App.ToolsSize.value,
+            color: PaletteWorker.currentPaletteColor.hexColor,
+        });
     }
 }

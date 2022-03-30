@@ -16,21 +16,19 @@ const PenToolSettings: React.FC<IToolSettingsContainer> = React.memo(()=> {
 
             <Tooltip
                 placement="bottom"
-                className="tool-property"
                 maxWidth={ 160 }
                 tooltip={ <div className="text-center">Removes all sharp pixels from your line</div> }
             >
-                <Checkbox checked={ pixelPerfect } onChange={ v=> pixelPerfectState.value = v }>
+                <Checkbox className="tool-property" checked={ pixelPerfect } onChange={ v=> pixelPerfectState.value = v }>
                     <span>Pixel perfect</span>
                 </Checkbox>
             </Tooltip>
             <Tooltip
                 placement="bottom"
                 maxWidth={ 160 }
-                className="tool-property"
                 tooltip={ <div className="text-center">Auto pick color you click</div> }
             >
-                <Checkbox checked={ autoPick } onChange={ v=> autoPickState.value = v }>
+                <Checkbox className="tool-property" checked={ autoPick } onChange={ v=> autoPickState.value = v }>
                     <span>Auto pick</span>
                 </Checkbox>
             </Tooltip>

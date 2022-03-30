@@ -9,11 +9,12 @@ import PaletteWorker from "../../../editor/workers/PaletteWorker";
 import Panel, { SwitchViewModeButton } from "../../ui/panels/Panel";
 import createClassName from "../../../src/hooks/createClassName";
 import Button from "../../ui/buttons/Button";
+import { AnimatePresence, motion } from "framer-motion";
 
 const PalettePanel: React.FC = ()=> {
     const [palette, paletteState] = useStateListener(PaletteWorker.Palette, "palette-panel-palette");
     const [viewMode, setViewMode] = useState<ViewMode>(ViewMode.LIST);
-    useJustStatesListener([PaletteWorker.CurrentPaletteColorId], "palette-panel-just");
+    useJustStatesListener([PaletteWorker.CurrentPaletteColorId, PaletteWorker.LastPaletteColorId], "palette-panel-just");
 
     const className = createClassName([
         "palette-panel flex flex-column gap-2"
@@ -24,12 +25,6 @@ const PalettePanel: React.FC = ()=> {
             ...v,
             new PaletteColor(Date.now(), [(Math.sin(v.length/5) + 1) / 2 * 360, 100, 50, 1])
         ] : v);
-    }
-    function toggleViewMode() {
-        if (viewMode == ViewMode.LIST)
-            setViewMode(ViewMode.GRID);
-        else if (viewMode == ViewMode.GRID)
-            setViewMode(ViewMode.LIST);
     }
     
     return (
@@ -46,14 +41,16 @@ const PalettePanel: React.FC = ()=> {
                 />
             </header>
 
-            <div className="palette-colors-list auto-borders ph-1">
-                { palette.map(color=>
-                    <PaletteColorComponent 
-                        color={ color.hslaColor }
-                        id={ color.id }
-                        key={ color.id }
-                    />
-                ) }
+            <div className="palette-panel-scroll">
+                <div className="palette-colors-list auto-borders ph-1">
+                    { palette.map(color=>
+                        <PaletteColorComponent 
+                            color={ color.hslaColor }
+                            id={ color.id }
+                            key={ color.id }
+                        />
+                    ) }
+                </div>
             </div>
 
             <footer className="ph-1 pb-1">

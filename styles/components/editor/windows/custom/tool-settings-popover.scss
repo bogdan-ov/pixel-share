@@ -12,23 +12,22 @@
         align-items: flex-start;
 
         .checkbox-wrapper {
-            width: 100%;
-            
-            justify-content: space-between;
             flex-direction: row-reverse;
         }
         .tool-property{
-            &:not(:last-child) {
-                margin: 0 !important;
-                margin-bottom: 15px !important;
-            }
-            .checkbox {
+            justify-content: space-between;
+            
+            .checkbox, &.checkbox {
                 margin: 0 !important;
             }
         }
         
-        > div {
+        > * {
             width: 100%;
+            &:not(:last-child) {
+                margin: 0 !important;
+                margin-bottom: 15px !important;
+            }
         }
         hr {
             display: none;

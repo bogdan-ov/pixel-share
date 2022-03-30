@@ -10,9 +10,13 @@ export class Keyboard {
     keysPressed: { [key: string]: boolean }
 
     private OnKeyDownTrigger: Trigger<KeyboardEvent>
+    private OnKeyPressTrigger: Trigger<KeyboardEvent>
     private OnKeyUpTrigger: Trigger<KeyboardEvent>
-    private OnKeyUpDownTrigger: Trigger<KeyboardEvent>
+    private OnKeyUpPressTrigger: Trigger<KeyboardEvent>
     private OnEscapeTrigger: Trigger
+
+    private pressed: boolean
+    private released: boolean
 
     constructor() {
         this.isCtrl = false;
@@ -23,16 +27,19 @@ export class Keyboard {
         this.keysPressed = {};
 
         this.OnKeyDownTrigger = trigger("keyboard-key-down");
+        this.OnKeyPressTrigger = trigger("keyboard-key-press");
         this.OnKeyUpTrigger = trigger("keyboard-key-up");
-        this.OnKeyUpDownTrigger = trigger("keyboard-key-up-down");
+        this.OnKeyUpPressTrigger = trigger("keyboard-key-up-down");
         this.OnEscapeTrigger = trigger("keyboard-escape");
+
+        this.pressed = false;
+        this.released = false;
     }
 
     init() {
         window.addEventListener("keydown", e => {
-            if (e.altKey)
-                e.preventDefault();
-
+            this.released = false;
+                
             this.keysPressed[e.code.toLowerCase()] = true;
 
             this.isCtrl = e.ctrlKey;
@@ -42,20 +49,29 @@ export class Keyboard {
             this.isEnter = e.code == "Enter";
 
             this.OnKeyDownTrigger.trigger(e);
-            this.OnKeyUpDownTrigger.trigger(e);
-            if (e.code == "Escape")
-                this.OnEscapeTrigger.trigger(true);
+            if (!this.pressed) {
+                this.OnKeyUpPressTrigger.trigger(e);
+                this.OnKeyPressTrigger.trigger(e);
+                if (e.code == "Escape")
+                    this.OnEscapeTrigger.trigger(true);
+                this.pressed = true;
+            }
         });
         window.addEventListener("keyup", e => {
             if (e.altKey)
                 e.preventDefault();
     
+            this.pressed = false;
+                
             this.isCtrl = false;
             this.isShift = false;
             this.isAlt = false;
             
             this.OnKeyUpTrigger.trigger(e);
-            this.OnKeyUpDownTrigger.trigger(e);
+            if (!this.released) {
+                this.OnKeyUpPressTrigger.trigger(e);
+                this.released = true;
+            }
 
             delete this.keysPressed[e.code.toLowerCase()];
         });
@@ -76,11 +92,14 @@ export class Keyboard {
     onKeyDown(callback: (event: KeyboardEvent) => void, customId?: string): () => void {
         return this.OnKeyDownTrigger.listen(callback, customId);
     }
+    onKeyPress(callback: (event: KeyboardEvent) => void, customId?: string): () => void {
+        return this.OnKeyPressTrigger.listen(callback, customId);
+    }
     onKeyUp(callback: (event: KeyboardEvent) => void, customId?: string): () => void {
         return this.OnKeyUpTrigger.listen(callback, customId);
     }
-    onKeyUpDown(callback: (event: KeyboardEvent) => void, customId?: string): () => void {
-        return this.OnKeyUpDownTrigger.listen(callback, customId);
+    onKeyUpPress(callback: (event: KeyboardEvent) => void, customId?: string): () => void {
+        return this.OnKeyUpPressTrigger.listen(callback, customId);
     }
     onEscape(callback: ()=> void, customId?: string): ()=> void {
         return this.OnEscapeTrigger.listen(callback, customId);

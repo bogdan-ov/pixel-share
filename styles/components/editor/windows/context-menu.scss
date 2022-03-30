@@ -1,0 +1,13 @@
+.context-menu-wrapper {
+    position: fixed;
+    z-index: 9999;
+    left: 100px;
+    top: 100px;
+
+    pointer-events: none;
+
+    &.active {
+        pointer-events: all;
+    }
+    
+}

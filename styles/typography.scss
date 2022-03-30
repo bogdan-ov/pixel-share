@@ -1,9 +1,9 @@
 .text-blue {
     color: $blue !important;
 }
-// .text-muted {
-//     color: rgb(124, 124, 124) !important;
-// }
+.text-red {
+    color: $red !important;
+}
 .text-muted {
     color: $grey !important;
 }
@@ -13,11 +13,17 @@
 .text-center {
     text-align: center;
 }
+.text-underline {
+    text-decoration: underline;
+}
 .fw-500 {
     font-weight: 500;
 }
-.fs-medium {
-    font-size: 18px;
+.fw-700 {
+    font-weight: 700;
+}
+.fs-middle {
+    font-size: 15px !important;
 }
 .fs-small {
     font-size: 12px;

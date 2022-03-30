@@ -10,7 +10,7 @@ export default class PaletteColor {
         this.hslaColor = color || [0, 0, 0, 1];
     }
 
-    fromHex(hex: string): PaletteColor {
+    setHex(hex: string): PaletteColor {
         this.hslaColor = hexToHsl(hex);
 
         return this;

@@ -1,161 +1,137 @@
 import React from "react";
-import App from "../../../editor/App";
-import ActionWorker from "../../../editor/workers/ActionWorker";
 import ProjectWorker from "../../../editor/workers/ProjectWorker";
+import ViewWorker from "../../../editor/workers/ViewWorker";
+import useStateListener from "../../../src/hooks/useStateListener";
 import { EditorTriggers, EditorWindowType } from "../../../states/editor-states";
-import { IContextMenuButtonsGroup } from "../../context-menu/ContextMenu";
+import Button, { IButton } from "../../ui/buttons/Button";
+import Checkbox from "../../ui/inputs/Checkbox";
+import TriggerNotice, { ITriggerNotice } from "../../ui/interactive/TriggerNotice";
+import Panel from "../../ui/panels/Panel";
+import DropdownMenu, { IDropdownMenu } from "../../ui/windows/DropdownMenu";
 
 interface IMenubarButton {
-    title: string
-    contextButtonsGroups: IContextMenuButtonsGroup[]
-    
-    // icon: keyof typeof icons
-    // onClick: ()=> void
-    // tooltip?: React.ReactElement
-
-    // trigger?: EditorActionType
-};
+    header?: IDropdownMenu["header"]
+    buttonsGroups?: IDropdownMenu["buttonsGroups"]
+}
 
 const Menubar: React.FC = React.memo(()=> {
+    const [gridEnabled, enableGridState] = useStateListener(ViewWorker.GridEnabled);
+    const [projectName] = useStateListener(ProjectWorker.Name);
 
-    function pngExportHandler() {
+    function resizeHandler() {
         EditorTriggers.Window.trigger({
-            type: EditorWindowType.EXPORT_IMAGE
-        }, "menubar");
-    }
-    function undoHandler() {
-        ActionWorker.undo()
-    }
-
-    function loadProjectHandler() {
-        ProjectWorker.openProject();
-    }
-    function saveProjectHandler() {
-        ProjectWorker.saveProject();
-    }
-
-    function resizeCanvas() {
-        const sizePrompt = prompt("🔳 Canvas size (width*height):", `${ App.canvasWidth }*${ App.canvasHeight }`)
-        if (!sizePrompt) {
-            return;
-        }
-        const size = sizePrompt.toString().split("*");
-        if (size.length != 2 || typeof (+size[0]) != "number" || typeof (+size[1]) != "number") {
-            EditorTriggers.Notification.trigger({
-                content: "😛 Incorrect syntax"
-            })
-            return;
-        }
-
-        ProjectWorker.resizeProjectCanvas(+size[0], +size[1]);
+            type: EditorWindowType.RESIZE_CANVAS_WINDOW,
+        })
     }
     
     return (
-        <div className="menubar slot gap-4">
+        <Panel className="menubar-panel flex flex-column justify-between">
 
-            <div className="menubar-buttons slot height-fill gap-1">
-
+            <div className="flex flex-column gap-1">
+                
+                {/* // ? Project */}
                 <MenubarButton
-                    title="Project"
-                    contextButtonsGroups={ [[
+                    header={ <span className="text-muted p-1 ph-1">{ projectName || "<Untitled>" }</span> }
+                    buttonsGroups={ [
+                        [
+                            {
+                                icon: "save",
+                                content: <span>Save <span className="text-muted">{ projectName }</span></span>,
+                                actionName: "save-project-trigger"
+                            },
+                            {
+                                icon: "open",
+                                content: "Open",
+                                actionName: "open-project-trigger"
+                            },
+                            {
+                                content: "Save as...",
+                                actionName: "save-project-as-trigger"
+                            },
+                        ],
+                        [
+                            {
+                                icon: "file-export",
+                                content: "Export!",
+                                actionName: "export-image-trigger"
+                            },
+                        ],
+                    ] }
+                
+                    tooltip={ <span>Project</span> }
+                    icon="file"
+                />
+
+                {/* // ? Image */}
+                <MenubarButton
+                    buttonsGroups={ [[
                         {
-                            content: "Save",
-                            icon: "save",
-                            actionName: "save-project",
-                        },
-                        {
-                            content: "Open",
-                            icon: "open",
-                            actionName: "open-project"
+                            content: "Resize",
+                            handler: resizeHandler
                         },
                     ]] }
+                
+                    tooltip={ <span>Image</span> }
+                    icon="image"
                 />
+
+                {/* // ? View */}
                 <MenubarButton
-                    title="Edit"
-                    contextButtonsGroups={ [[
+                    buttonsGroups={ [[
                         {
-                            content: "Undo",
-                            icon: "undo",
-                            actionName: "undo",
+                            content: "Toggle grid",
+                            actionName: "toggle-grid",
+                            icon: gridEnabled ? "checkmark" : undefined
+                        },
+                        {
+                            content: "Grid configuration",
+                            handler: ()=> {
+                                EditorTriggers.Window.trigger({
+                                    type: EditorWindowType.GRID_CONFIG_WINDOW
+                                });
+                            }
                         }
                     ]] }
-                />
 
-                {/* // ? Resize canvas
-                <MenubarButton
-                    icon="rectangle"
-                    tooltip={ <span>Resize canvas</span> }
-                    onClick={ resizeCanvas }
+                    tooltip={ <span>Grid</span> }
+                    icon="visible"
                 />
-                // ? Open project
-                <MenubarButton
-                    icon="load"
-                    tooltip={ <span>Load project</span> }
-                    onClick={ loadProjectHandler }
-                />
-                // ? Save project
-                <MenubarButton
-                    icon="save"
-                    tooltip={ <span>Save project</span> }
-                    onClick={ saveProjectHandler }
-                />
-                // ? Undo
-                <MenubarButton
-                    icon="cross"
-                    tooltip={ <span>Undo</span> }
-                    onClick={ undoHandler }
-                    trigger={ EditorActionType.UNDO }
-                />
-                // ? Export
-                <MenubarButton
-                    icon="checkmark"
-                    tooltip={ <span>Export PNG</span> }
-                    onClick={ pngExportHandler }
-                /> */}
 
             </div>
-
-        </div>
-    );
+            
+        </Panel>
+    )
 });
 
-const MenubarButton: React.FC<IMenubarButton> = props=> {
-
-    // const controls = useAnimation();
-
-    // useEffect(()=> {
-    //     if (!props.trigger) return;
-
-    //     EditorTriggers.Action.listen(action=> {
-            
-    //         if (action.type == props.trigger)
-    //             controls.start({
-    //                 y: [0, -2, 1, 0],
-    //                 transition: {
-    //                     ease: "easeInOut",
-    //                     duration: .3
-    //                 }
-    //             });
-
-    //     });
-        
-    // }, []);
-
-    function onClickHandler(e: React.MouseEvent) {
-        EditorTriggers.ContextMenu.trigger({
-            title: <span className="text-muted p-1">{ props.title }</span>,
-            event: e,
-            buttonsGroups: props.contextButtonsGroups
-        });
-    }
+export const MenubarButton: React.FC<IButton & ITriggerNotice & IMenubarButton> = props=> {
+    const btn = (
+        <TriggerNotice
+            triggerType={ props.triggerType }
+            trigger={ props.trigger }
+        >
+            <Button
+                tooltipPlacement="left"
+                tooltipOffset={ 10 }
+                
+                fab
+                color="transparent"
+                className="icon-muted text-muted"
+                { ...props }
+            />
+        </TriggerNotice>
+    )
+    
+    if (!props.buttonsGroups)
+        return btn;
     
     return (
-        <button
-            onClick={ onClickHandler }
-            className="menubar-button button color-transparent"
+        <DropdownMenu 
+            minWidth={ 240 }
+            header={ props.header }
+            buttonsGroups={ props.buttonsGroups || [] }
         >
-            { props.children || props.title }
-        </button>
+            { btn }
+        </DropdownMenu>
     );
 };
 

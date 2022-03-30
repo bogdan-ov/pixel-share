@@ -14,7 +14,7 @@ interface IPopover {
     setActive?: (value: boolean)=> void
     offset?: number
     
-    openTrigger: EditorWindowType
+    trigger: EditorWindowType
     onActive?: (action: any)=> void
     onClose?: ()=> void
 
@@ -38,7 +38,7 @@ const Popover: React.FC<IPopover & MyComponent> = props=> {
     useEffect(()=> {
 
         const unlisten = EditorTriggers.Window.listen(action=> {
-            if (action.type != props.openTrigger) return;
+            if (action.type != props.trigger) return;
 
             const node = ref.current;
             const targetNode = action.targetRef?.current;
@@ -55,7 +55,7 @@ const Popover: React.FC<IPopover & MyComponent> = props=> {
 
             const pos = vec(
                 targetInRight ? left - bounds.width : right,
-                top
+                top - (targetBounds?.height || 0)/2
             ).clamp(vec(0, 0), vec(innerWidth - bounds.width, innerHeight - bounds.height));
             
             node.style.left = `${ pos.x }px`;
@@ -68,19 +68,17 @@ const Popover: React.FC<IPopover & MyComponent> = props=> {
             
         });
 
-        const unlistenKeyboard = Keyboard.onEscape(()=> {
+        return unlisten;
+        
+    }, [ref]);
+    useEffect(()=> {
+        return Keyboard.onEscape(()=> {
             if (_active) {
                 _setActive(false);
                 props.onClose && props.onClose();
             }
         });
-
-        return ()=> {
-            unlisten();
-            unlistenKeyboard();
-        }
-        
-    }, [ref]);
+    }, []);
     
     return (
         <ClickOutside 

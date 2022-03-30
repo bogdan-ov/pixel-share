@@ -1,3 +1,4 @@
+import { EditorTriggers } from "../../states/editor-states";
 import { vec, Vector2 } from "../../utils/math";
 import LayersWorker from "../workers/LayersWorker";
 import SelectionWorker from "../workers/SelectionWorker";
@@ -40,22 +41,8 @@ export class Renderer {
         }
 
         const sel = SelectionWorker.selection;
-        if (sel.imageData) {
-            curLayer.putImageData(sel.imageData, sel.from);
-            // const imageData = sel.imageData.data;
-
-            // for (let i = 0; i < imageData.length; i ++) {
-            //     const pos = vec(i % sel.width, Math.floor(i / sel.width)).add(sel.from);
-            //     const color = `rgba(${ imageData[i*4] }, ${ imageData[i*4+1] }, ${ imageData[i*4+2] }, ${ imageData[i*4+3]/255 })`;
-
-            //     curLayer.drawPixel({
-            //         position: pos,
-            //         color,
-            //         size: 1
-            //     });
-                
-            // }
-        }
+        if (sel.imageData)
+            curLayer.putImageData(sel.imageData, sel.from.x, sel.from.y);
         
         previewLayer.clearPixels();
     }

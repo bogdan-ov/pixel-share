@@ -143,6 +143,10 @@ $gap-length: 10;
     @extend .slot;
     @extend .justify-center;
 }
+.list {
+    @extend .flex;
+    @extend .flex-column;
+}
 
 .width-fill {
     width: 100% !important;
@@ -169,4 +173,8 @@ $gap-length: 10;
 }
 .text-left {
     text-align: left;
+}
+
+.pos-abs {
+    position: absolute;
 }

@@ -44,7 +44,7 @@ const Notification: React.FC<INotification & { removeNotification(id: INotificat
             } }
             className="notification slot gap-2"
         >
-            <main dangerouslySetInnerHTML={ { __html: props.content } } />
+            <main className="slot" dangerouslySetInnerHTML={ { __html: props.content } } />
         </motion.div>
     );
 };

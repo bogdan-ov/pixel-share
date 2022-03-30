@@ -1,0 +1,30 @@
+.popover-wrapper {
+    position: fixed;
+    z-index: 999;
+    
+    pointer-events: none;
+    
+    &.active {
+        pointer-events: all;
+
+        .popover {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+
+            transition: .1s ease-out;
+        }
+        
+    }
+
+    .popover {
+        opacity: 0;
+        transform: translateY(20px) scale(.95);
+
+        box-shadow: 0 10px 30px rgba(0, 0, 0, .2);
+        
+        .popover-content {
+            display: flex;
+            flex-direction: column;
+        }
+    }
+}
