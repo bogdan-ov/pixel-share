@@ -133,7 +133,7 @@ const WelcomeWindow: React.FC = ()=> {
                 </main>
 
                 <footer className="footer list gap-2 mt-8">
-                    <span className="text-muted" style={{ transform: "translateX(6px)" }}>(c) Pixel share - i don't have any rights</span>
+                    <span className="text-muted" style={{ transform: "translateX(6px)" }}>(c) Pixel share - i don{"'"}t have any rights</span>
                     <div className="bogdanov">
                         <Image alt="Bogdanov" layout="fill" objectFit="cover" src="../../../public/img/bogdanov-logo.png" />
                     </div>

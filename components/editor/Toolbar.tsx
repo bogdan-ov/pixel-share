@@ -82,7 +82,7 @@ const Tool: React.FC<{ type: ToolType }> = props=> {
         [ToolType.FILL]: <>
             <i className="text-muted">Who drew this icon?</i>
             <ToolTooltipKey keys={ ["Shift"] }>to fill all selection</ToolTooltipKey>
-            <ToolTooltipKey keys={ ["Alt"] }>fill same colors<br />(don't work on some browsers)</ToolTooltipKey>
+            <ToolTooltipKey keys={ ["Alt"] }>fill same colors<br />(don{"'"}t work on some browsers)</ToolTooltipKey>
         </>,
         
         [ToolType.ELLIPSE]: <>{ shapeTool }</>,
