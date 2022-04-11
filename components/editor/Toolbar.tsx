@@ -7,7 +7,6 @@ import Icon from "../Icon";
 import Button from "../ui/buttons/Button";
 import { HotkeysBuilder, Key } from "../ui/Misc";
 import Tooltip from "../ui/windows/Tooltip";
-import logo_img from "../../public/img/logo.png";
 import Image from "next/image";
 
 const Toolbar: React.FC = ()=> {
@@ -40,7 +39,7 @@ const Toolbar: React.FC = ()=> {
                     >:D</Button>
                 </a>
                 <div className="logo small">
-                    <Image alt="Logo" src={ logo_img } layout="fill" objectFit="cover" />
+                    <Image alt="Logo" src="../../public/img/logo.png" layout="fill" objectFit="cover" />
                 </div>
             </div>
 
