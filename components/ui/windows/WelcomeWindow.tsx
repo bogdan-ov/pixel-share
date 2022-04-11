@@ -52,7 +52,7 @@ const WelcomeWindow: React.FC = ()=> {
                 <main className="content list gap-4">
                     <div className="logos slot">
                         <div className="logo">
-                            <Image alt="Logo" src="../../../public/img/logo.png" layout="fill" objectFit="cover" />
+                            <Image alt="Logo" src="/img/logo.png" layout="fill" objectFit="cover" />
                         </div>
                         <span>Pixel share! <span className="text-muted">
                             <a href="https://vk.com/bbog908" target="_blank" rel="noreferrer">Bogdanov</a> made it :D
@@ -135,7 +135,7 @@ const WelcomeWindow: React.FC = ()=> {
                 <footer className="footer list gap-2 mt-8">
                     <span className="text-muted" style={{ transform: "translateX(6px)" }}>(c) Pixel share - i don{"'"}t have any rights</span>
                     <div className="bogdanov">
-                        <Image alt="Bogdanov" layout="fill" objectFit="cover" src="../../../public/img/bogdanov-logo.png" />
+                        <Image alt="Bogdanov" layout="fill" objectFit="cover" src="/img/bogdanov-logo.png" />
                     </div>
                 </footer>
                 

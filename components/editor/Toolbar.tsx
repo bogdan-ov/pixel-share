@@ -39,7 +39,7 @@ const Toolbar: React.FC = ()=> {
                     >:D</Button>
                 </a>
                 <div className="logo small">
-                    <Image alt="Logo" src="../../public/img/logo.png" layout="fill" objectFit="cover" />
+                    <Image alt="Logo" src="/img/logo.png" layout="fill" objectFit="cover" />
                 </div>
             </div>
 
