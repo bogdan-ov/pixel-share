@@ -10,6 +10,7 @@ import Button from "../buttons/Button";
 import AspectRatioField from "../../editor/settings/AspectRatioField";
 import { clamp } from "../../../utils/math";
 import config from "../../../utils/config";
+import Image from "next/image";
 
 interface ISizeVariantButton {
     size: number
@@ -53,7 +54,9 @@ const WelcomeWindow: React.FC = ()=> {
 
                 <main className="content list gap-4">
                     <div className="logos slot">
-                        <img alt="Logo" src={ logo_img.src } className="logo" />
+                        <div className="logo">
+                            <Image alt="Logo" src={ logo_img } layout="fill" objectFit="cover" />
+                        </div>
                         <span>Pixel share! <span className="text-muted">
                             <a href="https://vk.com/bbog908" target="_blank" rel="noreferrer">Bogdanov</a> made it :D
                         </span></span>
@@ -134,7 +137,9 @@ const WelcomeWindow: React.FC = ()=> {
 
                 <footer className="footer list gap-2 mt-8">
                     <span className="text-muted" style={{ transform: "translateX(6px)" }}>(c) Pixel share - i don't have any rights</span>
-                    <img alt="Bogdanov" src={ bogdanovLogo_img.src } className="bogdanov" />
+                    <div className="bogdanov">
+                        <Image alt="Bogdanov" layout="fill" objectFit="cover" src={ bogdanovLogo_img } />
+                    </div>
                 </footer>
                 
             </div>

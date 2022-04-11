@@ -39,8 +39,8 @@ class ProjectWorker {
         window.addEventListener("beforeunload", (e)=> {
             if (!this.Saved.value) {
                 // ! aAAAAAA
-                // e.preventDefault();
-                // e.returnValue = "Close/reload page? You didn't save your changes";
+                e.preventDefault();
+                e.returnValue = "Close/reload page? You didn't save your changes";
             }
         });
         EditorTriggers.Edited.listen(()=> {

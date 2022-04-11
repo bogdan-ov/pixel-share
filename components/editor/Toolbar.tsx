@@ -8,6 +8,7 @@ import Button from "../ui/buttons/Button";
 import { HotkeysBuilder, Key } from "../ui/Misc";
 import Tooltip from "../ui/windows/Tooltip";
 import logo_img from "../../public/img/logo.png";
+import Image from "next/image";
 
 const Toolbar: React.FC = ()=> {
 
@@ -38,7 +39,9 @@ const Toolbar: React.FC = ()=> {
                         className="show-on-hover fw-500 text-muted mb-2"
                     >:D</Button>
                 </a>
-                <img alt="Logo" src={ logo_img.src } className="logo" style={ { width: 40, height: 40 } } />
+                <div className="logo small">
+                    <Image alt="Logo" src={ logo_img } layout="fill" objectFit="cover" />
+                </div>
             </div>
 
         </div>
