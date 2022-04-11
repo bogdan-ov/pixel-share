@@ -1,41 +1,29 @@
 import React, { useState } from "react";
 import App from "../../../../editor/App";
-import createClassName from "../../../../src/hooks/createClassName";
+import useStateListener from "../../../../src/hooks/useStateListener";
 import { EditorTriggers, EditorWindowType } from "../../../../states/editor-states";
 import config from "../../../../utils/config";
 import { clamp } from "../../../../utils/math";
 import { Anchor } from "../../../../utils/types";
 import Button from "../../../ui/buttons/Button";
 import Input from "../../../ui/inputs/Input";
-import Tooltip from "../../../ui/windows/Tooltip";
 import Window, { IWindowNeeds } from "../../../ui/windows/Window";
-
-interface IAnchorCell {
-    anchor: Anchor
-    setAnchor: (v: Anchor)=> void
-    type: Anchor
-}
+import AspectRatioField from "../../settings/AspectRatioField";
+import AnchorField from "./AnchorField";
 
 const ResizeCanvasWindow: React.FC<IWindowNeeds> = props=> {
+    const [canvasWidth] = useStateListener(App.CanvasWidth);
+    const [canvasHeight] = useStateListener(App.CanvasHeight);
+
     const [active, setActive] = useState<boolean>(false);
-    const [width, setWidth] = useState<number>(App.CanvasWidth.value);
-    const [height, setHeight] = useState<number>(App.CanvasHeight.value);
+    const [width, setWidth] = useState<number>(canvasWidth);
+    const [height, setHeight] = useState<number>(canvasHeight);
     const [scale, setScale] = useState<number>(1);
-    const [keepAspect, setKeepAspect] = useState<boolean>(true);
-    const [aspect, setAspect] = useState<number>(App.CanvasWidth.value / App.CanvasHeight.value);
+    const [aspect, setAspect] = useState<number>(canvasWidth / canvasHeight);
     const [anchor, setAnchor] = useState<Anchor>(Anchor.TOP_LEFT);
 
-    const finalWidth = Math.round(width * scale);
-    const finalHeight = Math.round(height * scale);
-
-    function toggleKeepAspect() {
-        if (!keepAspect) {
-            setAspect(width / height);
-            setKeepAspect(true);
-        } else {
-            setKeepAspect(false);
-        }
-    }
+    const finalWidth = clamp(Math.round(width * scale), config.MIN_CANVAS_WIDTH, config.MAX_CANVAS_WIDTH);
+    const finalHeight = clamp(Math.round(height * scale), config.MIN_CANVAS_HEIGHT, config.MAX_CANVAS_HEIGHT);
     
     function applyHandler() {
         const successResize = App.resizeCanvas(finalWidth, finalHeight, anchor, true);
@@ -65,7 +53,6 @@ const ResizeCanvasWindow: React.FC<IWindowNeeds> = props=> {
     return (
         <Window 
             constrainsRef={ props.constrainsRef }
-            custom
             active={ active }
             setActive={ setActive }
         
@@ -80,72 +67,23 @@ const ResizeCanvasWindow: React.FC<IWindowNeeds> = props=> {
 
                 <div className="flex width-fill gap-4">
                     {/* Anchor */}
-                    <Tooltip
-                        tooltip={ <span>Anchor</span> }
-                        placement="bottom"
-                        offset={ -6 }
-                    >
-                        <div className="anchor">
-                            <AnchorCell type={ Anchor.TOP_LEFT } anchor={ anchor } setAnchor={ setAnchor } />
-                            <AnchorCell type={ Anchor.TOP_CENTER } anchor={ anchor } setAnchor={ setAnchor } />
-                            <AnchorCell type={ Anchor.TOP_RIGHT } anchor={ anchor } setAnchor={ setAnchor } />
-                            <AnchorCell type={ Anchor.CENTER_LEFT } anchor={ anchor } setAnchor={ setAnchor } />
-                            <AnchorCell type={ Anchor.CENTER_CENTER } anchor={ anchor } setAnchor={ setAnchor } />
-                            <AnchorCell type={ Anchor.CENTER_RIGHT } anchor={ anchor } setAnchor={ setAnchor } />
-                            <AnchorCell type={ Anchor.BOTTOM_LEFT } anchor={ anchor } setAnchor={ setAnchor } />
-                            <AnchorCell type={ Anchor.BOTTOM_CENTER } anchor={ anchor } setAnchor={ setAnchor } />
-                            <AnchorCell type={ Anchor.BOTTOM_RIGHT } anchor={ anchor } setAnchor={ setAnchor } />
-                        </div>
-                    </Tooltip>
+                    <AnchorField
+                        anchor={ anchor }
+                        setAnchor={ setAnchor }
+                    />
                     
                     <div className="list width-fill gap-2">
 
                         {/* Width / Height */}
-                        <div className="slot width-fill gap-2">
-                            <div className="list gap-2 width-fill">
+                        <AspectRatioField
+                            width={ width }
+                            height={ height }
+                            setWidth={ setWidth }
+                            setHeight={ setHeight }
 
-                                <label className="slot justify-between width-fill">
-                                    <span>Width</span>
-                                    <Input
-                                        value={ width }
-                                        onSubmitChange={ v=> {
-                                            setWidth(+v)
-                                            if (keepAspect)
-                                                setHeight(+v/aspect);
-                                        } }
-
-                                        min={ 1 }
-                                        max={ config.MAX_CANVAS_WIDTH }
-
-                                        type="number"
-                                    />
-                                </label>
-                                <label className="slot justify-between width-fill">
-                                    <span>Height</span>
-                                    <Input
-                                        value={ height }
-                                        onSubmitChange={ v=> {
-                                            setHeight(+v)
-                                            if (keepAspect)
-                                                setWidth(+v*aspect);
-                                        } }
-
-                                        min={ 1 }
-                                        max={ config.MAX_CANVAS_HEIGHT }
-
-                                        type="number"
-                                    />
-                                </label>
-                                
-                            </div>
-
-                            <Button
-                                ghost
-                                size="small"
-                                onClick={ toggleKeepAspect }
-                                icon={ keepAspect ? "keep" : "not-keep" }
-                            />
-                        </div>
+                            aspect={ aspect }
+                            setAspect={ setAspect }
+                        />
 
                         {/* Scale */}
                         <label className="slot justify-between gap-2" style={ { maxWidth: "max-content" } }>
@@ -192,22 +130,6 @@ const ResizeCanvasWindow: React.FC<IWindowNeeds> = props=> {
             </div>
             
         </Window>
-    );
-};
-
-const AnchorCell: React.FC<IAnchorCell> = props=> {
-    const className = createClassName([
-        "anchor-cell",
-        props.type == props.anchor && "active"
-    ]);
-    
-    return (
-        <Button 
-            onClick={ ()=> props.setAnchor(props.type) }
-            className={ className }
-            ghost
-            icon={ `arrow-${ Anchor[props.type].toLowerCase().replace("_", "-") }` as any }
-        />
     );
 };
 

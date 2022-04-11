@@ -3,6 +3,8 @@ import createClassName from "../../../src/hooks/createClassName";
 import { EditorStates } from "../../../states/editor-states";
 import { clamp } from "../../../utils/math";
 import { MyComponent } from "../../../utils/types";
+import Icon from "../../Icon";
+import Button from "../buttons/Button";
 
 interface IInput {
     value: string | number
@@ -15,6 +17,7 @@ interface IInput {
     minLength?: number
     max?: number
     min?: number
+    disabled?: boolean
 
     width?: number
     inputClassName?: string
@@ -24,15 +27,21 @@ interface IInput {
 const Input: React.FC<IInput & MyComponent> = props=> {
     const [newValue, setNewValue] = useState<IInput["value"]>(props.value);
 
+    const wrapperClassName = createClassName([
+        "input-wrapper",
+        props.type == "number" && "type-number",
+        props.className || ""
+    ]);
+    
     useEffect(()=> {
         setNewValue(props.value);
     }, [props.value]);
 
-    function onChangeHandler(e: React.ChangeEvent<HTMLInputElement>) {
-        props.onChange && props.onChange(clampValue(e.target.value));
-        props.onSubmitChange && props.onSubmitChange(clampValue(e.target.value));
+    function onChangeHandler(value: string | number) {
+        props.onChange && props.onChange(clampValue(value));
+        props.onSubmitChange && props.onSubmitChange(clampValue(value));
 
-        setNewValue(e.target.value);
+        setNewValue(value);
     }
     function onFocusHandler() {
         EditorStates.InputIsFocused.value = true;
@@ -53,10 +62,11 @@ const Input: React.FC<IInput & MyComponent> = props=> {
     
     return (
         <form
-            className={ createClassName(["input-wrapper", props.className || ""]) }
+            className={ wrapperClassName }
             onSubmit={ e=> { e.preventDefault(); onSubmitHandler() } }
         >
             <input 
+                disabled={ props.disabled }
                 className={ createClassName(["input", props.inputClassName || ""]) }
                 style={ {
                     width: props.width,
@@ -71,10 +81,28 @@ const Input: React.FC<IInput & MyComponent> = props=> {
                 placeholder={ props.placeholder }
                 
                 value={ newValue }
-                onChange={ onChangeHandler }
+                onChange={ e=> onChangeHandler(e.target.value) }
                 onFocus={ onFocusHandler }
                 onBlur={ onSubmitHandler }
             />
+
+            {/* { props.type == "number" && <div className="increment-buttons">
+                <button
+                    className="button ghost"
+                    onClick={ e=> {
+                        (e.target as HTMLButtonElement).blur();
+                        onChangeHandler(+props.value + 1);
+                    } }
+                ><Icon icon="small-arrow-up" /></button>
+                <button
+                    className="button ghost"
+                    onClick={ e=> {
+                        (e.target as HTMLButtonElement).blur();
+                        onChangeHandler(+props.value - 1);
+                    } }
+                ><Icon icon="small-arrow-down" /></button>
+            </div> } */}
+            
         </form>
     );
 };

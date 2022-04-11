@@ -21,10 +21,7 @@ const PalettePanel: React.FC = ()=> {
     ]);
     
     function addHandler() {
-        paletteState.set(v=> v.length < config.MAX_PALETTE_COLORS ? [
-            ...v,
-            new PaletteColor(Date.now(), [(Math.sin(v.length/5) + 1) / 2 * 360, 100, 50, 1])
-        ] : v);
+        PaletteWorker.addPaletteColor();
     }
     
     return (
@@ -41,17 +38,7 @@ const PalettePanel: React.FC = ()=> {
                 />
             </header>
 
-            <div className="palette-panel-scroll">
-                <div className="palette-colors-list auto-borders ph-1">
-                    { palette.map(color=>
-                        <PaletteColorComponent 
-                            color={ color.hslaColor }
-                            id={ color.id }
-                            key={ color.id }
-                        />
-                    ) }
-                </div>
-            </div>
+            <PalettePanelContent palette={ palette } />
 
             <footer className="ph-1 pb-1">
                 <Button 
@@ -63,6 +50,22 @@ const PalettePanel: React.FC = ()=> {
             </footer>
             
         </Panel>
+    );
+};
+
+export const PalettePanelContent: React.FC<{ palette: PaletteColor[] }> = props=> {
+    return (
+        <div className="palette-panel-scroll">
+            <div className="palette-colors-list auto-borders ph-1">
+                { props.palette.map(color=>
+                    <PaletteColorComponent 
+                        hslaColor={ color.hslaColor }
+                        id={ color.id }
+                        key={ color.id }
+                    />
+                ) }
+            </div>
+        </div>
     );
 };
 

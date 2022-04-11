@@ -53,6 +53,9 @@ class HotkeysWorker {
             // History
             "undo": { variants: ["ctrl+Z"] },
             "redo": { variants: ["ctrl+shift+Z"] },
+
+            // Modifiers
+            "stroke-modifier-window-trigger": { variants: ["ctrl+shift+L"] }
         };
     }
 

@@ -13,7 +13,7 @@ interface IToolColorsIndicator {
 }
 
 export const ToolSettingsContainer: React.FC = props=> (
-    <div className="tool-settings-container slot gap-4"><hr className="vertical" />{ props.children }</div>
+    <div className="tool-settings-container slot gap-4 height-fill"><hr className="vertical" />{ props.children }</div>
 );
 export const CurrentColorsIndicator: React.FC<IToolColorsIndicator> = props=> {
     const [currentColorId] = useStateListener(PaletteWorker.CurrentPaletteColorId);

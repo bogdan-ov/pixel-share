@@ -166,12 +166,17 @@ class PaletteWorker {
     putPaletteColor(paletteColor: PaletteColor) {
         this.Palette.set(v=> v.length < config.MAX_PALETTE_COLORS ? [...v, paletteColor] : v);
     }
-    addPaletteColor(hslaColor: HSLA) {
-        const id = Date.now();
-        this.putPaletteColor(
-            new PaletteColor(id, hslaColor)
-        );
-        this.CurrentPaletteColorId.value = id;
+    addPaletteColor(hslaColor?: HSLA) {
+        if (this.palette.length < config.MAX_PALETTE_COLORS-1) {
+            this.pushToHistory();
+            
+            const id = Date.now();
+            this.Palette.set(v=> [
+                ...v,
+                new PaletteColor(Date.now(), hslaColor || [(Math.sin(v.length/5) + 1) / 2 * 360, 100, 50, 1])
+            ]);
+            this.CurrentPaletteColorId.value = id;
+        }
     }
     async fastAddPaletteColor() {
         const data = await navigator.clipboard.readText();
@@ -205,7 +210,10 @@ class PaletteWorker {
     }
 
     pushToHistory() {
-        HistoryWorker.pushToPast(HistoryItemType.PALETTE);
+        EditorTriggers.History.trigger({
+            type: HistoryItemType.PALETTE
+        });
+        // HistoryWorker.pushToPast1(HistoryItemType.PALETTE);
     }
 }
 

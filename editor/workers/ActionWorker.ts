@@ -56,7 +56,12 @@ class ActionWorker {
 
             // History
             "undo": ()=> HistoryWorker.undo(),
-            "redo": ()=> HistoryWorker.redo()
+            "redo": ()=> HistoryWorker.redo(),
+
+            // Modifiers
+            "stroke-modifier-window-trigger": ()=> EditorTriggers.Window.trigger({ type: EditorWindowType.STROKE_MODIFIER_WINDOW }),
+            "array-modifier-window-trigger": ()=> EditorTriggers.Window.trigger({ type: EditorWindowType.ARRAY_MODIFIER_WINDOW }),
+            "decay-modifier-window-trigger": ()=> EditorTriggers.Window.trigger({ type: EditorWindowType.DECAY_MODIFIER_WINDOW }),
         }
     }
 
@@ -119,29 +124,6 @@ class ActionWorker {
             targetId: layerId || this.curLayerId
         })
     }
-    // Image data
-    // copyImageData(layerId?: number) {
-    //     SelectionWorker.copyImageData(layerId);
-    //     // EditorTriggers.Action.trigger({
-    //     //     type: EditorActionType.COPY_IMAGE_DATA,
-    //     //     targetId: layerId || this.curLayerId
-    //     // });
-    // }
-    // pasteImageData(layerId?: number) {
-    //     SelectionWorker.pasteImageData(layerId);
-    //     // SelectionWorker.
-    //     // EditorTriggers.Action.trigger({
-    //     //     type: EditorActionType.PASTE_IMAGE_DATA,
-    //     //     targetId: layerId || this.curLayerId
-    //     // });
-    // }
-    // cutImageData(layerId?: number) {
-    //     SelectionWorker.cutImageData(layerId);
-    //     // EditorTriggers.Action.trigger({
-    //     //     type: EditorActionType.CUT_IMAGE_DATA,
-    //     //     targetId: layerId || this.curLayerId
-    //     // });
-    // }
 
     // Project
     saveProjectTrigger() {

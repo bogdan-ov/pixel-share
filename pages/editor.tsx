@@ -12,7 +12,6 @@ import ToolSettings from "../components/editor/tools-settings/ToolSettings";
 import ToolSettingsPopover from "../components/editor/tools-settings/ToolSettingsPopover";
 import GridConfigWindow from "../components/editor/windows/view/GridConfigWindow";
 import ExportImageWindow from "../components/editor/windows/export-window/ExportImageWindow";
-import BrowseProjectsWindow from "../components/editor/windows/projects-window/BrowseProjectsWindow";
 import OpenProjectWindow from "../components/editor/windows/projects-window/OpenProjectWindow";
 import SaveProjectWindow from "../components/editor/windows/projects-window/SaveProjectWindow";
 import ResizeCanvasWindow from "../components/editor/windows/resize-canvas-window/ResizeCanvasWindow";
@@ -22,11 +21,16 @@ import Keyboard from "../editor/managers/Keyboard";
 import Mouse from "../editor/managers/Mouse";
 import PaletteWorker from "../editor/workers/PaletteWorker";
 import ProjectWorker from "../editor/workers/ProjectWorker";
-import { EditorStates, EditorTriggers, EditorWindowType } from "../states/editor-states";
+import { EditorActionType, EditorStates, EditorTriggers, EditorWindowType } from "../states/editor-states";
 import config from "../utils/config";
 import { clamp, Vector2 } from "../utils/math";
+import ArrayModifierWindow from "../components/ui/windows/modifiers/array/ArrayModifierWindow";
+import DecayModifierWindow from "../components/ui/windows/modifiers/decay/DecayModifierWindow";
+import StrokeModifierWindow from "../components/ui/windows/modifiers/stroke/StrokeModifierWindow";
+import WelcomeWindow from "../components/ui/windows/WelcomeWindow";
 
 const Editor: React.FC = ()=> {
+    
     const workspaceRef = createRef<HTMLDivElement>();
     const layersRef = createRef<HTMLDivElement>();
     
@@ -62,7 +66,7 @@ const Editor: React.FC = ()=> {
                 return;
             }
             
-            // Move pan
+            // Move pan horizontal and vertical
             if (!Keyboard.isCtrl) {
                 App.pan.x += delta.x;
                 if (Keyboard.isShift)
@@ -73,14 +77,24 @@ const Editor: React.FC = ()=> {
                 
                 return;
             }
-            // Zoom
             
+            // Zoom
             App.zoom -= delta.y / 1000 * App.zoom;
             
             const min = 1 / (App.CanvasHeight.value / 32) - .025;
             const max = config.MAX_ZOOM;
 
             App.zoom = +clamp(App.zoom, min*2, max*2).toFixed(3);
+
+            if (layersNode) {
+                const bounds = layersNode.getBoundingClientRect();
+                
+                if (App.zoom < max*2 && App.zoom > min*2)
+                App.pan.copy(App.pan.addNum(
+                    (Mouse.screenPos.x - bounds.width/2 - bounds.left) * -delta.y / 1000,
+                    (Mouse.screenPos.y - bounds.height/2 - bounds.top) * -delta.y / 1000,
+                ));
+            }
 
             updateCanvasTransform();
         }
@@ -103,12 +117,15 @@ const Editor: React.FC = ()=> {
             removeMoveListener();
         }
     }, [workspaceRef, layersRef]);
-    useEffect(
-        ProjectWorker.Name.listen(name=> {
+    useEffect(()=> {
+        const unlistenName = ProjectWorker.Name.listen(name=> {
             if (name)
                 document.title = `${ name } - Editor - Pixel share!`;
-        }),
-    []);
+        });
+
+        return ()=> unlistenName();
+        
+    }, []);
 
     function onWorkspaceContext(e: React.MouseEvent) {
         e.preventDefault();
@@ -119,14 +136,16 @@ const Editor: React.FC = ()=> {
     return (
         <Page safeMissClick title="Editor" className="editor-page">
 
-            <div className="flex flex-column" style={ { height: "100vh" } }>
+            <div className="list" style={ { height: "100vh" } }>
 
                 <div className="flex width-fill height-fill">
                     <Toolbar />
-                    <div className="flex flex-column width-fill height-fill">
+                    <div className="list width-fill height-fill">
                         <ToolSettings />
                         
-                        {/* <div className="flex flex-column width-fill height-fill"> */}
+                        <div className="flex width-fill height-fill">
+                            {/* <FramesPanel /> */}
+                            
                             <div 
                                 className="workspace"
                                 ref={ workspaceRef }
@@ -134,9 +153,7 @@ const Editor: React.FC = ()=> {
                             >
                                 <div className="canvas-layers" ref={ layersRef } />
                             </div>
-
-                            {/* <AnimationTimeline /> */}
-                        {/* </div> */}
+                        </div>
 
                         <Helper />
                         <NotificationsList />
@@ -152,6 +169,10 @@ const Editor: React.FC = ()=> {
                 <ExportImageWindow constrainsRef={ workspaceRef } />
                 <ResizeCanvasWindow constrainsRef={ workspaceRef } />
                 <GridConfigWindow constrainsRef={ workspaceRef } />
+
+                <StrokeModifierWindow constrainsRef={ workspaceRef } />
+                <ArrayModifierWindow constrainsRef={ workspaceRef } />
+                <DecayModifierWindow constrainsRef={ workspaceRef } />
                 
             </div>
             <Pipette />
@@ -165,6 +186,9 @@ const Editor: React.FC = ()=> {
             <SaveProjectWindow />
             
             <ContextMenu />
+
+            <WelcomeWindow />
+            
         </Page>
     )
 };

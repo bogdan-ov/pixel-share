@@ -45,5 +45,26 @@
         }
         
     }
+
+    &.size-small {
+        grid-template-columns: repeat(2, 360px);
+        .project .project-preview {
+            height: 240px;
+            canvas {
+                transform: scale(1.2);
+            }
+        }
+    }
     
+}
+.no-projects {
+    // width: 100%;
+    height: 120px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: $border-radius;
+    border: 2px dashed lighten($bg, 8);
 }

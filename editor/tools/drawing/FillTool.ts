@@ -1,5 +1,6 @@
 import { ToolType } from "..";
 import { EditorStates, EditorTriggers } from "../../../states/editor-states";
+import State, { state } from "../../../states/State";
 import { vec, Vector2 } from "../../../utils/math";
 import { RGBA } from "../../../utils/types";
 import { rgbToHex } from "../../../utils/utils";
@@ -13,9 +14,13 @@ import SelectionWorker from "../../workers/SelectionWorker";
 import PickerTool from "../parent/PickerTool";
 
 export default class FillTool extends PickerTool {
+    FillSameColors: State<boolean>
+    
     constructor() {
         super(ToolType.FILL);
 
+        this.FillSameColors = state<boolean>(false, "fill-tool-fill-same-color");
+        
         this.resizable = false;
     }
 
@@ -37,9 +42,7 @@ export default class FillTool extends PickerTool {
             
             return;
         }
-        // Normal selection
-
-        EditorStates.HelperText.value = "Filling...";
+        // Normal fill
 
         const canvasWidth = App.CanvasWidth.value;
         const canvasHeight = App.CanvasHeight.value;
@@ -71,7 +74,7 @@ export default class FillTool extends PickerTool {
                     !comparePixelColor(rgbaColor, startPixelColor)
                 ) &&
                 (rgbaColor[3] == 255 ? rgbToHex(rgbaColor) != PaletteWorker.currentPaletteColor.hexColor : true) &&
-                SelectionWorker.pointInsideSelection(pos)
+                SelectionWorker.pointInSelection(pos)
             );
         }
         function pickColorAt(index: number): RGBA {
@@ -83,50 +86,75 @@ export default class FillTool extends PickerTool {
             ]
         }
 
-        function tryFillPixel(pos: Vector2, offset: Vector2) {
-            if (
-                pixelIsValid(pos.add(offset), pickColorAt(pos.add(offset).toIndex(canvasWidth))) &&
-                visited.findIndex(v => Vector2.compare(v, pos.add(offset))) < 0
-            ) {
-                fillPixel(pos.add(offset));
-                queue.push(pos.add(offset));
-                visited.push(pos.add(offset));
-            }
-        }
-        function stop() {
+        if (this.FillSameColors.value || Keyboard.isAlt) {
+            // Fill same colors
+            const data = imageData.data;
             
-            EditorStates.HelperText.value = `Filled in ${ Date.now() - startFillingDate }ms`;
-            EditorTriggers.Edited.trigger(true);
-            // clearInterval(inter);
-        }
-
-        const queue: Vector2[] = [startPixelPos.expand()];
-        const visited: Vector2[] = [];
-        let i = 0;
-
-        while (queue.length > 0 && i < imageData.data.length) {
-        // const inter = setInterval(()=> {
-            if (!(queue.length > 0 && i < imageData.data.length && visited.length != App.CanvasWidth.value*App.CanvasHeight.value)) {
-                stop();
-                return;
+            for (let i = 0; i < data.length; i ++) {
+                const pixelColor: RGBA = [
+                    data[i*4],
+                    data[i*4+1],
+                    data[i*4+2],
+                    data[i*4+3]
+                ];
+                
+                if (comparePixelColor(pixelColor, startPixelColor)) {
+                    fillPixel(
+                        vec(i % imageData.width, Math.floor(i / imageData.width))
+                    );
+                }
             }
+
+            EditorStates.HelperText.value = "Filled same color";
+        } else {
+            // Normal fill
+            EditorStates.HelperText.value = "Filling...";
             
-            const currentPos = queue[queue.length - 1];
-            if (!currentPos) {
-                stop();
-                // break;
+            function tryFillPixel(pos: Vector2, offset: Vector2) {
+                if (
+                    pixelIsValid(pos.add(offset), pickColorAt(pos.add(offset).toIndex(canvasWidth))) &&
+                    visited.findIndex(v => Vector2.compare(v, pos.add(offset))) < 0
+                ) {
+                    fillPixel(pos.add(offset));
+                    queue.push(pos.add(offset));
+                    visited.push(pos.add(offset));
+                }
             }
-            queue.pop();
+            function stop() {
+                
+                EditorStates.HelperText.value = `Filled in ${ Date.now() - startFillingDate }ms`;
+                EditorTriggers.Edited.trigger(true);
+                // clearInterval(inter);
+            }
 
-            tryFillPixel(currentPos, vec(1, 0))
-            tryFillPixel(currentPos, vec(0, 1))
-            tryFillPixel(currentPos, vec(-1, 0))
-            tryFillPixel(currentPos, vec(0, -1))
+            const queue: Vector2[] = [startPixelPos.expand()];
+            const visited: Vector2[] = [];
+            let i = 0;
 
-            i++;
-        // });
+            while (queue.length > 0 && i < imageData.data.length) {
+            // const inter = setInterval(()=> {
+                if (!(queue.length > 0 && i < imageData.data.length && visited.length != App.CanvasWidth.value*App.CanvasHeight.value)) {
+                    stop();
+                    return;
+                }
+                
+                const currentPos = queue[queue.length - 1];
+                if (!currentPos) {
+                    stop();
+                    // break;
+                }
+                queue.pop();
+
+                tryFillPixel(currentPos, vec(1, 0))
+                tryFillPixel(currentPos, vec(0, 1))
+                tryFillPixel(currentPos, vec(-1, 0))
+                tryFillPixel(currentPos, vec(0, -1))
+
+                i++;
+            // });
+            }
+            stop();
         }
-        stop();
 
     }
 } 

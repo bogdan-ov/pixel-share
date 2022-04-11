@@ -1,24 +1,22 @@
-.resize-canvas-window {
-    .anchor {
-        display: grid;
-        grid-template-columns: repeat(3, 26px);
-        grid-template-rows: repeat(3, 26px);
-        grid-gap: 2px;
+.anchor {
+    display: grid;
+    grid-template-columns: repeat(3, 26px);
+    grid-template-rows: repeat(3, 26px);
+    grid-gap: 2px;
 
-        .anchor-cell {
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            
-            background: lighten($bg, 6);
-            border-radius: $border-radius;
-            cursor: pointer;
-            
-            &.active {
-                color: $blue;
-                // background: $blue;
-            }
-        }
+    .anchor-cell {
+        padding: 0;
+        width: 100%;
+        height: 100%;
         
+        background: transparent !important;
+        border-radius: $border-radius;
+        cursor: pointer;
+        
+        &.active {
+            color: $blue;
+            background: transparentize($blue, .9) !important;
+        }
     }
+    
 }

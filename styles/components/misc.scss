@@ -50,9 +50,17 @@
 }
 .color-bubble {
     width: 14px;
+    min-width: 14px;
     height: 14px;
 
     border-radius: 50%;
+
+    &.size-middle {
+        width: 16px;
+        min-width: 16px;
+        height: 16px;
+    }
+    
 }
 .pipette {
     width: 78px;
@@ -73,4 +81,40 @@
 }
 .trans {
     transition: .1s;
+}
+
+.preview-canvas {
+    width: 164px;
+    height: 164px;
+    image-rendering: pixelated;
+
+    background: url(../../public/img/checkerboard.png);
+    border-radius: 2px;
+
+    &.by-width {
+        width: 100%;
+        height: auto;
+    }
+    &.by-height {
+        width: auto;
+        height: 100%;
+    }
+    
+}
+
+.badge {
+    padding: 4px 6px;
+    padding-top: 3px;
+
+    background: lighten($bg, 4);
+    border-radius: 20px;
+}
+
+.border-box {
+    width: max-content;
+    // height: max-content;
+    padding: 20px;
+
+    border: 2px solid darken($bg, 2);
+    border-radius: calc($border-radius);
 }

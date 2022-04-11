@@ -10,6 +10,7 @@ const ResizableToolSettings: React.FC<IToolSettingsContainer> = ()=> {
     return (
         <ToolSettingsContainer>
             <Tooltip
+                style={ { height: "100%" } }
                 tooltip={ <span>Tool size</span> }
                 placement="bottom"
                 offset={ 20 }

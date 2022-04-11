@@ -104,7 +104,7 @@ class SelectionWorker {
         const previewLayer = LayersWorker.previewLayer;
         if (!curLayer || !previewLayer) return;
 
-        this.pushToHistory();
+        this.pushToHistory(curLayer.id);
 
         const sel = this.selection;
         const imgData = imageData || curLayer.getImageData(
@@ -146,13 +146,15 @@ class SelectionWorker {
     selectAll() {
         this.setSelection(vec(0, 0), vec(App.CanvasWidth.value-1, App.CanvasHeight.value-1));
     }
-    getSelection(): SelectionWorker["selection"] | Pick<SelectionWorker["selection"], "from" | "to"> {
+    getSelection(): SelectionWorker["selection"] | Pick<SelectionWorker["selection"], "from" | "to" | "width" | "height"> {
         if (this.selection.active) {
             return this.selection;
         } else {
             return {
                 from: vec(0, 0),
                 to: vec(App.CanvasWidth.value, App.CanvasHeight.value),
+                width: App.CanvasWidth.value,
+                height: App.CanvasHeight.value
             }
         }
     }
@@ -206,7 +208,7 @@ class SelectionWorker {
             }
             this.endMoveSelection();
             
-            this.pushToHistory();
+            this.pushToHistory(layer.id);
             
             const parsedImageData = JSON.parse(res.replace(config.IMAGE_DATA_PREFIX, ""));
             const imageData = new ImageData(parsedImageData.width, parsedImageData.height);
@@ -215,12 +217,17 @@ class SelectionWorker {
             const imagePos = this.selection.from.addNum(-1, -1);
 
             this.setSelection(imagePos, vec(
-                imagePos.x + imageData.width,
-                imagePos.y + imageData.height
+                imagePos.x + imageData.width-1,
+                imagePos.y + imageData.height-1
             ));
             
             this.startMoveSelection(imageData);
             EditorStates.MovingSelection.value = true;
+
+            EditorTriggers.Notification.trigger({
+                content: "Image data pasted!",
+                type: "success"
+            });
         }
         function pasteError() {
             EditorTriggers.Notification.trigger({
@@ -240,16 +247,25 @@ class SelectionWorker {
         const successCopy = this.copyImageData(layerId);
         
         if (layer && successCopy) {
-            this.pushToHistory();
+            this.pushToHistory(layer.id);
             layer.clearBySelection();
+
+            EditorTriggers.Notification.trigger({
+                content: "Image data cut!",
+                type: "success"
+            });
         }
     }
 
-    pushToHistory() {
-        HistoryWorker.pushToPast(HistoryItemType.LAYERS);
+    pushToHistory(layerId: number) {
+        EditorTriggers.History.trigger({
+            type: HistoryItemType.LAYER_EDITED,
+            targetId: layerId
+        });
     }
-    pointInsideSelection(point: Vector2, allowBehind: boolean=false): boolean {
-        return (!allowBehind && this.selection.active) ? pointInsideArea(point, this.selection.from, this.selection.width-1, this.selection.height-1) : true;
+    pointInSelection(point: Vector2, allowBehind: boolean=false): boolean {
+        const sel = this.getSelection();
+        return !allowBehind ? pointInsideArea(point, sel.from, sel.width-1, sel.height-1) : true;
     }
 }
 export default new SelectionWorker();

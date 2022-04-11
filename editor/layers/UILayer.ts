@@ -2,6 +2,7 @@ import { EditorStates } from "../../states/editor-states";
 import config from "../../utils/config";
 import { vec, Vector2 } from "../../utils/math";
 import { Anchor } from "../../utils/types";
+import { hslaToString } from "../../utils/utils";
 import App from "../App";
 import Mouse from "../managers/Mouse";
 import tools, { ToolType } from "../tools";
@@ -86,11 +87,11 @@ export default class UILayer extends Layer {
         const cellWidth = ViewWorker.GridWidth.value;
         const cellHeight = ViewWorker.GridHeight.value;
 
-        this.context.strokeStyle = ViewWorker.GridColor.value;
+        this.context.strokeStyle = hslaToString(ViewWorker.GridColor.value);
         const lineWidth = Math.round(20/App.zoom);
         this.context.lineWidth = lineWidth + lineWidth%2;
 
-        for (let x = 1; x < Math.floor(width/cellWidth); x ++) {
+        for (let x = 1; x < Math.floor(width/cellWidth)+1; x ++) {
 
             this.context.moveTo(x*scale*cellWidth, 0);
             this.context.lineTo(x*scale*cellWidth, height*scale);
@@ -98,7 +99,7 @@ export default class UILayer extends Layer {
             this.context.stroke();
             this.context.beginPath();
         }
-        for (let y = 1; y < Math.floor(height/cellHeight); y ++) {
+        for (let y = 1; y < Math.floor(height/cellHeight)+1; y ++) {
             this.context.moveTo(0, y*scale*cellHeight);
             this.context.lineTo(width*scale, y*scale*cellHeight);
             

@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import React, { useState } from "react";
 import ProjectWorker from "../../../../editor/workers/ProjectWorker";
 import useFetchProjects from "../../../../src/hooks/useFetchProjects";
-import { EditorWindowType } from "../../../../states/editor-states";
+import { EditorTriggers, EditorWindowType } from "../../../../states/editor-states";
 import Icon from "../../../Icon";
 import Button from "../../../ui/buttons/Button";
 import { FullWindowContent, FullWindowFooter } from "../../../ui/windows/FullWindow";
@@ -19,6 +19,18 @@ const OpenProjectWindow: React.FC = ()=> {
 
     function openProjectHandler(name: string) {
         ProjectWorker.openProject(name);
+        setActive(false);
+    }
+    function openProjectNewTabHandler(name: string) {
+        const to = window.location.host;
+        if (to) {
+            window.open(to + `/editor?project=${ name.replace(/\s/gm, "--") }`, "_blank")?.focus();
+        } else {
+            EditorTriggers.Notification.trigger({
+                content: "Something went wrong when opening the project",
+                type: "danger"
+            });
+        }
         setActive(false);
     }
     function deleteProjectHandler(name: string) {

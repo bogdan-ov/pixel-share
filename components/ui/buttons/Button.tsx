@@ -7,9 +7,11 @@ import Tooltip, { ITooltip } from "../windows/Tooltip";
 export type IButton = {
     btnType?: React.ButtonHTMLAttributes<HTMLButtonElement>["type"]
     color?: "transparent" | "blue" | "red"
-    size?: "small" | "middle"
-    fab?: boolean
+    size?: "small" | "middle" | "fit"
+    type?: "fab" | "link"
+    // fab1?: boolean
     ghost?: boolean
+    active?: boolean
     
     tooltip?: ITooltip["tooltip"]
     tooltipDelay?: ITooltip["delay"]
@@ -33,9 +35,10 @@ const Button: React.FC<IButton> = props=> {
     const className = createClassName([
         "button",
         props.color && `color-${ props.color }`,
-        props.size && props.size,
+        props.size && `size-${ props.size }`,
+        props.type && `type-${ props.type }`,
         props.ghost && "ghost",
-        props.fab && "fab",
+        props.active && "active",
         props.className
     ]);
     

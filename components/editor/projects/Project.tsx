@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { IProjectData } from "../../../editor/workers/ProjectWorker";
 import createClassName from "../../../src/hooks/createClassName";
-import { ReactState } from "../../../utils/types";
+import { MyComponent, ReactState } from "../../../utils/types";
 import Button from "../../ui/buttons/Button";
 import DropdownMenu, { IDropdownMenu } from "../../ui/windows/DropdownMenu";
 import ProjectPreviewCanvas from "./ProjectPreviewCanvas";
@@ -31,10 +31,21 @@ interface IProjectsGrid {
 }
 
 const Project: React.FC<IProjectData & IProject> = props=> {
+    const [weight, setWeight] = useState<number>(0);
+    
     const className = createClassName([
         "project list gap-2 show-on-hover-trigger",
         props.active && "active"
     ]);
+    
+    useEffect(()=> {
+
+        for (const layer of props.layers) {
+            const w = layer.imageData.width*layer.imageData.height
+            setWeight(w*8)
+        }
+        
+    }, []);
     
     return (
         <article onClick={ ()=> props.onSelect(props) } className={ className }>
@@ -57,6 +68,8 @@ const Project: React.FC<IProjectData & IProject> = props=> {
                         <span>{ props.date && new Date(+props.date).toLocaleDateString(undefined, { dateStyle:"long" }) }</span>
                         <span>{ props.date && new Date(+props.date).toLocaleTimeString(undefined, { timeStyle: "short" }) }</span>
                     </div> : <i className="text-muted">No date</i> }
+
+                    <span className="text-muted">{ Math.floor((weight / 8 / 1024) * 100) / 100 } kB</span>
                 </div>
 
                 { props.dropdownMenuButtonsGroups && <DropdownMenu
@@ -66,9 +79,9 @@ const Project: React.FC<IProjectData & IProject> = props=> {
                 >
                     <Button
                         className="show-on-hover"
-                        fab
+                        type="fab"
                         size="middle"
-                        icon="menu-bars"
+                        icon="menu-dots"
                     />
                 </DropdownMenu> }
                 
@@ -78,9 +91,14 @@ const Project: React.FC<IProjectData & IProject> = props=> {
     );
 };
 
-export const ProjectsGrid: React.FC<IProjectsGrid> = props=> {
+export const ProjectsGrid: React.FC<IProjectsGrid & MyComponent> = props=> {
+    const className = createClassName([
+        "projects-grid",
+        props.className
+    ])
+    
     return (
-        <div className="projects-grid">
+        <div className={ className } style={ props.style }>
 
             { props.children }
             

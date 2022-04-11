@@ -5,6 +5,10 @@
         padding: 10px;
         margin-bottom: 5px;
     }
+    .panel-content {
+        height: 100%;
+        max-width: min-content;
+    }
     .panel-footer {
         min-height: max-content;
         padding: 10px;

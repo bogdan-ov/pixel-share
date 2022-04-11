@@ -24,7 +24,6 @@ const ExportImageWindow: React.FC<IExportImageWindow & IWindowNeeds> = props=> {
     
     return (
         <Window
-            custom
             active={ active }
             setActive={ setActive }
 

@@ -28,7 +28,7 @@ const SelectionToolSettings: React.FC = ()=> {
                         value={ darkAlpha }
                         onChange={ v=> darkAlphaState.value = +v }
                         onInputSubmit={ v=> darkAlphaState.value = +v }
-                        removeGroupBoxClass
+                        disableGroupBoxClass
                     />
                 </label>
             </Tooltip>

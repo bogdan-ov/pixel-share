@@ -1,3 +1,8 @@
+/**
+ * @author Bogdanov :D
+ * Yee
+ */
+
 import Link from "next/link";
 import React from "react";
 import Page from "../components/Page";

@@ -12,7 +12,7 @@ const SaveProjectWindow: React.FC = ()=> {
     const [active, setActive] = useState<boolean>(false);
     const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
     const [projectName, setProjectName] = useState<string>(ProjectWorker.Name.value);
-    const { projects, setProjects, fetch } = useFetchProjects();
+    const { projects, fetch } = useFetchProjects();
 
     const selectedProject: IProjectData | undefined = projects.find(p=> p.id == selectedProjectId);
     const projectToOverwrite: IProjectData | undefined = projects.find(p=> p.name.trim() == projectName.trim());
@@ -39,8 +39,11 @@ const SaveProjectWindow: React.FC = ()=> {
         setActive(false);
     }
     function overwriteProjectHandler(name: string) {
-        ProjectWorker.saveProject(name);
-        setActive(false);
+        const sure = confirm(`Are you sure to overwrite "${ name }"?`);
+        if (sure) {
+            ProjectWorker.saveProject(name);
+            setActive(false);
+        }
     }
     
     return (
@@ -100,7 +103,7 @@ const SaveProjectWindow: React.FC = ()=> {
 
                 <div className="slot gap-1">
                     <Button
-                        onClick={ saveProjectHandler }
+                        onClick={ !!projectToOverwrite ? ()=> overwriteProjectHandler(projectName) : saveProjectHandler }
                         color="blue"
                         disabled={ !projectName }
                         text={ !!projectToOverwrite ? "Overwrite" : "Save"}

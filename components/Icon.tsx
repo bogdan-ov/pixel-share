@@ -176,6 +176,20 @@ export const icons = {
     </svg>,
     "arrow-bottom-right": <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M1.75737 1.75737L10.2426 10.2427M10.2426 10.2427L10.0069 2.93589M10.2426 10.2427L2.93588 10.007" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>,
+    "grid": <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M11 1V14M4 1V14M1 4H14M1 11H14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+    </svg>,
+    "menu-dots": <svg width="2" height="7" viewBox="0 0 2 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="1" cy="1" r="1" fill="currentColor"/>
+        <circle cx="1" cy="6" r="1" fill="currentColor"/>
+    </svg>,
+    "modification": <svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M7.5493 1.91461C7.84934 0.994754 9.15066 0.994754 9.4507 1.91461L10.5176 5.18549C10.6518 5.59696 11.0355 5.87539 11.4683 5.87539H14.9126C15.8823 5.87539 16.2844 7.11698 15.4989 7.68549L12.7191 9.69731C12.3673 9.95195 12.22 10.4046 12.3547 10.8175L13.4181 14.0775C13.7184 14.9982 12.6655 15.7655 11.8811 15.1977L9.08629 13.1751C8.73644 12.9219 8.26357 12.9219 7.91371 13.1751L5.11893 15.1977C4.33446 15.7655 3.28165 14.9982 3.58194 14.0775L4.64531 10.8175C4.78 10.4046 4.63275 9.95195 4.2809 9.69731L1.50109 7.68549C0.715561 7.11698 1.11772 5.87539 2.08738 5.87539H5.53169C5.96449 5.87539 6.34817 5.59696 6.48239 5.18549L7.5493 1.91461Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
+    </svg>,
+    "checkbox": <svg width="13" height="12" viewBox="0 0 13 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect opacity="0.1" x="1" y="1" width="10" height="10" rx="2" stroke="currentColor" strokeWidth="2"/>
+        <path d="M2 5.2L4.85714 8L12 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>    
 };
 

@@ -1,13 +1,15 @@
 import HistoryWorker from "../../components/editor/history/HistoryWorker";
-import { EditorTriggers, EditorWindowType } from "../../states/editor-states";
+import { EditorActionType, EditorTriggers, EditorWindowType } from "../../states/editor-states";
 import State, { state } from "../../states/State";
 import config from "../../utils/config";
 import { Anchor } from "../../utils/types";
 import App from "../App";
 import Layer from "../layers/Layer";
 import PaletteColor from "../renderer/PaletteColor";
+import { ToolType } from "../tools";
 import LayersWorker, { IShortLayerData } from "./LayersWorker";
 import PaletteWorker, { IShortPaletteColorData } from "./PaletteWorker";
+import SelectionWorker from "./SelectionWorker";
 
 export interface IProjectData {
     id: number
@@ -34,17 +36,16 @@ class ProjectWorker {
     }
 
     init() {
-        let i = 0;
         window.addEventListener("beforeunload", (e)=> {
             if (!this.Saved.value) {
-                e.preventDefault();
-                e.returnValue = "Close/reload page? You didn't save your changes";
+                // ! aAAAAAA
+                // e.preventDefault();
+                // e.returnValue = "Close/reload page? You didn't save your changes";
             }
         });
-        EditorTriggers.Edited.listen((edited, from)=> {
+        EditorTriggers.Edited.listen(()=> {
             this.Saved.value = false;
-            config.DEBUG && console.log(`Edited, but unsaved ${ i } ${ from }`);
-            i ++;
+            console.log("Not saved");
         })
     }
     
@@ -145,25 +146,38 @@ class ProjectWorker {
         this.Name.value = projectName;
         this.Saved.value = true;
         
+        EditorTriggers.Action.trigger({
+            type: EditorActionType.START_APP
+        })
         EditorTriggers.Notification.trigger({
             content: `💾 "${ projectName }" opened!`,
             type: "success"
         });
     }
     deleteProject(name: string) {
-        const allow = confirm(`Are you sure to delete "${ name }"?`);
+        const sure = confirm(`Are you sure to delete "${ name }"?`);
 
-        if (allow)
+        if (sure)
             localStorage.removeItem(config.PROJECT_NAME_PREFIX + name);
     }
-    newProject() {
+    newProject(canvasWidth?: number, canvasHeight?: number) {
         LayersWorker.setDefaultLayers();
         PaletteWorker.setDefaultPalette();
-        App.resizeCanvas(config.CANVAS_WIDTH, config.CANVAS_HEIGHT, Anchor.TOP_LEFT, false);
+        App.CurrentToolType.value = ToolType.PEN;
+        SelectionWorker.selection.active = false;
 
+        App.resizeCanvas(
+            canvasWidth || config.INIT_CANVAS_WIDTH,
+            canvasHeight || config.INIT_CANVAS_HEIGHT,
+            Anchor.TOP_LEFT, false
+        );
+        
         App.initHistory();
         
         this.Name.value = "";
+        EditorTriggers.Action.trigger({
+            type: EditorActionType.START_APP
+        })
         EditorTriggers.Notification.trigger({
             content: `💾 New project created!`,
             type: "success"

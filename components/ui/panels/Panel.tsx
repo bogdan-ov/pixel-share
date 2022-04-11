@@ -1,7 +1,7 @@
 import React from "react";
 import createClassName from "../../../src/hooks/createClassName";
 import { MyComponent, ViewMode } from "../../../utils/types";
-import { capitalize, isNull } from "../../../utils/utils";
+import { capitalize } from "../../../utils/utils";
 import Button, { IButton } from "../buttons/Button";
 
 interface IPanel {

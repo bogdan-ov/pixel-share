@@ -4,6 +4,7 @@ $checkbox-icon-offset: 2px;
 .input {
     width: 100%;
     padding: 0 .5em;
+    padding-right: 0;
     height: 2.2em;
 
     background: transparent;
@@ -14,9 +15,6 @@ $checkbox-icon-offset: 2px;
 
     @include ff;
 
-    &:not(:hover).ghost {
-        border: 2px solid transparent !important;
-    }
     &.ghost {
         &::-webkit-outer-spin-button,
         &::-webkit-inner-spin-button {
@@ -24,8 +22,73 @@ $checkbox-icon-offset: 2px;
             margin: 0;
         }
     }
-    &:focus {
+    &:not(:disabled):focus {
         border: 2px solid $blue;
+    }
+    &:disabled {
+        cursor: default;
+        opacity: 0.5;
+    }
+}
+.input-wrapper {
+    /*
+    &.type-number {
+        height: 100%;
+        display: flex;
+        
+        .input {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+            border-right: none;
+
+            &:focus ~ .increment-buttons {
+                border-color: $blue;
+            }
+            &.ghost ~ .increment-buttons {
+                opacity: 0;
+            }
+            
+            
+        }
+        .increment-buttons {
+            height: 2.2em;
+
+            display: flex;
+            flex-direction: column;
+
+            border-top-right-radius: $border-radius;
+            border-bottom-right-radius: $border-radius;
+            border: 2px solid $dark-grey;
+            border-left: none;
+
+            transition: .1s;
+            
+            .button {
+                width: 14px;
+                height: 100%;
+                padding: 0;
+
+                background: transparent;
+                border-radius: 0;
+                
+                transform: translateY(0) !important;
+
+                svg {
+                    transform: scale(.8);
+                }
+            }
+        }
+    }
+    */
+
+    &:not(:hover) .input:not(:focus):not(:disabled).ghost,
+    .input:not(:focus):disabled.ghost {
+        border: 2px solid transparent !important;
+    }
+    &:hover .input:not(:disabled).ghost{
+        ~ .increment-buttons {
+            opacity: 1;
+        }
     }
 }
 
@@ -74,6 +137,10 @@ $checkbox-icon-offset: 2px;
         
     }
 }
+label:active .checkbox,
+.checkbox-wrapper:active .checkbox {
+    border: 2px solid $blue;
+}
 
 // Inputs
 .rename-input-wrapper {
@@ -121,15 +188,19 @@ $checkbox-icon-offset: 2px;
         transition: .1s;
     }
 
-    &:hover {
+    &:not(:disabled):hover {
         &::-webkit-slider-thumb {
             background: #484848;
         }
     }
-    &:active {
+    &:not(:disabled):active {
         &::-webkit-slider-thumb {
             background: $blue;
         }
+    }
+    &:disabled {
+        cursor: default;
+        opacity: .5;
     }
     
 }

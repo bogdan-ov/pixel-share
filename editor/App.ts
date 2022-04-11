@@ -17,6 +17,8 @@ import ProjectWorker from "./workers/ProjectWorker";
 import SelectionWorker from "./workers/SelectionWorker";
 import { Anchor } from "../utils/types";
 import ViewWorker from "./workers/ViewWorker";
+import FramesWorker from "./workers/FramesWorker";
+import ModifiersWorker from "./workers/ModifiersWorker";
 
 const cursors = {
     "initial": "initial",
@@ -48,8 +50,8 @@ export class Application {
         this.CurrentToolType = state<ToolType>(ToolType.PEN, "current-tool-tile");
         this.ToolsSize = state(1, "tools-size");
 
-        this.CanvasWidth = state<number>(64, "app-canvas-width");
-        this.CanvasHeight = state<number>(64, "app-canvas-height");
+        this.CanvasWidth = state<number>(config.INIT_CANVAS_WIDTH, "app-canvas-width");
+        this.CanvasHeight = state<number>(config.INIT_CANVAS_HEIGHT, "app-canvas-height");
         this.resizeAnchor = Anchor.TOP_LEFT;
         this.renderer = new Renderer();
 
@@ -63,25 +65,30 @@ export class Application {
         if (this.inited) return;
         
         this.workspaceElement = workspace;
-
-        this.zoom = innerHeight / this.CanvasHeight.value * .8;
-
         this.canvasLayersElement = canvasLayersElement;
         
         ProjectWorker.init();
-        ActionWorker.init();
-        PaletteWorker.init();
-        HotkeysWorker.init();
-        HistoryWorker.init();
         SelectionWorker.init();
-        LayersWorker.init();
+        HotkeysWorker.init();
+        ActionWorker.init();
+
+        HistoryWorker.init();
         ViewWorker.init();
+        
+        ModifiersWorker.init();
+        PaletteWorker.init();
+        LayersWorker.init();
+        // FramesWorker.init();
         
         LayersWorker.resizeLayers(Anchor.TOP_LEFT);
 
         Mouse.init();
         Keyboard.init();
         this.initListeners();
+
+        this.zoom = innerHeight / this.CanvasHeight.value * .5;
+        const workspaceBounds = this.workspaceElement.getBoundingClientRect();
+        this.pan.set(-workspaceBounds.width/2, -workspaceBounds.height/2 + 20);
 
         this.inited = true;
     }
@@ -91,21 +98,27 @@ export class Application {
     }
     
     resizeCanvas(width: number, height: number, anchor: Anchor, pushToHistory: boolean): boolean {
-        width = width || 64;
-        height = height || 64;
+        const _width = width || config.INIT_CANVAS_WIDTH;
+        const _height = height || config.INIT_CANVAS_HEIGHT;
 
         this.resizeAnchor = anchor;
         if (pushToHistory)
-            HistoryWorker.pushToPast(HistoryItemType.APP);
+            EditorTriggers.History.trigger({
+                type: null,
+                items: [
+                    HistoryWorker.makeAppData(),
+                    HistoryWorker.makeLayersListData()
+                ]
+            });
         
-        if (width <= 0 || height <= 0) {
+        if (_width <= config.MIN_CANVAS_WIDTH || _height <= config.MIN_CANVAS_HEIGHT) {
             EditorTriggers.Notification.trigger({
                 content: "❌ Too small!",
                 type: "danger"
             });
             return false;
         }
-        if (width >= 900 || height >= 900) {
+        if (_width > config.MAX_CANVAS_WIDTH || _height > config.MAX_CANVAS_HEIGHT) {
             EditorTriggers.Notification.trigger({
                 content: "❌ Too large!",
                 type: "danger"
@@ -113,13 +126,15 @@ export class Application {
             return false;
         }
         
-        this.CanvasWidth.value = width;
-        this.CanvasHeight.value = height;
+        this.CanvasWidth.value = _width;
+        this.CanvasHeight.value = _height;
 
         LayersWorker.resizeLayers(anchor);
         EditorTriggers.Edited.trigger({
             type: EditorEditedType.CANVAS_RESIZED
         });
+
+        console.log(this.CanvasWidth.value, this.CanvasHeight.value);
 
         return true;
     }
@@ -145,8 +160,6 @@ export class Application {
     }
 
     initListeners() {
-        EditorTriggers.Action.listen(this.actionListener, "app-action");
-
         // Mouse listeners
         Mouse.onDown(()=> {
             const currentLayer = LayersWorker.currentLayer;
@@ -203,40 +216,6 @@ export class Application {
         HistoryWorker.Past.value = [];
         HistoryWorker.Future.value = [];
         // HistoryWorker.pushToPast(HistoryItemType.ALL);
-    }
-
-    actionListener(action: IEditorActionTrigger) {
-        switch (action.type) {
-            // Add layer
-            case EditorActionType.ADD_LAYER:
-                LayersWorker.addLayer(action.targetId);
-                // EditorTriggers.Edited.trigger({ type: EditorEditedType.LAYERS_EDITED1 });
-                break;
-            // Clear layer
-            case EditorActionType.CLEAR_LAYER_CANVAS:
-                LayersWorker.pushToHistory();
-                LayersWorker.getLayer(action.targetId)?.clearCanvas();
-                EditorTriggers.Edited.trigger({ type: EditorEditedType.LAYERS_EDITED });
-                break;
-            // Clear layer selection
-            case EditorActionType.CLEAR_SELECTION:
-                LayersWorker.getLayer(action.targetId)?.clearBySelection();
-                EditorTriggers.Edited.trigger({ type: EditorEditedType.LAYERS_EDITED });
-                break;
-            // Delete layer
-            case EditorActionType.DELETE_LAYER:
-                LayersWorker.deleteLayer(action.targetId);
-                // EditorTriggers.Edited.trigger({ type: EditorEditedType.LAYERS_EDITED1 });
-                break;
-            case EditorActionType.DUPLICATE_LAYER:
-                LayersWorker.duplicateLayer(action.targetId);
-                // EditorTriggers.Edited.trigger({ type: EditorEditedType.LAYERS_EDITED1 });
-                break;
-            case EditorActionType.MERGE_VISIBLE_LAYERS:
-                LayersWorker.mergeVisibleLayers();
-                // EditorTriggers.Edited.trigger({ type: EditorEditedType.LAYERS_EDITED1 });
-                break;
-        }
     }
 
     // Tools

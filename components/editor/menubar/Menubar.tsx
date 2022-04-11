@@ -81,7 +81,7 @@ const Menubar: React.FC = React.memo(()=> {
                         {
                             content: "Toggle grid",
                             actionName: "toggle-grid",
-                            icon: gridEnabled ? "checkmark" : undefined
+                            icon: gridEnabled ? "checkbox" : undefined
                         },
                         {
                             content: "Grid configuration",
@@ -94,7 +94,28 @@ const Menubar: React.FC = React.memo(()=> {
                     ]] }
 
                     tooltip={ <span>Grid</span> }
-                    icon="visible"
+                    icon="grid"
+                />
+
+                {/* // ? Modifiers */}
+                <MenubarButton
+                    buttonsGroups={ [[
+                        {
+                            content: "Stroke",
+                            actionName: "stroke-modifier-window-trigger"
+                        },
+                        {
+                            content: "Array",
+                            actionName: "array-modifier-window-trigger"
+                        },
+                        {
+                            content: "Decay",
+                            actionName: "decay-modifier-window-trigger"
+                        },
+                    ]] }
+
+                    tooltip={ <span>Modifiers</span> }
+                    icon="modification"
                 />
 
             </div>
@@ -113,7 +134,7 @@ export const MenubarButton: React.FC<IButton & ITriggerNotice & IMenubarButton> 
                 tooltipPlacement="left"
                 tooltipOffset={ 10 }
                 
-                fab
+                type="fab"
                 color="transparent"
                 className="icon-muted text-muted"
                 { ...props }

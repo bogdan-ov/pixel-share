@@ -1,3 +1,5 @@
+import { HSLA } from "./types";
+
 export default {
     get DEBUG(): boolean {
         return process.env.NODE_ENV.toLowerCase() == "development";
@@ -5,10 +7,17 @@ export default {
     LOG_TRIGGERS: false,
     LOG_STATES: false,
     
+    INIT_GRID_WIDTH: 8,
+    INIT_GRID_HEIGHT: 8,
+    INIT_GRID_COLOR: [0, 0, 0, 1] as HSLA,
+    MIN_CANVAS_WIDTH: 4,
+    MIN_CANVAS_HEIGHT: 4,
     MAX_CANVAS_WIDTH: 960,
     MAX_CANVAS_HEIGHT: 960,
-    CANVAS_WIDTH: 64,
-    CANVAS_HEIGHT: 64,
+    MIN_ARRAY_MOD_OFFSET: -64,
+    MAX_ARRAY_MOD_OFFSET: 64,
+    INIT_CANVAS_WIDTH: 64,
+    INIT_CANVAS_HEIGHT: 64,
     UI_SCALE: 12,
     
     EMPTY_PIXEL_COLOR: "rgba(0,0,0,0)",

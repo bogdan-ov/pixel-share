@@ -13,6 +13,9 @@
 
         .checkbox-wrapper {
             flex-direction: row-reverse;
+            > span {
+                margin-right: 20px;
+            }
         }
         .tool-property{
             justify-content: space-between;

@@ -7,6 +7,7 @@ import Icon from "../Icon";
 import Button from "../ui/buttons/Button";
 import { HotkeysBuilder, Key } from "../ui/Misc";
 import Tooltip from "../ui/windows/Tooltip";
+import logo_img from "../../public/img/logo.png";
 
 const Toolbar: React.FC = ()=> {
 
@@ -25,17 +26,20 @@ const Toolbar: React.FC = ()=> {
                 ) }
             </div>
 
-            <a href="https://vk.com/bbog908" target="_blank" rel="noreferrer" className="link">
-                <Button
-                    tooltip={ <span>Bogdanov did it! :D<br /><i className="text-muted">бигбоб</i></span> }
-                    tooltipColor="blue"
-                
-                    fab
-                    ghost
-                    style={ { fontSize: 16 } }
-                    className="show-on-hover fw-500 text-muted mb-2"
-                >:D</Button>
-            </a>
+            <div className="list items-center pb-1">
+                <a href="https://vk.com/bbog908" target="_blank" rel="noreferrer" className="link">
+                    <Button
+                        tooltip={ <span>Bogdanov made it! :D<br /><i className="text-muted">бигбоб</i></span> }
+                        tooltipColor="blue"
+                    
+                        type="fab"
+                        ghost
+                        style={ { fontSize: 16 } }
+                        className="show-on-hover fw-500 text-muted mb-2"
+                    >:D</Button>
+                </a>
+                <img alt="Logo" src={ logo_img.src } className="logo" style={ { width: 40, height: 40 } } />
+            </div>
 
         </div>
     );
@@ -76,6 +80,7 @@ const Tool: React.FC<{ type: ToolType }> = props=> {
         [ToolType.FILL]: <>
             <i className="text-muted">Who drew this icon?</i>
             <ToolTooltipKey keys={ ["Shift"] }>to fill all selection</ToolTooltipKey>
+            <ToolTooltipKey keys={ ["Alt"] }>fill same colors<br />(don't work on some browsers)</ToolTooltipKey>
         </>,
         
         [ToolType.ELLIPSE]: <>{ shapeTool }</>,

@@ -7,16 +7,19 @@ import { EditorEditedType, EditorStates, EditorTriggers } from "../../../states/
 import State, { state } from "../../../states/State";
 import config from "../../../utils/config";
 import { Anchor, HSLA } from "../../../utils/types";
+import { exists } from "../../../utils/utils";
 
 export enum HistoryItemType {
     ALL,
-    LAYERS,
+    LAYER_EDITED,
+    LAYERS_LIST_EDITED,
     PALETTE,
     APP
 }
 export interface IHistoryItem {
     type: HistoryItemType
     data: any
+    targetId?: number
 }
 
 export interface ILayerData {
@@ -33,7 +36,7 @@ export interface IAppData {
     canvasHeight: number
     resizeAnchor: Anchor
 }
-type PushToType = "pushPast" | "pushFuture";
+type PushToType = "pushItemsPast" | "pushItemsFuture";
 
 class HistoryWorker {
     Past: State<IHistoryItem[][]>
@@ -45,20 +48,27 @@ class HistoryWorker {
     }
 
     init() {
-        // Yee
+        EditorTriggers.History.listen(history=> {
+            this.Future.value = [];
+            if (history.type) {
+                this.pushItemsByType(history.type, "pushItemsPast", history.targetId);
+            } 
+            if (history.items)
+                this.pushItemsPast(history.items);
+        });
     }
     
     undo() {
         if (this.Past.value.length <= 0 || EditorStates.MovingSelection.value || EditorStates.IsDrawing.value)
             return;
             
-        const lastPastItems = this.Past.value.at(-1);
+        const lastPastItems = [...this.Past.value].at(-1);
         if (!lastPastItems) {
             config.DEBUG && console.error("Last history in the PAST items doesn't exit!");
             return;
         }
 
-        this.undoRedoItems(lastPastItems, "pushFuture");
+        this.restoreItems(lastPastItems, "pushItemsFuture");
         
         const newPast = [...this.Past.value];
         newPast.pop();
@@ -72,14 +82,14 @@ class HistoryWorker {
         if (this.Future.value.length <= 0 || EditorStates.MovingSelection.value || EditorStates.IsDrawing.value)
             return;
             
-        const lastFutureItems = this.Future.value.at(-1);
+        const lastFutureItems = [...this.Future.value].at(-1);
         
         if (!lastFutureItems) {
             config.DEBUG && console.error("Last history in the FUTURE items doesn't exit!");
             return;
         }
 
-        this.undoRedoItems(lastFutureItems, "pushPast");
+        this.restoreItems(lastFutureItems, "pushItemsPast");
         
         const newFuture = [...this.Future.value];
         newFuture.pop();
@@ -89,77 +99,83 @@ class HistoryWorker {
             type: EditorEditedType.REDO
         }, "history-redo");
     }
-    private undoRedoItems(items: IHistoryItem[], to: PushToType) {
+    private restoreItems(items: IHistoryItem[], to: PushToType) {
+
+        // this[to](items);
+        
         for (const item of items) {
+            this.pushItemsByType(item.type, to, item.targetId);
             switch (item.type) {
 
                 // All
                 case HistoryItemType.ALL:
-                    this.pushTo(HistoryItemType.ALL, to);
-                    this.undoRedoLayers(item);
-                    this.undoRedoPalette(item);
-                    this.undoRedoApp(item);
+                    this.restoreLayersList(item);
+                    this.restorePalette(item);
+                    this.restoreApp(item);
                     break;
 
                 // App
                 case HistoryItemType.APP:
-                    this.pushTo(HistoryItemType.APP, to);
-                    this.undoRedoApp(item);
+                    this.restoreApp(item);
                     break;
-                // Layers
-                case HistoryItemType.LAYERS:
-                    this.pushTo(HistoryItemType.LAYERS, to);
-                    this.undoRedoLayers(item);
+                // Layers list
+                case HistoryItemType.LAYERS_LIST_EDITED:
+                    this.restoreLayersList(item);
+                    break;
+                // Layer
+                case HistoryItemType.LAYER_EDITED:
+                    this.restoreLayer(item);
                     break;
                 // Palette
                 case HistoryItemType.PALETTE:
-                    this.pushTo(HistoryItemType.PALETTE, to);
-                    this.undoRedoPalette(item);
+                    this.restorePalette(item);
                     break;
             }
         }
     }
 
-    pushToPast(type: HistoryItemType) {
-        config.DEBUG && console.log(`Pushed ${ HistoryItemType[type] }`);
-        
-        this.Future.value = [];
-        this.pushTo(type, "pushPast");
-    }
-    private pushTo(type: HistoryItemType, to: PushToType) {
+    private pushItemsByType(type: HistoryItemType, to: PushToType, targetId?: number) {
         switch (type) {
 
             // All
             case HistoryItemType.ALL:
-                this[to]([
+                this[to](([
                     this.makeAppData(),
-                    this.makeLayersData(),
+                    this.makeLayersListData(),
+                    targetId && this.makeLayerData(targetId),
                     this.makePaletteData()
-                ]);
+                ] as any).filter(Boolean));
                 break;
 
             // App
             case HistoryItemType.APP:
                 this[to]([
                     this.makeAppData(),
-                ]);
+                ])
                 break;
-            // Layers
-            case HistoryItemType.LAYERS: 
+            // Layers list
+            case HistoryItemType.LAYERS_LIST_EDITED: 
                 this[to]([
-                    this.makeLayersData(),
-                ]);
+                    this.makeLayersListData(),
+                ])
+                break;
+            // Layer
+            case HistoryItemType.LAYER_EDITED:
+                if (exists(targetId))
+                    this[to]([
+                        this.makeLayerData(targetId!),
+                    ])
                 break;
             // Palette
             case HistoryItemType.PALETTE: 
                 this[to]([
                     this.makePaletteData()
-                ]);
+                ])
                 break;
                 
         }
     }
-    private pushPast(items: IHistoryItem[]) {
+    pushItemsPast(items: IHistoryItem[]) {
         const newPast = [...this.Past.value];
         newPast.push(items);
 
@@ -168,7 +184,7 @@ class HistoryWorker {
 
         this.Past.value = newPast;
     }
-    private pushFuture(items: IHistoryItem[]) {
+    private pushItemsFuture(items: IHistoryItem[]) {
         const newFuture = [...this.Future.value];
         newFuture.push(items);
 
@@ -179,7 +195,7 @@ class HistoryWorker {
     }
 
     // App
-    private makeAppData(): IHistoryItem {
+    makeAppData(): IHistoryItem {
         return {
             type: HistoryItemType.APP,
             data: {
@@ -189,15 +205,15 @@ class HistoryWorker {
             } as IAppData
         };
     }
-    private undoRedoApp(item: IHistoryItem) {
+    private restoreApp(item: IHistoryItem) {
         const historyApp: IAppData = item.data;
 
         App.resizeCanvas(historyApp.canvasWidth, historyApp.canvasHeight, historyApp.resizeAnchor, false);
     }
     // Layers
-    private makeLayersData(): IHistoryItem {
+    makeLayersListData(): IHistoryItem {
         return {
-            type: HistoryItemType.LAYERS,
+            type: HistoryItemType.LAYERS_LIST_EDITED,
             data: {
                 layers: LayersWorker.normalLayers.map(layer=> ({
                     id: layer.id,
@@ -207,27 +223,43 @@ class HistoryWorker {
             }
         };
     }
-    private undoRedoLayers(item: IHistoryItem) {
-        const historyLayers: ILayerData[] = item.data.layers;
+    makeLayerData(layerId: number): IHistoryItem {
+        const layer = LayersWorker.Layers.value.find(l=> l.id == layerId);
+        
+        return {
+            type: HistoryItemType.LAYER_EDITED,
+            targetId: layerId,
+            data: {
+                layer: {
+                    id: layerId,
+                    name: layer?.name,
+                    imageData: layer?.getImageData()
+                } as ILayerData
+            }
+        }
+    }
+    private restoreLayersList(item: IHistoryItem) {
+        const historyLayersList: ILayerData[] = item.data.layers;
 
-        // let newLayers: Layer[] = [...LayersWorker.normalLayers];
         let newLayers: Layer[] = [];
-        for (const historyLayer of historyLayers) {
-            // newLayers = newLayers.filter(l=> l.id == historyLayer.id);
-            // const layer = newLayers.find(l=> l.id == historyLayer.id);
-            
-            // if (!layer)
-                // Add layer if it doesn't exists
-                newLayers.push(new Layer(historyLayer.id, historyLayer.name, historyLayer.imageData));
-            // else
-            //     // Just replace image data if it exists
-            //     layer.replaceDataUrl(historyLayer.dataUrl);
+        for (const historyLayer of historyLayersList) {
+            newLayers.push(new Layer(historyLayer.id, historyLayer.name, historyLayer.imageData));
         }
         
         LayersWorker.setLayers(newLayers);
     }
+    private restoreLayer(item: IHistoryItem) {
+        const historyLayer: ILayerData = item.data.layer;
+        const layer = LayersWorker.Layers.value.find(l=> l.id == historyLayer.id);
+        if (!layer) return;
+
+        layer.replaceImageData(historyLayer.imageData);
+        layer.name = historyLayer.name;
+
+        LayersWorker.Layers.notify();
+    }
     // Palette
-    private makePaletteData(): IHistoryItem {
+    makePaletteData(): IHistoryItem {
         return {
             type: HistoryItemType.PALETTE,
             data: {
@@ -238,7 +270,7 @@ class HistoryWorker {
             }
         };
     }
-    private undoRedoPalette(item: IHistoryItem) {
+    private restorePalette(item: IHistoryItem) {
         const historyPalette: IPaletteColorData[] = item.data.palette;
         
         const newPalette: PaletteColor[] = [];

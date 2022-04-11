@@ -34,7 +34,7 @@ export default class PreviewLayer extends Layer {
         allowPreview?: boolean
         allowDrawBehindSelection?: boolean
     }) {
-        if (!SelectionWorker.pointInsideSelection(props.position, props.allowDrawBehindSelection || false))
+        if (!SelectionWorker.pointInSelection(props.position, props.allowDrawBehindSelection || false))
             return;
         
         const pixel = this.getPixelAt(props.position);

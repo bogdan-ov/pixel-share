@@ -6,6 +6,7 @@ $bg: #101013;
 $panel-bg: darken($bg, 2);
 $blue: #137dff;
 $red: #ff183f;
+$green: #28be67;
 $grey: transparentize(#fff, .7);
 $dark-grey: transparentize(#fff, .9);
 
@@ -27,6 +28,22 @@ body {
     @include ff;
 }
 
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: $bg;
+}
+::-webkit-scrollbar-thumb {
+    background: darken($bg, 6);
+    border-radius: 8px;
+    cursor: pointer;
+    &:hover {
+        background: darken($bg, 4);
+    }
+}
+
 @import "./typography.scss";
 @import "./components/buttons.scss";
 @import "./components/inputs.scss";
@@ -40,6 +57,7 @@ body {
 @import "./components/editor/panels/layers-panel.scss";
 @import "./components/editor/panels/menubar-panel.scss";
 @import "./components/editor/panels/toolbar.scss";
+@import "./components/editor/panels/frames-panel.scss";
 
 @import "./components/editor/windows/drop-down-menu.scss";
 @import "./components/editor/windows/window.scss";
@@ -51,6 +69,8 @@ body {
 @import "./components/editor/windows/custom/export-image-window.scss";
 @import "./components/editor/windows/custom/projects-window.scss";
 @import "./components/editor/windows/custom/resize-canvas-window.scss";
+@import "./components/editor/windows/custom/modifier-window.scss";
+@import "./components/editor/windows/custom/welcome-window.scss";
 
 @import "./components/editor/notification.scss";
 @import "./components/editor/color-picker.scss";

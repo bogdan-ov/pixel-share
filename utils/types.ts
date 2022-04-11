@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Dispatch, SetStateAction } from "react";
 
 export interface MyComponent {
     className?: string
@@ -27,7 +27,10 @@ export enum Anchor {
     BOTTOM_RIGHT,
 }
 
-export type ReactState<T> = React.Dispatch<React.SetStateAction<T>>
+// export type ReactState<T> = Dispatch<SetStateAction<T>>
+export type ReactStateValue<T> = T | ((old: T)=> T)
+export type ReactState<T> = (value: ReactStateValue<T>)=> void
+export type ReactSimpleState<T> = (value: T)=> void
 
 export type RGBA = [red: number, green: number, blue: number, alpha: number];
 export type HSLA = [hue: number, saturation: number, lightness: number, alpha: number];

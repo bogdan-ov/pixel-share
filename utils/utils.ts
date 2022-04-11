@@ -1,6 +1,7 @@
-import { random } from "./math";
-import { HSLA, RGBA } from "./types";
+import { random, vec, Vector2 } from "./math";
+import { HSLA, ReactState, ReactStateValue, RGBA } from "./types";
 import converter from "color-convert";
+import React from "react";
 
 export const coolLayerNames = [
     "New layer", "asdkcp", "Another layer", "It's layer!", "Name me, please...",
@@ -19,8 +20,8 @@ export function capitalize(string: string): string {
 export function safeValue<T>(value: T | undefined | null, safe: T): T {
     return (value === undefined || value === null) ? safe : value;
 }
-export function isNull(value: any): boolean {
-    return value === null || value === undefined;
+export function exists(value: any): boolean {
+    return value !== null || value !== undefined;
 }
 
 export function rgbToHex(rgba: RGBA): string {
@@ -37,6 +38,18 @@ export function hexToHsl(hex: string): HSLA {
 }
 export function randomColor(): string {
     return `hsl(${ Math.round(random(0, 360)) }, 100%, 50%)`;
+}
+
+export function drawImageData(context: CanvasRenderingContext2D, imageData: ImageData, offset: Vector2=new Vector2()) {
+    const data = imageData.data;
+
+    for (let i = 0; i < data.length; i ++) {
+        const pos = vec(i % imageData.width, Math.floor(i / imageData.width)).add(offset);
+        const color = `rgba(${ data[i*4] }, ${ data[i*4+1] }, ${ data[i*4+2] }, ${ data[i*4+3]/255 })`;
+
+        context.fillStyle = color;
+        context.fillRect(Math.floor(pos.x), Math.floor(pos.y), 1, 1);
+    }
 }
 
 export function putItemAt<T>(array: T[], item: T, index: number): T[] {

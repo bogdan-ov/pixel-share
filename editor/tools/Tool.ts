@@ -56,7 +56,7 @@ export default class Tool {
         }
 
         if (!this.isPickingColor && this.allowAutoHistory)
-            HistoryWorker.pushToPast(HistoryItemType.LAYERS);
+            LayersWorker.currentLayer?.pushToHistory();
 
         this.isUsing = true;
         EditorStates.IsDrawing.value = true;

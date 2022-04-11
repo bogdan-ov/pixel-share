@@ -11,7 +11,7 @@ const LayersPanelFooter: React.FC = ()=> {
     const allowRename = !!LayersWorker.currentLayer;
 
     return (
-        <footer className="panel-footer flex items-center gap-1">
+        <footer className="panel-footer slot gap-1">
             <FooterButton
                 triggerType="Action"
                 trigger={ EditorActionType.ADD_LAYER }

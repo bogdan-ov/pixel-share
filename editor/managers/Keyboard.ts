@@ -42,9 +42,9 @@ export class Keyboard {
                 
             this.keysPressed[e.code.toLowerCase()] = true;
 
+            this.isAlt = e.altKey;
             this.isCtrl = e.ctrlKey;
             this.isShift = e.shiftKey;
-            this.isAlt = e.altKey;
             this.isEsc = e.code == "Escape";
             this.isEnter = e.code == "Enter";
 
@@ -65,6 +65,8 @@ export class Keyboard {
                 
             this.isCtrl = false;
             this.isShift = false;
+            this.isEnter = false;
+            this.isEsc = false;
             this.isAlt = false;
             
             this.OnKeyUpTrigger.trigger(e);

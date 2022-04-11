@@ -37,7 +37,7 @@ export default class SelectionTool extends ShapeTool {
         const sel = SelectionWorker.selection;
         
         if (sel.active) {
-            if (Keyboard.isShift) {
+            if (this.startMovingSelection) {
                 // Move selection
                 if (!EditorStates.MovingSelection.value) {
                     SelectionWorker.startMoveSelection();
@@ -70,13 +70,17 @@ export default class SelectionTool extends ShapeTool {
         }
     }
 
-    onMove(renderer: Renderer): void {
-        super.onMove(renderer);
+    onUpdate(): void {
+        super.onUpdate();
 
         // Cursor style
-        if (Keyboard.isShift)
+        if (this.startMovingSelection)
             App.setCursor("move");
         else
             App.setCursor("default");
+    }
+
+    get startMovingSelection(): boolean {
+        return Keyboard.isShift || (EditorStates.MovingSelection.value && SelectionWorker.pointInSelection(Mouse.pos));
     }
 }

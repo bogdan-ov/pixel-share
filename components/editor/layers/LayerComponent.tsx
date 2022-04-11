@@ -7,7 +7,6 @@ import { EditorWrongActionType, EditorActionType, EditorTriggers, EditorStates, 
 import Icon from "../../Icon";
 import Button from "../../ui/buttons/Button";
 import RenamableText from "../../ui/inputs/RenamableText";
-import HistoryWorker, { HistoryItemType } from "../history/HistoryWorker";
 
 export interface ILayerComponent {
     id: Layer["id"]
@@ -190,9 +189,6 @@ const LayerComponent: React.FC<ILayerComponent> = props=> {
         LayersWorker.toggleLayerLock(props.id);
     }
     function renameHandler(newName: string) {
-        HistoryWorker.pushToPast(HistoryItemType.LAYERS);
-        // EditorTriggers.History.trigger(HistoryItemType.LAYERS, "layer-worker")
-
         LayersWorker.renameLayer(props.id, newName);
     }
 
@@ -234,16 +230,22 @@ const LayerComponent: React.FC<ILayerComponent> = props=> {
             </main>
 
             <div className="layer-action-buttons flex flex-column">
-                <button 
-                    className={ ["button ghost small", props.locked ? "show" : ""].join(" ") }
+                <Button 
+                    ghost
+                    size="small"
+                    className={ props.locked ? "show" : "" }
                     onClick={ toggleLockHandler }
                     title={ props.locked ? "Unlock layer" : "Lock layer" }
-                ><Icon icon={ props.locked ? "lock" : "unlock" } /></button>
-                <button 
-                    className={ ["button ghost small", !props.visible ? "show" : ""].join(" ") }
+                    icon={ props.locked ? "lock" : "unlock" }
+                />
+                <Button 
+                    ghost
+                    size="small"
+                    className={ !props.visible ? "show" : "" }
                     onClick={ toggleVisibleHandler }
                     title={ props.visible ? "Hide layer" : "Show layer" }
-                ><Icon icon={ props.visible ? "visible" : "hidden" } /></button>
+                    icon={ props.visible ? "visible" : "hidden" }
+                />
             </div>
 
         </motion.div>

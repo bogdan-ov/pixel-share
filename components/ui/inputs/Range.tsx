@@ -16,20 +16,21 @@ interface IRange {
     value: number
     onChange: (value: number)=> void
     onInputSubmit: (value: number)=> void
-
+    
     rangeStyle?: React.CSSProperties
     inputStyle?: React.CSSProperties
     step?: number
-
+    
+    disabled?: boolean
     disableInput?: boolean
-    removeGroupBoxClass?: boolean
+    disableGroupBoxClass?: boolean
 }
 
 const Range: React.FC<IRange & MyComponent> = props=> {
 
     const className = createClassName([
-        "slot gap-2",
-        !props.removeGroupBoxClass && "group-box",
+        "slot gap-1",
+        !props.disableGroupBoxClass && "group-box",
         props.className
     ]);
     
@@ -43,10 +44,13 @@ const Range: React.FC<IRange & MyComponent> = props=> {
                     } }
                     inputClassName="ghost"
                     type="number"
+
                     min={ props.inputMin || props.min }
                     max={ props.inputMax || props.max }
                     minLength={ props.inputMinLength }
                     maxLength={ props.inputMaxLength }
+                    
+                    disabled={ props.disabled }
                     value={ props.value }
                     onChange={ v=> props.onChange(+v) }
                     onSubmit={ v=> props.onInputSubmit(+v) }
@@ -54,14 +58,17 @@ const Range: React.FC<IRange & MyComponent> = props=> {
             }
 
             <input
+                type="range"
+                className="range-input"
                 style={ props.rangeStyle }
+
                 min={ props.min }
                 max={ props.max }
                 step={ props.step || 1 }
+                
+                disabled={ props.disabled }
                 value={ props.value }
                 onChange={ e=> props.onChange(+e.target.value) }
-                type="range"
-                className="range-input"
             />
         
         </div>

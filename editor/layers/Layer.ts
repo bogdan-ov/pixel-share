@@ -1,9 +1,13 @@
+import { HistoryItemType } from "../../components/editor/history/HistoryWorker";
+import { EditorEditedType, EditorTriggers } from "../../states/editor-states";
 import config from "../../utils/config";
 import { vec, Vector2 } from "../../utils/math";
 import { Anchor, RGBA } from "../../utils/types";
 import { safeValue } from "../../utils/utils";
 import App from "../App";
+import Modifier, { ModifierType } from "../modifiers/Modifier";
 import LayersWorker from "../workers/LayersWorker";
+import ModifiersWorker from "../workers/ModifiersWorker";
 import SelectionWorker from "../workers/SelectionWorker";
 
 export interface IPixelData {
@@ -117,7 +121,7 @@ export default class Layer {
         allowDrawBehindSelection?: boolean
     }) {
         if (!this.editable) return;
-        if (!SelectionWorker.pointInsideSelection(props.position, props.allowDrawBehindSelection || false))
+        if (!SelectionWorker.pointInSelection(props.position, props.allowDrawBehindSelection || false))
             return;
         
         const size = props.size || 1;
@@ -133,33 +137,10 @@ export default class Layer {
         } else {
             // Draw
             this.context.fillStyle = props.color;
-            if (props.size == 3) {
-                this.context.fillRect(
-                    x+1, y+1,
-                    1, 1
-                );
-                this.context.fillRect(
-                    x, y+1,
-                    1, 1
-                );
-                this.context.fillRect(
-                    x+2, y+1,
-                    1, 1
-                );
-                this.context.fillRect(
-                    x+1, y,
-                    1, 1
-                );
-                this.context.fillRect(
-                    x+1, y+2,
-                    1, 1
-                );
-            } else {
-                this.context.fillRect(
-                    x, y,
-                    size, size
-                );
-            }
+            this.context.fillRect(
+                x, y,
+                size, size
+            );
         }
     }
     pixelPerfect() {}
@@ -170,10 +151,13 @@ export default class Layer {
     clearRect(pos: Vector2, width: number, height: number) {
         this.context.clearRect(pos.x, pos.y, width, height);
     }
+    /**
+     * **Clear ALL layer if selection isn't active!**
+     */
     clearBySelection() {
-        LayersWorker.pushToHistory();
+        LayersWorker.layersListPushToHistory();
 
-        const selection = SelectionWorker.selection;
+        const selection = SelectionWorker.getSelection();
         const pos = selection.from.expand();
         
         this.clearRect(pos, selection.width, selection.height);
@@ -220,6 +204,11 @@ export default class Layer {
         return this.visible && !this.locked;
     }
 
+    // Image date
+    getSelectionImageData(): ImageData {
+        const sel = SelectionWorker.getSelection();
+        return this.getImageData(sel.from, sel.width, sel.height);
+    }
     pickColorAt(pos: Vector2): RGBA {
         const imageData = this.getImageData();
         const pixelIndex = pos.toIndex(this.canvas.width) * 4;
@@ -273,12 +262,10 @@ export default class Layer {
             const pos = vec(i % imageData.width, Math.floor(i / imageData.width)).add(vec(x, y));
             const color = `rgba(${ data[i*4] }, ${ data[i*4+1] }, ${ data[i*4+2] }, ${ data[i*4+3]/255 })`;
 
-            this.drawPixel({
-                position: pos,
-                color,
-                size: 1
-            });
-            
+            if (pos.y < imageData.height + y) {
+                this.context.fillStyle = color;
+                this.context.fillRect(pos.x, pos.y, 1, 1);
+            }
         }
 
     }
@@ -300,10 +287,38 @@ export default class Layer {
         }
 
         this.clearCanvas();
-        
-        const img = new Image();
-        img.src = dataUrl;
+        this.putDataUrl(dataUrl, x, y);
+    }
 
-        this.context.drawImage(img, x, y);
+    // Modifiers
+    applyModifierByType(type: ModifierType, props?: any[], historyAndNotify: boolean=true) {
+        this.applyModifier(ModifiersWorker.getModifier(type), props, historyAndNotify);
+    }
+    applyModifier(modifier: Modifier, props?: any, historyAndNotify: boolean=true) {
+        if (historyAndNotify)
+            LayersWorker.layerPushToHistory(this.id);
+        
+        if (props)
+            modifier.render(props);
+        this.clearBySelection();
+        this.putImageData(modifier.imageData);
+
+        if (historyAndNotify) {
+            EditorTriggers.Edited.trigger({
+                type: EditorEditedType.LAYERS_EDITED
+            })
+            EditorTriggers.Notification.trigger({
+                content: `Modifier ${ modifier.name } applied!`,
+                type: "success"
+            });
+        }
+    }
+
+    // Mics
+    pushToHistory() {
+        EditorTriggers.History.trigger({
+            type: HistoryItemType.LAYER_EDITED,
+            targetId: this.id
+        });
     }
 }

@@ -8,8 +8,8 @@ import { HSLA } from "../../../utils/types";
 import { hslToHex } from "../../../utils/utils";
 import Tooltip from "../../ui/windows/Tooltip";
 
-interface IPaletteColorComponent {
-    color: HSLA
+export interface IPaletteColorComponent {
+    hslaColor: HSLA
     id: PaletteColor["id"]
 };
 
@@ -42,7 +42,7 @@ const PaletteColorComponent: React.FC<IPaletteColorComponent> = props=> {
                 style={ {
                     height: 6,
                     borderRadius: 10,
-                    background: hslToHex(props.color)
+                    background: hslToHex(props.hslaColor)
                 } }
             /></div>,
             event: e,
@@ -68,7 +68,7 @@ const PaletteColorComponent: React.FC<IPaletteColorComponent> = props=> {
             placement="left"
             tooltip={ <div className="slot flex-column">
                 <span>Double tap to edit!</span>
-                <span className="text-muted">{ hslToHex(props.color) }</span>
+                <span className="text-muted">{ hslToHex(props.hslaColor) }</span>
             </div> }
         >
             <div className={ className } ref={ ref }>
@@ -77,7 +77,7 @@ const PaletteColorComponent: React.FC<IPaletteColorComponent> = props=> {
                     onDoubleClick={ editHandler }
                     onContextMenu={ onContextHandler }
                     className="palette-color"
-                    style={ { background: hslToHex(props.color) } } 
+                    style={ { background: hslToHex(props.hslaColor) } } 
                 >
                     <div className="last-active-indicator" />
                 </div>

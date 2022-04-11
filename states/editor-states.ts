@@ -1,4 +1,5 @@
 import React, { RefObject } from "react";
+import { HistoryItemType, IHistoryItem } from "../components/editor/history/HistoryWorker";
 import { INotification } from "../components/editor/notification/Notification";
 import { IDropdownMenuButtonsGroup } from "../components/ui/windows/DropdownMenu";
 import { state, trigger } from "./State";
@@ -15,6 +16,8 @@ export enum EditorWrongActionType {
     UNEDITABLE_LAYER
 }
 export enum EditorActionType {
+    START_APP,
+    
     ADD_LAYER,
     RENAME_LAYER,
     DELETE_LAYER,
@@ -36,12 +39,16 @@ export enum EditorWindowType {
     GRID_CONFIG_WINDOW,
 
     OPEN_PROJECT_WINDOW,
-    SAVE_PROJECT_WINDOW
+    SAVE_PROJECT_WINDOW,
+
+    ARRAY_MODIFIER_WINDOW,
+    DECAY_MODIFIER_WINDOW,
+    STROKE_MODIFIER_WINDOW
 }
 
-export interface IEditorEditedTrigger {
+export type IEditorEditedTrigger = {
     type: EditorEditedType
-}
+} | true;
 export interface IEditorWindowTrigger {
     type: EditorWindowType
     targetId?: number
@@ -63,24 +70,26 @@ export interface IEditorActionTrigger {
 export interface IEditorWrongActionTrigger {
     type: EditorWrongActionType
 }
+export interface IEditorHistoryTrigger {
+    type: HistoryItemType | null
+    targetId?: number
+    items?: IHistoryItem[]
+}
 
 export const EditorTriggers = {
     // Was done
-    Edited: trigger<IEditorEditedTrigger | true>("editor-edited"),
+    Edited: trigger<IEditorEditedTrigger>("editor-edited"),
 
-    // To call notification
+    // To call something
     Notification: trigger<Omit<INotification, "id">>("editor-notification"),
-    // To call window
     Window: trigger<IEditorWindowTrigger>("editor-window"),
-    // To call context menu
     ContextMenu: trigger<IEditorContextMenuTrigger>("editor-context-menu"),
+    History: trigger<IEditorHistoryTrigger>("editor-history"),
 
     // Was wrong...
     WrongAction: trigger<IEditorWrongActionTrigger>("editor-wrong-action"),
     // Will be done
     Action: trigger<IEditorActionTrigger>("editor-action"),
-
-    // History: trigger<HistoryItemType>("editor-history-trigger"),
 }
 export const EditorStates = {
     HelperText: state<string>("", "editor-helper-text"),

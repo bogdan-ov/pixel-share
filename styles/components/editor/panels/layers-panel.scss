@@ -84,9 +84,11 @@ $layer-blob-size: 64px;
                 .layer-action-buttons {
                     pointer-events: all;
                     > .button {
-                        opacity: 1;
-                        &:disabled {
+                        &:not(.show) {
                             opacity: .4;
+                        }
+                        &:disabled {
+                            opacity: .2;
                         }
                     }
                 }

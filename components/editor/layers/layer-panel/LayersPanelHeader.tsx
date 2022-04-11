@@ -1,10 +1,6 @@
 import React from "react";
-import { EditorEditedType, EditorTriggers, EditorWindowType } from "../../../../states/editor-states";
-import { MyComponent } from "../../../../utils/types";
-import TriggerNotice, { ITriggerNotice } from "../../../ui/interactive/TriggerNotice";
-import Button, { IButton } from "../../../ui/buttons/Button";
+import { EditorEditedType } from "../../../../states/editor-states";
 import HistoryWorker from "../../history/HistoryWorker";
-import App from "../../../../editor/App";
 import ProjectWorker from "../../../../editor/workers/ProjectWorker";
 import { MenubarButton } from "../../menubar/Menubar";
 import useStateListener from "../../../../src/hooks/useStateListener";
@@ -31,8 +27,9 @@ const LayersPanelHeader: React.FC = ()=> {
                     icon="undo"
                     ghost
 
-                    tooltip={ <span>Undo</span> }
+                    tooltip={ <span>Undo <span className="text-muted">({ historyPast.length })</span></span> }
                     tooltipHotkeysName="undo"
+                    tooltipPlacement="bottom"
                     onClick={ undoHandler }
 
                     disabled={ historyPast.length <= 0 }
@@ -43,8 +40,9 @@ const LayersPanelHeader: React.FC = ()=> {
                     icon="redo"
                     ghost
 
-                    tooltip={ <span>Redo</span> }
+                    tooltip={ <span>Redo <span className="text-muted">({ historyFuture.length })</span></span> }
                     tooltipHotkeysName="redo"
+                    tooltipPlacement="bottom"
                     onClick={ redoHandler }
 
                     disabled={ historyFuture.length <= 0 }

@@ -1,5 +1,5 @@
 import config from "../utils/config";
-import { random, randomId } from "../utils/math";
+import { randomId } from "../utils/math";
 
 function createId(key: string, customId?: string): string {
     return `${key}:${customId || randomId()}`;
@@ -10,7 +10,7 @@ export default class State<T = any> {
     key: string
 
     listeners: {
-        [id: string]: (value: T) => void
+        [id: string]: (value: T, from: string) => void
     }
 
     constructor(value: T, key: string) {
@@ -26,10 +26,10 @@ export default class State<T = any> {
         this._value = value;
         this.notify();
     }
-    set(value: (value: T) => T, noNotify?: boolean) {
+    set(value: (value: T) => T, noNotify: boolean=false, from: string="") {
         this.value = value(this.value);
         if (!noNotify)
-            this.notify();
+            this.notify(from);
     }
 
     listen(listener: State<T>["listeners"][1], customId?: string, overwrite?: boolean) {
@@ -47,10 +47,10 @@ export default class State<T = any> {
         config.DEBUG && console.log(id, "State unlisten!");
     }
 
-    notify() {
+    notify(from: string="") {
         const keys = Object.keys(this.listeners);
         for (let i = 0; i < keys.length; i++) {
-            this.listeners[keys[i]](this._value)
+            this.listeners[keys[i]](this._value, from)
         }
 
         config.DEBUG && config.LOG_STATES && console.log(`🟢 State "${ this.key }" notify all! ${ keys.length } listeners`);

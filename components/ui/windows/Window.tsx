@@ -2,14 +2,15 @@ import { motion, useDragControls } from "framer-motion";
 import React, { createRef, RefObject, useEffect, useState } from "react";
 import Keyboard from "../../../editor/managers/Keyboard";
 import createClassName from "../../../src/hooks/createClassName";
+import useSafeState from "../../../src/hooks/useSafeState";
 import { EditorTriggers, EditorWindowType, IEditorWindowTrigger } from "../../../states/editor-states";
 import { MyComponent } from "../../../utils/types";
 import Icon from "../../Icon";
+import Button from "../buttons/Button";
 
 export interface IWindow {
     trigger: EditorWindowType
     
-    custom?: boolean
     active?: boolean
     setActive?: (value: boolean)=> void
     title?: React.ReactElement
@@ -27,10 +28,7 @@ export interface IWindowNeeds {
 const Window: React.FC<IWindow & MyComponent & IWindowNeeds> = props=> {
     const ref = createRef<HTMLDivElement>();
     const dragControls = useDragControls();
-    const [active, setActive] = useState<boolean>(false);
-
-    const _active = props.custom ? props.active! : active;
-    const _setActive = props.custom ? props.setActive! : setActive;
+    const [active, setActive] = useSafeState(false, props.active, props.setActive);
     
     const className = ["window-draggable-wrapper flex flex-column gap-1"].join(" ");
     
@@ -39,18 +37,18 @@ const Window: React.FC<IWindow & MyComponent & IWindowNeeds> = props=> {
         const unlistenWindow = EditorTriggers.Window.listen((action)=> {
             if (action.type != props.trigger) return;
 
-            _setActive(true);
+            setActive(true);
 
             if (props.onTrigger)
                 props.onTrigger(action);
         });
         const unlistenKeyboard = Keyboard.onKeyPress(e=> {
-            if (!_active) return;
+            if (!active) return;
             
             if (e.code == "Enter")
                 props.onEnter && props.onEnter();
             if (e.code == "Escape") {
-                props.onEscape ? props.onEscape() : _setActive(false);
+                props.onEscape ? props.onEscape() : setActive(false);
             }
         })
 
@@ -65,10 +63,10 @@ const Window: React.FC<IWindow & MyComponent & IWindowNeeds> = props=> {
         dragControls.start(e);
     }
     function onCloseHandler() {
-        _setActive(false);
+        setActive(false);
     }
     
-    return _active ? (
+    return active ? (
         <motion.div
             initial={ {
                 left: 100,
@@ -104,11 +102,13 @@ const Window: React.FC<IWindow & MyComponent & IWindowNeeds> = props=> {
             >
                 <header className="window-header slot justify-between" onPointerDown={ onHeaderPointerDownHandler }>
                     { props.title || <span></span> }
-                    <button 
+                    <Button 
                         style={{ transform: "translateX(8px)" }}
-                        className="button ghost small"
+                        ghost
+                        size="small"
                         onClick={ onCloseHandler }
-                    ><Icon icon="small-cross" /></button>
+                        icon="small-cross"
+                    />
                 </header>
                 
                 <main className="window-content">
