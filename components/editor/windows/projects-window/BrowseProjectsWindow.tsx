@@ -7,11 +7,11 @@ interface IBrowseProjectsWindow {
     active: boolean
     setActive: ReactState<boolean>
 
-    // selectedProjectId: number | null
     setSelectedProjectId: ReactState<number | null>
 
     projects: IProjectData[]
     fetchProjects: ()=> void
+    title: React.ReactElement
 }
 
 const BrowseProjectsWindow: React.FC<Pick<IFullWindow, "trigger"> & IBrowseProjectsWindow> = props=> {
@@ -34,17 +34,16 @@ const BrowseProjectsWindow: React.FC<Pick<IFullWindow, "trigger"> & IBrowseProje
     
     return (
         <FullWindow
-            custom
             active={ props.active }
             setActive={ props.setActive }
             className="projects-window"
             style={ { width: "max-content" } }
             trigger={ props.trigger }
         >
-            <div className="scrollable p-4">
+            <div className="scrollable">
             
                 <FullWindowHeader>
-                    <span className="text-muted">Browse your awesome projects! { loading && "(Loading...)" }</span>
+                    <span className="text-muted">{ props.title } { loading && "(Loading...)" }</span>
                 </FullWindowHeader>
                 
                 { props.children && (props.children as any)[0] }

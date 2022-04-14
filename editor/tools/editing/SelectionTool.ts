@@ -81,6 +81,9 @@ export default class SelectionTool extends ShapeTool {
     }
 
     get startMovingSelection(): boolean {
-        return Keyboard.isShift || (EditorStates.MovingSelection.value && SelectionWorker.pointInSelection(Mouse.pos));
+        if (SelectionWorker.selection.active)
+            return Keyboard.isShift || (EditorStates.MovingSelection.value && SelectionWorker.pointInSelection(Mouse.pos));
+        else
+            return false;
     }
 }

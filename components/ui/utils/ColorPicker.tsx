@@ -17,7 +17,7 @@ interface IColorPicker {
     size?: number
     short?: boolean
     palette?: boolean
-    onEnd?: ()=> void
+    onPickEnd?: (color: HSLA)=> void
 }
 
 const DEFAULT_SIZE = 240;
@@ -52,7 +52,7 @@ const ColorPicker: React.FC<IColorPicker> = props=> {
         }
         function onPointerUp() {
             if (mouseDown) {
-                props.onEnd && props.onEnd();
+                props.onPickEnd && props.onPickEnd(props.newColor);
                 mouseDown = false;
             }
         }
@@ -115,7 +115,7 @@ const ColorPicker: React.FC<IColorPicker> = props=> {
         const hsl = hexToHsl(hex.replace("#", ""));
 
         setHsl(hsl);
-        props.onEnd && props.onEnd();
+        props.onPickEnd && props.onPickEnd(props.newColor);
     }
 
     function setHsl(hsl: [number?, number?, number?, number?]) {
@@ -192,7 +192,7 @@ const ColorPicker: React.FC<IColorPicker> = props=> {
                                     value={ hue.toFixed(0) }
                                     onSubmitChange={ v=> {
                                         setHsl([+(+v).toFixed(0) % 360])
-                                        props.onEnd && props.onEnd();
+                                        props.onPickEnd && props.onPickEnd(props.newColor);
                                     } }
 
                                     min={ 0 }
@@ -212,7 +212,7 @@ const ColorPicker: React.FC<IColorPicker> = props=> {
                                     value={ saturation.toFixed(0) }
                                     onSubmitChange={ v=> {
                                         setHsl([undefined, +(+v).toFixed(0)])
-                                        props.onEnd && props.onEnd();
+                                        props.onPickEnd && props.onPickEnd(props.newColor);
                                     } }
 
                                     min={ 0 }
@@ -232,7 +232,7 @@ const ColorPicker: React.FC<IColorPicker> = props=> {
                                     value={ lightness.toFixed(0) }
                                     onSubmitChange={ v=> {
                                         setHsl([undefined, undefined, +(+v).toFixed(0)])
-                                        props.onEnd && props.onEnd();
+                                        props.onPickEnd && props.onPickEnd(props.newColor);
                                     } }
 
                                     min={ 0 }
@@ -270,7 +270,7 @@ const ColorPicker: React.FC<IColorPicker> = props=> {
                             key={ color.id }
                             onClick={ ()=> {
                                 setHsl([...color.hslaColor]);
-                                props.onEnd && props.onEnd();
+                                props.onPickEnd && props.onPickEnd(props.newColor);
                             } }
                             { ...color }
                         />

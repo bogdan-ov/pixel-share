@@ -190,7 +190,19 @@ export const icons = {
     "checkbox": <svg width="13" height="12" viewBox="0 0 13 12" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect opacity="0.1" x="1" y="1" width="10" height="10" rx="2" stroke="currentColor" strokeWidth="2"/>
         <path d="M2 5.2L4.85714 8L12 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>    
+    </svg>,
+    "add-color": <svg width="18" height="12" viewBox="0 0 18 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M7 5C6.44772 5 6 5.44772 6 6C6 6.55228 6.44772 7 7 7V5ZM17 7C17.5523 7 18 6.55228 18 6C18 5.44772 17.5523 5 17 5V7ZM13 1C13 0.447715 12.5523 0 12 0C11.4477 0 11 0.447715 11 1H13ZM11 11C11 11.5523 11.4477 12 12 12C12.5523 12 13 11.5523 13 11H11ZM7 7H12V5H7V7ZM12 7H17V5H12V7ZM13 6V1H11V6H13ZM11 6V11H13V6H11Z" fill="currentColor"/>
+        <path d="M7 1H6C3.23858 1 1 3.23858 1 6V6C1 8.76142 3.23858 11 6 11H7" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+    </svg>,
+    "delete-color": <svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8 1L12 5M16 9L12 5M12 5L16 1M12 5L8 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+        <path d="M7 5H6.75C3.85051 5 1.5 7.35051 1.5 10.25V10.25C1.5 13.1495 3.85051 15.5 6.75 15.5V15.5C9.64949 15.5 12 13.1495 12 10.25V10" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+    </svg>,
+    "duplicate-color": <svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M9.53553 14.5355C9.07124 14.9998 8.52004 15.3681 7.91342 15.6194C7.30679 15.8707 6.65661 16 6 16C5.34339 16 4.69321 15.8707 4.08658 15.6194C3.47995 15.3681 2.92876 14.9998 2.46447 14.5355C2.00017 14.0712 1.63188 13.52 1.3806 12.9134C1.12933 12.3068 1 11.6566 1 11C1 10.3434 1.12933 9.69321 1.3806 9.08658C1.63188 8.47995 2.00017 7.92876 2.46447 7.46447" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+        <circle cx="11" cy="6" r="5" stroke="currentColor" strokeWidth="2"/>
+    </svg>,
 };
 
 const Icon: React.FC<{ icon: keyof typeof icons }> = ({ icon })=>

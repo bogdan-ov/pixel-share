@@ -58,6 +58,34 @@ const Window: React.FC<IWindow & MyComponent & IWindowNeeds> = props=> {
         };
         
     }, []);
+    useEffect(()=> {
+        const node = ref.current;
+        if (!node) return;
+        
+        function onBlur() {
+            if (!node) return;
+            node.style.zIndex = "888";
+        }
+        function onFocus() {
+            if (!node) return;
+            node.style.zIndex = "899";
+        }
+
+        node.addEventListener("focus", onFocus);
+        node.addEventListener("blur", onBlur);
+        return ()=> {
+            node?.removeEventListener("focus", onFocus)
+            node?.removeEventListener("blur", onBlur)
+        };
+        
+    }, [ref]);
+    useEffect(()=> {
+        if (!ref.current) return;
+
+        if (active) {
+            ref.current.focus();
+        }
+    }, [active, ref]);
     
     function onHeaderPointerDownHandler(e: React.PointerEvent) {
         dragControls.start(e);
@@ -80,6 +108,7 @@ const Window: React.FC<IWindow & MyComponent & IWindowNeeds> = props=> {
 
             ref={ ref }
             className={ className }
+            tabIndex={ 0 }
         >
             <motion.div 
                 initial={ {

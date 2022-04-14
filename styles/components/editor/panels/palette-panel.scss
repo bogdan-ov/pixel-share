@@ -114,7 +114,7 @@ $list-size: 44px;
             display: grid;
             grid-template-columns: $grid-size $grid-size;
             grid-template-rows: repeat(auto-fill, $grid-size);
-            grid-gap: 5px;
+            grid-gap: 6px;
         }
         .palette-color {
             width: $grid-size;
@@ -126,6 +126,29 @@ $list-size: 44px;
         display: grid;
         grid-template-columns: $list-size;
         grid-template-rows: auto;
+    }
+    
+}
+.preview-palette {
+    width: 100%;
+    // padding: 4px;
+
+    display: flex;
+    align-items: center;
+
+    // border: 2px solid transparent;
+    // border-radius: calc($border-radius + 4px);
+
+    // cursor: pointer;
+    @extend .auto-borders;
+    @extend .hor;
+
+    // &.active {
+    //     border: 2px solid $blue;
+    // }
+    .color {
+        width: 100%;
+        height: 100%;
     }
     
 }

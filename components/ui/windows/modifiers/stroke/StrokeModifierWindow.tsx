@@ -195,7 +195,7 @@ const StrokeModifierWindow: React.FC<IWindowNeeds> = props=> {
                     lastColor={ lastColor }
                     newColor={ color }
                     setNewColor={ setColor }
-                    onEnd={ ()=> setTime(v=> v+1) }
+                    onPickEnd={ ()=> setTime(v=> v+1) }
                 />
                 
             </div>

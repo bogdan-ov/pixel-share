@@ -3,7 +3,6 @@ import ContextMenu from "../components/context-menu/ContextMenu";
 import Helper from "../components/editor/Helper";
 import LayersPanel from "../components/editor/layers/layer-panel/LayersPanel";
 import Menubar from "../components/editor/menubar/Menubar";
-import NotificationsList from "../components/editor/notification/Notification";
 import ColorPickerPopover from "../components/editor/palette/ColorPickerPopover";
 import PalettePanel from "../components/editor/palette/PalettePanel";
 import Pipette from "../components/editor/palette/Pipette";
@@ -21,16 +20,19 @@ import Keyboard from "../editor/managers/Keyboard";
 import Mouse from "../editor/managers/Mouse";
 import PaletteWorker from "../editor/workers/PaletteWorker";
 import ProjectWorker from "../editor/workers/ProjectWorker";
-import { EditorActionType, EditorStates, EditorTriggers, EditorWindowType } from "../states/editor-states";
+import { EditorStates, EditorTriggers, EditorWindowType } from "../states/editor-states";
 import config from "../utils/config";
 import { clamp, Vector2 } from "../utils/math";
 import ArrayModifierWindow from "../components/ui/windows/modifiers/array/ArrayModifierWindow";
 import DecayModifierWindow from "../components/ui/windows/modifiers/decay/DecayModifierWindow";
 import StrokeModifierWindow from "../components/ui/windows/modifiers/stroke/StrokeModifierWindow";
 import WelcomeWindow from "../components/ui/windows/WelcomeWindow";
+import PaletteWindow from "../components/editor/windows/palette/PaletteWindow";
+import EditorNotification from "../components/editor/notification/EditorNotification";
 
 const Editor: React.FC = ()=> {
     
+    const ref = createRef<HTMLDivElement>();
     const workspaceRef = createRef<HTMLDivElement>();
     const layersRef = createRef<HTMLDivElement>();
     
@@ -136,7 +138,7 @@ const Editor: React.FC = ()=> {
     return (
         <Page safeMissClick title="Editor" className="editor-page">
 
-            <div className="list" style={ { height: "100vh" } }>
+            <div ref={ ref } className="list" style={ { height: "100vh" } }>
 
                 <div className="flex width-fill height-fill">
                     <Toolbar />
@@ -156,7 +158,7 @@ const Editor: React.FC = ()=> {
                         </div>
 
                         <Helper />
-                        <NotificationsList />
+                        <EditorNotification />
                     </div>
 
                     <PalettePanel />
@@ -165,17 +167,18 @@ const Editor: React.FC = ()=> {
                     
                 </div>
 
-                {/* Windows goes here... (constrains is "workspaceRef") */}
-                <ExportImageWindow constrainsRef={ workspaceRef } />
-                <ResizeCanvasWindow constrainsRef={ workspaceRef } />
-                <GridConfigWindow constrainsRef={ workspaceRef } />
-
-                <StrokeModifierWindow constrainsRef={ workspaceRef } />
-                <ArrayModifierWindow constrainsRef={ workspaceRef } />
-                <DecayModifierWindow constrainsRef={ workspaceRef } />
                 
             </div>
             <Pipette />
+
+            {/* Windows goes here... (constrains is "ref") */}
+            <ExportImageWindow constrainsRef={ ref } />
+            <ResizeCanvasWindow constrainsRef={ ref } />
+            <GridConfigWindow constrainsRef={ ref } />
+
+            <StrokeModifierWindow constrainsRef={ ref } />
+            <ArrayModifierWindow constrainsRef={ ref } />
+            <DecayModifierWindow constrainsRef={ ref } />
 
             {/* Popovers goes here */}
             <ColorPickerPopover />
@@ -184,6 +187,7 @@ const Editor: React.FC = ()=> {
             {/* Full windows goes here */}
             <OpenProjectWindow />
             <SaveProjectWindow />
+            <PaletteWindow />
             
             <ContextMenu />
 

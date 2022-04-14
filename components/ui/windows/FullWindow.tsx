@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Keyboard from "../../../editor/managers/Keyboard";
 import createClassName from "../../../src/hooks/createClassName";
+import useSafeState from "../../../src/hooks/useSafeState";
 import { EditorTriggers, EditorWindowType } from "../../../states/editor-states";
 import { MyComponent } from "../../../utils/types";
 import Button from "../buttons/Button";
@@ -8,36 +9,31 @@ import Button from "../buttons/Button";
 export interface IFullWindow {
     trigger: EditorWindowType
 
-    custom?: boolean
     active?: boolean
     setActive?: (v: boolean)=> void
 
-    minWidth?: number
+    minWidth?: number | string
 
     windowClassName?: string
 }
 
 const FullWindow = React.forwardRef<HTMLDivElement, React.PropsWithChildren<IFullWindow & MyComponent>>((props, ref)=> {
-    const [active, setActive] = useState<boolean>(false);
-
-    const _active = props.custom ? props.active! : active;
-    const _setActive = props.custom ? props.setActive! : setActive;
+    const [active, setActive] = useSafeState<boolean>(false, props.active, props.setActive);
     
     const wrapperClassName = createClassName([
         "full-window-wrapper",
         props.className,
-        _active && "active"
+        active && "active"
     ]);
 
     useEffect(()=> {
 
         const unlistenKeyboard = Keyboard.onEscape(()=> {
-            _setActive(false);
+            setActive(false);
         });
         const unlistenWindow = EditorTriggers.Window.listen(window=> {
             if (window.type == props.trigger) {
-                _setActive(true);
-                console.log("Window called!");
+                setActive(true);
             }
         });
 
@@ -60,14 +56,14 @@ const FullWindow = React.forwardRef<HTMLDivElement, React.PropsWithChildren<IFul
                     className={ createClassName(["full-window flex flex-column", props.windowClassName]) }
                     style={ { minWidth: props.minWidth, ...props } }
                 >
-                    { _active && props.children }
+                    { active && props.children }
                 </div>
                 
                 <Button 
                     ghost
                     size="middle"
                     icon="cross"
-                    onClick={ ()=> _setActive(false) }
+                    onClick={ ()=> setActive(false) }
                 />
             </div>
             
@@ -75,18 +71,18 @@ const FullWindow = React.forwardRef<HTMLDivElement, React.PropsWithChildren<IFul
     );
 });
 
-export const FullWindowHeader: React.FC = props=> (
-    <header className="full-window-header slot justify-between">
+export const FullWindowHeader: React.FC<MyComponent> = props=> (
+    <header className={ createClassName(["full-window-header slot justify-between", props.className]) } style={ props.style }>
         { props.children }
     </header>
 );
-export const FullWindowFooter: React.FC = props=> (
-    <footer className="full-window-footer slot justify-between">
+export const FullWindowFooter: React.FC<MyComponent> = props=> (
+    <footer className={ createClassName(["full-window-footer slot justify-between", props.className]) } style={ props.style }>
         { props.children }
     </footer>
 );
-export const FullWindowContent: React.FC = props=> (
-    <main className="list gap-2 full-window-content">
+export const FullWindowContent: React.FC<MyComponent> = props=> (
+    <main className={ createClassName(["full-window-content", props.className])} style={ props.style }>
         { props.children }
     </main>
 );

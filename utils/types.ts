@@ -26,6 +26,7 @@ export enum Anchor {
     BOTTOM_CENTER,
     BOTTOM_RIGHT,
 }
+export type Extension = "png" | "jpg";
 
 // export type ReactState<T> = Dispatch<SetStateAction<T>>
 export type ReactStateValue<T> = T | ((old: T)=> T)

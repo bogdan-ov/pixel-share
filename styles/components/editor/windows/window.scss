@@ -1,13 +1,23 @@
 .window-draggable-wrapper {
-    padding: 10px;
+    margin: 10px;
     position: fixed;
     left: 100px;
     top: 100px;
-    z-index: 999;
+    z-index: 888;
+
+    &:focus .window {
+        border: 2px solid darken($blue, 8);
+        .window-header .button {
+            opacity: 1;
+        }
+    }
+    
 }
 .window {
     min-width: 200px;
     padding: 4px;
+
+    border: 2px solid transparent;
 
     .window-header {
         width: 100%;
@@ -19,6 +29,9 @@
 
         &:active {
             cursor: grabbing;
+        }
+        .button {
+            opacity: .3;
         }
         
     }

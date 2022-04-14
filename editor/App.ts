@@ -98,8 +98,8 @@ export class Application {
     }
     
     resizeCanvas(width: number, height: number, anchor: Anchor, pushToHistory: boolean): boolean {
-        const _width = width || config.INIT_CANVAS_WIDTH;
-        const _height = height || config.INIT_CANVAS_HEIGHT;
+        const _width = clamp(width || config.INIT_CANVAS_WIDTH, config.MIN_CANVAS_WIDTH, config.MAX_CANVAS_WIDTH);
+        const _height = clamp(height || config.INIT_CANVAS_HEIGHT, config.MIN_CANVAS_HEIGHT, config.MAX_CANVAS_HEIGHT);
 
         this.resizeAnchor = anchor;
         if (pushToHistory)
@@ -111,21 +111,6 @@ export class Application {
                 ]
             });
         
-        if (_width <= config.MIN_CANVAS_WIDTH || _height <= config.MIN_CANVAS_HEIGHT) {
-            EditorTriggers.Notification.trigger({
-                content: "❌ Too small!",
-                type: "danger"
-            });
-            return false;
-        }
-        if (_width > config.MAX_CANVAS_WIDTH || _height > config.MAX_CANVAS_HEIGHT) {
-            EditorTriggers.Notification.trigger({
-                content: "❌ Too large!",
-                type: "danger"
-            });
-            return false;
-        }
-        
         this.CanvasWidth.value = _width;
         this.CanvasHeight.value = _height;
 
@@ -133,8 +118,6 @@ export class Application {
         EditorTriggers.Edited.trigger({
             type: EditorEditedType.CANVAS_RESIZED
         });
-
-        console.log(this.CanvasWidth.value, this.CanvasHeight.value);
 
         return true;
     }

@@ -51,7 +51,6 @@ export default class Layer {
         this.context.imageSmoothingEnabled = false;
 
         this.resize(Anchor.TOP_LEFT);
-        this.appendCanvas();
         
         if (this.initialImageData) {
             if (typeof this.initialImageData == "string")
@@ -248,6 +247,7 @@ export default class Layer {
         
         this.clearCanvas();
 
+        // this.putImageData(imageData, x, y)
         this.context.putImageData(imageData, x, y);
     }
     putImageData(imageData: ImageData, x: number=0, y: number=0) {
@@ -255,7 +255,7 @@ export default class Layer {
             console.error("No layer image data to put");
             return;
         }
-
+        
         const data = imageData.data;
 
         for (let i = 0; i < data.length; i ++) {
@@ -267,7 +267,6 @@ export default class Layer {
                 this.context.fillRect(pos.x, pos.y, 1, 1);
             }
         }
-
     }
     putDataUrl(dataUrl: string, x: number=0, y: number=0) {
         if (!dataUrl) {
@@ -307,9 +306,8 @@ export default class Layer {
             EditorTriggers.Edited.trigger({
                 type: EditorEditedType.LAYERS_EDITED
             })
-            EditorTriggers.Notification.trigger({
+            EditorTriggers.Notification1.trigger({
                 content: `Modifier ${ modifier.name } applied!`,
-                type: "success"
             });
         }
     }

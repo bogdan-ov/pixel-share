@@ -10,17 +10,25 @@ export interface IShortPaletteColorData {
     id: PaletteColor["id"]
     hslaColor: PaletteColor["hslaColor"]
 }
+export type PalettePreset = (HSLA | string)[]
 
 class PaletteWorker {
     Palette: State<PaletteColor[]>
     CurrentPaletteColorId: State<PaletteColor["id"]>
     LastPaletteColorId: State<PaletteColor["id"]>
+    PresetPalettes: State<PalettePreset[]>
 
     constructor() {
 
         this.Palette = state<PaletteColor[]>([], "palette");
         this.CurrentPaletteColorId = state<PaletteColor["id"]>(0, "current-palette-color-id");
         this.LastPaletteColorId = state<PaletteColor["id"]>(0, "last-palette-color-id");
+        this.PresetPalettes = state<PalettePreset[]>([
+            ["#430067", "#94216a", "#ff004d", "#ff8426", "#ffdd34", "#50e112", "#3fa66f", "#365987", "#000000", "#0033ff", "#29adff", "#00ffcc", "#fff1e8", "#c2c3c7", "#ab5236", "#5f574f"],
+            ["#212b5e", "#636fb2", "#adc4ff", "#ffffff", "#ffccd7", "#ff7fbd", "#872450", "#e52d40", "#ef604a", "#ffd877", "#00cc8b", "#005a75", "#513ae8", "#19baff", "#7731a5", "#b97cff"],
+            ["#93c7e3", "#5672e1", "#3a159c", "#0f0d11", "#d85452", "#eeb8b4"],
+            ["#000000", "#1D2B53", "#7E2553", "#008751", "#AB5236", "#5F574F", "#C2C3C7", "#FFF1E8", "#FF004D", "#FFA300", "#FFEC27", "#00E436", "#29ADFF", "#83769C", "#FF77A8", "#FFCCAA"]
+        ], "palette-worker-preset-palettes");
     }
 
     init() {
@@ -64,6 +72,12 @@ class PaletteWorker {
     setCurrentColor(id: PaletteColor["id"]) {
         this.CurrentPaletteColorId.value = id;
     }
+    duplicateColor(id: number) {
+        const color = this.getPaletteColor(id);
+        if (!color) return;
+
+        this.addPaletteColor(Date.now(), color.hslaColor);
+    }
     deletePaletteColor(id: PaletteColor["id"]) {
         if (this.Palette.value.length <= config.MIN_PALETTE_COLORS) return;
 
@@ -101,7 +115,7 @@ class PaletteWorker {
             this.putPaletteColor(paletteColor);
             this.CurrentPaletteColorId.value = id;
 
-            EditorTriggers.Notification.trigger({
+            EditorTriggers.Notification1.trigger({
                 content: `<div class="color-bubble mr-1" style="background:${ useHex ? color : hslaToString(color as HSLA) };"></div> Added a new color to the palette!`
             });
         }
@@ -134,25 +148,8 @@ class PaletteWorker {
 
         this.Palette.value = palette;
     }
-    setDefaultPalette() {
-        this.Palette.value = [
-            new PaletteColor(1).setHex("#430067"),
-            new PaletteColor(2).setHex("#94216a"),
-            new PaletteColor(3).setHex("#ff004d"),
-            new PaletteColor(4).setHex("#ff8426"),
-            new PaletteColor(5).setHex("#ffdd34"),
-            new PaletteColor(6).setHex("#50e112"),
-            new PaletteColor(7).setHex("#3fa66f"),
-            new PaletteColor(8).setHex("#365987"),
-            new PaletteColor(9).setHex("#000000"),
-            new PaletteColor(10).setHex("#0033ff"),
-            new PaletteColor(11).setHex("#29adff"),
-            new PaletteColor(12).setHex("#00ffcc"),
-            new PaletteColor(13).setHex("#fff1e8"),
-            new PaletteColor(14).setHex("#c2c3c7"),
-            new PaletteColor(15).setHex("#ab5236"),
-            new PaletteColor(16).setHex("#5f574f"),
-        ];
+    setDefaultPalette(preset?: PalettePreset) {
+        this.Palette.value = (preset || this.PresetPalettes.value[0]).map((item, i)=> new PaletteColor(Date.now()+i).setAuto(item));
         this.CurrentPaletteColorId.value = this.Palette.value[0].id;
         this.LastPaletteColorId.value = this.Palette.value[1].id;
     }
@@ -166,45 +163,48 @@ class PaletteWorker {
     putPaletteColor(paletteColor: PaletteColor) {
         this.Palette.set(v=> v.length < config.MAX_PALETTE_COLORS ? [...v, paletteColor] : v);
     }
-    addPaletteColor(hslaColor?: HSLA) {
+    addPaletteColor(id?: number, hslaColor?: HSLA): boolean {
         if (this.palette.length < config.MAX_PALETTE_COLORS-1) {
             this.pushToHistory();
             
-            const id = Date.now();
+            const _id = id || Date.now();
             this.Palette.set(v=> [
                 ...v,
-                new PaletteColor(Date.now(), hslaColor || [(Math.sin(v.length/5) + 1) / 2 * 360, 100, 50, 1])
+                new PaletteColor(_id, hslaColor || [(Math.sin(v.length/5) + 1) / 2 * 360, 100, 50, 1])
             ]);
-            this.CurrentPaletteColorId.value = id;
+            this.CurrentPaletteColorId.value = _id;
+
+            return true;
         }
+        
+        return false;
     }
-    async fastAddPaletteColor() {
+    async pasteColorFromClipboard() {
         const data = await navigator.clipboard.readText();
 
         if (!(data.indexOf("#") == 0 || data.indexOf("rgb") == 0 || data.indexOf("hsl") == 0)) {
-            EditorTriggers.Notification.trigger({
+            EditorTriggers.Notification1.trigger({
                 content: "🤷‍♂️ Cannot paste a color from clipboard (HEX, RGB or HSL)",
-                type: "danger"
             })
             return;
         }
 
+        const id = Date.now();
         // Hex
         if (data.indexOf("#") == 0) {
-            this.addPaletteColor(hexToHsl(data));
+            this.addPaletteColor(id, hexToHsl(data));
         }
         else if (data.indexOf("rgb") == 0) {
             const rgbStr = data.replace("hsl", "").replace("(", "").replace(")", "").split(",");
-            this.addPaletteColor(rgbToHsl([ parseInt(rgbStr[0]) || 0, parseInt(rgbStr[1]) || 0, parseInt(rgbStr[2]) || 0, 1 ]));
+            this.addPaletteColor(id, rgbToHsl([ parseInt(rgbStr[0]) || 0, parseInt(rgbStr[1]) || 0, parseInt(rgbStr[2]) || 0, 1 ]));
         }
         else if (data.indexOf("hsl") == 0) {
             const hslStr = data.replace("hsl", "").replace("(", "").replace(")", "").split(",");
-            this.addPaletteColor([ parseInt(hslStr[0]) || 0, parseInt(hslStr[1]) || 0, parseInt(hslStr[2]) || 0, 1 ]);
+            this.addPaletteColor(id, [ parseInt(hslStr[0]) || 0, parseInt(hslStr[1]) || 0, parseInt(hslStr[2]) || 0, 1 ]);
         }
 
-        EditorTriggers.Notification.trigger({
+        EditorTriggers.Notification1.trigger({
             content: `😎 Created a new color from clipboard! ${ data }`,
-            type: "success"
         });
 
     }

@@ -1,5 +1,5 @@
 import HistoryWorker, { HistoryItemType } from "../../components/editor/history/HistoryWorker";
-import { EditorStates, EditorTriggers } from "../../states/editor-states";
+import { EditorEditedType, EditorStates, EditorTriggers } from "../../states/editor-states";
 import config from "../../utils/config";
 import { pointInsideArea, vec, Vector2 } from "../../utils/math";
 import App from "../App";
@@ -71,6 +71,15 @@ class SelectionWorker {
 
     // Selection
     setSelection(from: Vector2, to: Vector2) {
+        from = from.clamp(
+            vec(0, 0),
+            vec(App.CanvasWidth.value-1, App.CanvasHeight.value-1)
+        )
+        to = to.clamp(
+            vec(0, 0),
+            vec(App.CanvasWidth.value-1, App.CanvasHeight.value-1)
+        )
+        
         if (!(
             Math.abs(to.x - from.x) > 0 &&
             Math.abs(to.y - from.y) > 0
@@ -183,6 +192,10 @@ class SelectionWorker {
             });
             navigator.clipboard.writeText(a);
 
+            EditorTriggers.Edited.trigger({
+                type: EditorEditedType.SELECTION_COPY
+            })
+
             return true;
         } else {
             copyError();
@@ -191,9 +204,8 @@ class SelectionWorker {
         }
 
         function copyError() {
-            EditorTriggers.Notification.trigger({
+            EditorTriggers.Notification1.trigger({
                 content: "🤔 Can't copy image data...",
-                type: "danger"
             })
         }
     }
@@ -224,15 +236,16 @@ class SelectionWorker {
             this.startMoveSelection(imageData);
             EditorStates.MovingSelection.value = true;
 
-            EditorTriggers.Notification.trigger({
+            EditorTriggers.Edited.trigger({
+                type: EditorEditedType.SELECTION_PASTE
+            })
+            EditorTriggers.Notification1.trigger({
                 content: "Image data pasted!",
-                type: "success"
             });
         }
         function pasteError() {
-            EditorTriggers.Notification.trigger({
-                content: "😦 Can't paste image data...",
-                type: "danger"
+            EditorTriggers.Notification1.trigger({
+                content: "😦 Can't paste image data..."
             })
         }
 
@@ -250,9 +263,11 @@ class SelectionWorker {
             this.pushToHistory(layer.id);
             layer.clearBySelection();
 
-            EditorTriggers.Notification.trigger({
+            EditorTriggers.Edited.trigger({
+                type: EditorEditedType.SELECTION_CUT
+            })
+            EditorTriggers.Notification1.trigger({
                 content: "Image data cut!",
-                type: "success"
             });
         }
     }

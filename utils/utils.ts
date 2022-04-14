@@ -1,5 +1,5 @@
 import { random, vec, Vector2 } from "./math";
-import { HSLA, ReactState, ReactStateValue, RGBA } from "./types";
+import { HSLA, ReactState, ReactStateValue, RGBA, ViewMode } from "./types";
 import converter from "color-convert";
 import React from "react";
 
@@ -23,7 +23,12 @@ export function safeValue<T>(value: T | undefined | null, safe: T): T {
 export function exists(value: any): boolean {
     return value !== null || value !== undefined;
 }
-
+export function ellipsis(text: string, maxLength: number): string {
+    if (text.length > maxLength)
+        return text.slice(0, maxLength) + "... ";
+    else
+        return text;
+} 
 export function rgbToHex(rgba: RGBA): string {
     return "#" + converter.rgb.hex([rgba[0], rgba[1], rgba[2]]);
 }
@@ -38,6 +43,12 @@ export function hexToHsl(hex: string): HSLA {
 }
 export function randomColor(): string {
     return `hsl(${ Math.round(random(0, 360)) }, 100%, 50%)`;
+}
+export function viewModeToString(viewMode: ViewMode): string {
+    return `view-${ ViewMode[viewMode].replace("_", "-").toLowerCase() }`
+}
+export function validateName(name: string): string {
+    return name.trim().replace(/\\|\/|:|<|>|'|"|\||\?|\*/gm, "").replace(/\s{2}/gm, " ");
 }
 
 export function drawImageData(context: CanvasRenderingContext2D, imageData: ImageData, offset: Vector2=new Vector2()) {

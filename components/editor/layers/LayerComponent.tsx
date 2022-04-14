@@ -1,5 +1,5 @@
 import { motion, useAnimation, Variants } from "framer-motion";
-import React, { useEffect, useState } from "react";
+import React, { createRef, useEffect, useState } from "react";
 import Layer from "../../../editor/layers/Layer";
 import LayersWorker from "../../../editor/workers/LayersWorker";
 import createClassName from "../../../src/hooks/createClassName";
@@ -34,10 +34,13 @@ const LayerComponent: React.FC<ILayerComponent> = props=> {
     const [blob, setBlob] = useState<string>("");
     const [pointerPressed, setPointerPressed] = useState<boolean>(false);
     const [selected, setSelected] = useState<boolean>(false);
+    const ref = createRef<HTMLDivElement>();
+    
+    const active = LayersWorker.layerIsCurrent(props.id);
     
     const className = createClassName([
         "layer",
-        LayersWorker.layerIsCurrent(props.id) && "active",
+        active && "active",
         selected && "selected"
     ]);
     
@@ -90,6 +93,10 @@ const LayerComponent: React.FC<ILayerComponent> = props=> {
         }
 
     }, [pointerPressed]);
+    useEffect(()=> {
+        if (active)
+            ref.current?.focus();
+    }, [active]);
 
     function move(dir: number) {
         if (LayersWorker.layerIsEditable(props.id))
@@ -202,6 +209,8 @@ const LayerComponent: React.FC<ILayerComponent> = props=> {
     
     return (
         <motion.div
+            ref={ ref }
+            tabIndex={ 0 }
             onContextMenu={ onContextHandler }
             onPointerDown={ ()=> setPointerPressed(true) }
             className={ className }

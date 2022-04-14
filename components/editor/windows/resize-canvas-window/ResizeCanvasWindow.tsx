@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import App from "../../../../editor/App";
 import useStateListener from "../../../../src/hooks/useStateListener";
 import { EditorTriggers, EditorWindowType } from "../../../../states/editor-states";
@@ -25,6 +25,15 @@ const ResizeCanvasWindow: React.FC<IWindowNeeds> = props=> {
     const finalWidth = clamp(Math.round(width * scale), config.MIN_CANVAS_WIDTH, config.MAX_CANVAS_WIDTH);
     const finalHeight = clamp(Math.round(height * scale), config.MIN_CANVAS_HEIGHT, config.MAX_CANVAS_HEIGHT);
     
+    useEffect(()=> {
+
+        if (active) {
+            setWidth(canvasWidth);
+            setHeight(canvasHeight);
+        }
+        
+    }, [active]);
+    
     function applyHandler() {
         const successResize = App.resizeCanvas(finalWidth, finalHeight, anchor, true);
 
@@ -34,8 +43,7 @@ const ResizeCanvasWindow: React.FC<IWindowNeeds> = props=> {
             setAspect(finalWidth/finalHeight);
             setScale(1);
 
-            EditorTriggers.Notification.trigger({
-                type: "success",
+            EditorTriggers.Notification1.trigger({
                 content: `😃 Canvas resized! ${ width }px*${ height }px`,
             });
         }

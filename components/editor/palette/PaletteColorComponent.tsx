@@ -34,6 +34,11 @@ const PaletteColorComponent: React.FC<IPaletteColorComponent> = props=> {
             targetRef: ref
         });
     }
+    function editPaletteHandler() {
+        EditorTriggers.Window.trigger({
+            type: EditorWindowType.PALETTE_WINDOW
+        });
+    }
     
     function onContextHandler(e: React.MouseEvent) {
         EditorTriggers.ContextMenu.trigger({
@@ -51,6 +56,10 @@ const PaletteColorComponent: React.FC<IPaletteColorComponent> = props=> {
                     icon: "pen",
                     content: <span>Edit color</span>,
                     handler: editHandler
+                },
+                {
+                    content: <span>Edit palette</span>,
+                    handler: editPaletteHandler
                 },
                 {
                     icon: "cross",

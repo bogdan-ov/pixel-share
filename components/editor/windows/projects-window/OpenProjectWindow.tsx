@@ -18,19 +18,8 @@ const OpenProjectWindow: React.FC = ()=> {
     const selectedProject = projects.find(p=> p.id == selectedProjectId);;
 
     function openProjectHandler(name: string) {
+        ProjectWorker.saveProject("");
         ProjectWorker.openProject(name);
-        setActive(false);
-    }
-    function openProjectNewTabHandler(name: string) {
-        const to = window.location.host;
-        if (to) {
-            window.open(to + `/editor?project=${ name.replace(/\s/gm, "--") }`, "_blank")?.focus();
-        } else {
-            EditorTriggers.Notification.trigger({
-                content: "Something went wrong when opening the project",
-                type: "danger"
-            });
-        }
         setActive(false);
     }
     function deleteProjectHandler(name: string) {
@@ -38,7 +27,10 @@ const OpenProjectWindow: React.FC = ()=> {
         fetch();
     }
     function createNewProjectHandler() {
-        ProjectWorker.newProject();
+        ProjectWorker.saveProject("");
+        EditorTriggers.Window.trigger({
+            type: EditorWindowType.WELCOME_WINDOW
+        })
         setActive(false);
     }
     
@@ -47,6 +39,7 @@ const OpenProjectWindow: React.FC = ()=> {
             projects={ projects }
             fetchProjects={ fetch }
             
+            title={ <span>Open project</span> }
             active={ active }
             setActive={ setActive }
 
@@ -55,7 +48,7 @@ const OpenProjectWindow: React.FC = ()=> {
             trigger={ EditorWindowType.OPEN_PROJECT_WINDOW }
         >
 
-            <FullWindowContent>
+            <FullWindowContent className="list gap-2">
                 { active && <ProjectsGrid
                     projects={ projects }
                     projectTitle="Double click to open!"

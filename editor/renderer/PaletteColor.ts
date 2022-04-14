@@ -15,6 +15,14 @@ export default class PaletteColor {
 
         return this;
     }
+    setAuto(hexOrHsl: string | HSLA): PaletteColor {
+        if (typeof hexOrHsl == "string")
+            this.setHex(hexOrHsl);
+        else
+            this.hslaColor = hexOrHsl;
+        
+        return this;
+    }
 
     get hexColor(): string {
         return hslToHex(this.hslaColor);

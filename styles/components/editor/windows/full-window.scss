@@ -29,6 +29,7 @@
 }
 
 .full-window {
+    max-width: calc(100vw - 60px);
     max-height: calc(100vh - 60px);
 
     transform: translateY(10px) scale(.8);
@@ -40,10 +41,19 @@
 
     .full-window-header {
         width: 100%;
+        padding: 20px;
+        padding-bottom: 0;
         margin-bottom: 20px;
+        ~ .full-window-content {
+            padding-top: 0;
+        }
     }
     .full-window-content {
+        padding: 20px;
         height: 100%;
+        &.p-0 {
+            padding: 0;
+        }
     }
     .full-window-footer {
         padding: 24px 30px;

@@ -1,7 +1,7 @@
 import React from "react";
 import createClassName from "../../../src/hooks/createClassName";
 import { MyComponent, ViewMode } from "../../../utils/types";
-import { capitalize } from "../../../utils/utils";
+import { capitalize, viewModeToString } from "../../../utils/utils";
 import Button, { IButton } from "../buttons/Button";
 
 interface IPanel {
@@ -18,7 +18,7 @@ interface ISwitchViewModeButton {
 const Panel: React.FC<IPanel & MyComponent> = props=> {
     const className = createClassName([
         "panel",
-        props.viewMode !== undefined && `view-${ ViewMode[props.viewMode].replace("_", "-").toLowerCase() }`,
+        props.viewMode !== undefined && viewModeToString(props.viewMode),
         props.className,
     ]);
     

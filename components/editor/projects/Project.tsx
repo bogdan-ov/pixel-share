@@ -4,6 +4,7 @@ import createClassName from "../../../src/hooks/createClassName";
 import { MyComponent, ReactState } from "../../../utils/types";
 import Button from "../../ui/buttons/Button";
 import DropdownMenu, { IDropdownMenu } from "../../ui/windows/DropdownMenu";
+import Tooltip from "../../ui/windows/Tooltip";
 import ProjectPreviewCanvas from "./ProjectPreviewCanvas";
 
 interface IProject {
@@ -31,7 +32,7 @@ interface IProjectsGrid {
 }
 
 const Project: React.FC<IProjectData & IProject> = props=> {
-    const [weight, setWeight] = useState<number>(0);
+    const [imageWeight, setWeight] = useState<number>(0);
     
     const className = createClassName([
         "project list gap-2 show-on-hover-trigger",
@@ -42,9 +43,9 @@ const Project: React.FC<IProjectData & IProject> = props=> {
 
         for (const layer of props.layers) {
             const w = layer.imageData.width*layer.imageData.height
-            setWeight(w*8)
+            setWeight(+(w / 8 / 1024).toFixed(2))
         }
-        
+        // 540/1024=
     }, []);
     
     return (
@@ -69,7 +70,16 @@ const Project: React.FC<IProjectData & IProject> = props=> {
                         <span>{ props.date && new Date(+props.date).toLocaleTimeString(undefined, { timeStyle: "short" }) }</span>
                     </div> : <i className="text-muted">No date</i> }
 
-                    <span className="text-muted">{ Math.floor((weight / 8 / 1024) * 100) / 100 } kB</span>
+                    <Tooltip
+                        tooltip={ <p>
+                            <span><span className="text-muted">Image weight</span> { imageWeight } kB</span><br/>
+                            <span><span className="text-muted">Project weight</span> { imageWeight*props.layers.length } kB</span>
+                        </p> }
+                        placement="bottom"
+                        style={{ width: "max-content" }}
+                    >
+                        <span className="text-muted">{ imageWeight*props.layers.length } kB</span>
+                    </Tooltip>
                 </div>
 
                 { props.dropdownMenuButtonsGroups && <DropdownMenu

@@ -66,6 +66,13 @@ export default class UILayer extends Layer {
             Math.floor(height*scale)
         );
 
+        // this.context.fillStyle = config.SELECTION_COLOR;
+        // this.context.fillRect(
+        //     Math.floor(pos.x*scale),
+        //     Math.floor(pos.y*scale),
+        //     Math.floor(width*scale),
+        //     Math.floor(height*scale)
+        // );
         this.context.strokeStyle = config.SELECTION_COLOR;
         this.context.lineDashOffset = Math.round(this.elapsed / 4) % (scale + scale*2);
         this.context.setLineDash([ scale*2, scale ])

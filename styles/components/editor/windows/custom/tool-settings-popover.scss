@@ -17,12 +17,15 @@
                 margin-right: 20px;
             }
         }
-        .tool-property{
+        .tool-property {
             justify-content: space-between;
             
             .checkbox, &.checkbox {
                 margin: 0 !important;
             }
+        }
+        .hidden {
+            display: none;
         }
         
         > * {

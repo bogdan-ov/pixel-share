@@ -2,11 +2,12 @@ import React, { createRef, useEffect } from "react";
 import App from "../../../../editor/App";
 import LayersWorker from "../../../../editor/workers/LayersWorker";
 import config from "../../../../utils/config";
+import Button from "../../../ui/buttons/Button";
 
 const ImagePreviewCanvas: React.FC = ()=> {
     const canvasRef = createRef<HTMLCanvasElement>();
 
-    useEffect(()=> {
+    function render() {
         const canvas = canvasRef.current;
         if (!canvas) {
             config.DEBUG && console.error("Image preview canvas doesn't exists!");
@@ -30,9 +31,21 @@ const ImagePreviewCanvas: React.FC = ()=> {
                 img.src = blob;
             })
             
+    }
+    useEffect(()=> {
+        render()
     }, []);
     
-    return <canvas className="image-preview-canvas" ref={ canvasRef } />
+    return (
+        <div className="list gap-1">
+            <canvas className="image-preview-canvas preview-canvas" ref={ canvasRef } />
+            <Button
+                type="link"
+                text="Refresh"
+                onClick={ render }
+            />
+        </div>
+    )
 };
 
 export default ImagePreviewCanvas;

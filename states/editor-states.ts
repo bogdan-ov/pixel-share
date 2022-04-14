@@ -1,6 +1,6 @@
 import React, { RefObject } from "react";
 import { HistoryItemType, IHistoryItem } from "../components/editor/history/HistoryWorker";
-import { INotification } from "../components/editor/notification/Notification";
+import { IEditorNotification } from "../components/editor/notification/Notification";
 import { IDropdownMenuButtonsGroup } from "../components/ui/windows/DropdownMenu";
 import { state, trigger } from "./State";
 
@@ -10,7 +10,11 @@ export enum EditorEditedType {
     REDO,
     CANVAS_RESIZED,
     LAYERS_EDITED,
-    PALETTE_EDITED
+    PALETTE_EDITED,
+
+    SELECTION_COPY,
+    SELECTION_PASTE,
+    SELECTION_CUT,
 }
 export enum EditorWrongActionType {
     UNEDITABLE_LAYER
@@ -40,10 +44,13 @@ export enum EditorWindowType {
 
     OPEN_PROJECT_WINDOW,
     SAVE_PROJECT_WINDOW,
+    PALETTE_WINDOW,
 
     ARRAY_MODIFIER_WINDOW,
     DECAY_MODIFIER_WINDOW,
-    STROKE_MODIFIER_WINDOW
+    STROKE_MODIFIER_WINDOW,
+
+    WELCOME_WINDOW
 }
 
 export type IEditorEditedTrigger = {
@@ -81,7 +88,7 @@ export const EditorTriggers = {
     Edited: trigger<IEditorEditedTrigger>("editor-edited"),
 
     // To call something
-    Notification: trigger<Omit<INotification, "id">>("editor-notification"),
+    Notification1: trigger<IEditorNotification>("editor-notification"),
     Window: trigger<IEditorWindowTrigger>("editor-window"),
     ContextMenu: trigger<IEditorContextMenuTrigger>("editor-context-menu"),
     History: trigger<IEditorHistoryTrigger>("editor-history"),

@@ -1,10 +1,8 @@
 $checkbox-icon-offset: 2px;
 
-// Text inputs
-.input {
+@mixin default-input {
     width: 100%;
     padding: 0 .5em;
-    padding-right: 0;
     height: 2.2em;
 
     background: transparent;
@@ -15,13 +13,6 @@ $checkbox-icon-offset: 2px;
 
     @include ff;
 
-    &.ghost {
-        &::-webkit-outer-spin-button,
-        &::-webkit-inner-spin-button {
-            appearance: none;
-            margin: 0;
-        }
-    }
     &:not(:disabled):focus {
         border: 2px solid $blue;
     }
@@ -30,13 +21,28 @@ $checkbox-icon-offset: 2px;
         opacity: 0.5;
     }
 }
+
+// Text inputs
+.input {
+    padding-right: 0;
+
+    @include default-input;
+
+    &.ghost {
+        &::-webkit-outer-spin-button,
+        &::-webkit-inner-spin-button {
+            appearance: none;
+            margin: 0;
+        }
+    }
+}
 .input-wrapper {
     /*
     &.type-number {
         height: 100%;
         display: flex;
         
-        .input {
+        .input {-
             border-top-right-radius: 0;
             border-bottom-right-radius: 0;
             border-right: none;
@@ -203,4 +209,15 @@ label:active .checkbox,
         opacity: .5;
     }
     
+}
+
+// Select
+.select {
+    @include default-input;
+
+    cursor: pointer;
+
+    option {
+        color: #000;
+    }
 }

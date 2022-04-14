@@ -49,7 +49,7 @@ class ActionWorker {
 
             // Color
             "switch-current-colors": ()=> PaletteWorker.switchCurrentColors(),
-            "fast-add-palette-color": ()=> PaletteWorker.fastAddPaletteColor(),
+            "fast-add-palette-color": ()=> PaletteWorker.pasteColorFromClipboard(),
 
             // View
             "toggle-grid": ()=> ViewWorker.GridEnabled.set(v=> !v),

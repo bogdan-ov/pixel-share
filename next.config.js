@@ -9,6 +9,9 @@ const nextConfig = {
   sassOptions: {
     includePaths: [path.join(__dirname, 'styles')],
   },
+  images: {
+    domains: ["sun9-87.userapi.com", "img2.safereactor.cc"]
+  }
 }
 
 module.exports = nextConfig

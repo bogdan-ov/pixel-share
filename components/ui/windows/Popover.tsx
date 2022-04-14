@@ -6,6 +6,7 @@ import { EditorTriggers, EditorWindowType } from "../../../states/editor-states"
 import { vec } from "../../../utils/math";
 import { MyComponent } from "../../../utils/types";
 import Icon from "../../Icon";
+import Button from "../buttons/Button";
 import ClickOutside from "../utils/ClickOutside";
 
 interface IPopover {
@@ -17,6 +18,7 @@ interface IPopover {
     trigger: EditorWindowType
     onActive?: (action: any)=> void
     onClose?: ()=> void
+    onPointerUp?: ()=> void
 
     disableContextMenu?: boolean
 }
@@ -91,7 +93,11 @@ const Popover: React.FC<IPopover & MyComponent> = props=> {
             style={ { padding: `${ props.offset || 20 }px` } }
             ref={ ref }
         >
-            <div onContextMenu={ props.disableContextMenu ? e=> e.preventDefault() : undefined } className="popover opacity-box p-2">
+            <div 
+                onPointerUp={ props.onPointerUp }
+                onContextMenu={ props.disableContextMenu ? e=> e.preventDefault() : undefined }
+                className="popover opacity-box p-2"
+            >
                 <main className={ contentClassName } style={ props.style }>{ props.children }</main>
             </div>
         </ClickOutside>
@@ -108,16 +114,16 @@ export const PopoverHeader: React.FC<IPopoverHeader & MyComponent> = props=> {
             { props.children }
 
             { props.closeButton && 
-                <button 
+                <Button
                     onClick={ ()=> props.setActive && props.setActive(false) }
-                    className="button ghost small"
+                    size="small"
+                    ghost
                     style={ {
                         left: 6
-                        // transform: "translateX(6px)"
                     } }
                 >
                     <Icon icon="small-cross" />
-                </button>
+                </Button>
             }
 
         </header>

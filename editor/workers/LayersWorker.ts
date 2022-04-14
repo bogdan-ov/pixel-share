@@ -33,11 +33,9 @@ class LayersWorker {
     init() {
         this.setDefaultLayers();
 
-        this.Layers.listen((layers, from)=> {
-            layers.map(layer => !layer.inited && layer.init());
-            EditorTriggers.Edited.trigger({
-                type: EditorEditedType.LAYERS_EDITED
-            }, "layers-worker")
+        this.Layers.listen(layers=> {
+            layers.map(layer=> layer.init());
+            this.rerenderLayersElements();
         });
         EditorTriggers.Action.listen(a=> this.actionListener(a), "layers-worker-action");
     }
@@ -85,6 +83,7 @@ class LayersWorker {
     }
     private updateLayers(callback: (layer: Layer) => Layer) {
         this.Layers.set(v => v.map(callback), false, "layers-worker");
+        this.layersEdited();
     }
     get currentLayer(): Layer | null {
         return this.getLayer(this.CurrentLayerId.value);
@@ -106,6 +105,8 @@ class LayersWorker {
         this.putLayerAt(layer, belowIndex+1);
 
         this.CurrentLayerId.value = id;
+        this.rerenderLayersElements();
+        this.layersEdited();
     }
     makeLayer(id?: Layer["id"], name?: string, imageData?: ImageData): Layer {
         return new Layer(safeValue(id, Date.now()), name || coolLayerNames[randomInt(0, coolLayerNames.length)] || "New layer", imageData);
@@ -139,6 +140,7 @@ class LayersWorker {
         }
 
         this.rerenderLayersElements();
+        this.layersEdited();
     }
     duplicateLayer(id?: Layer["id"]) {
         const layer = this.getLayer(id);
@@ -160,6 +162,7 @@ class LayersWorker {
         this.putLayerAt(dupLayer, belowIndex+1);
 
         this.CurrentLayerId.value = dupLayer.id;
+        this.layersEdited();
     }
     toggleLayerVisible(id: Layer["id"], visible?: boolean) {
         this.updateLayers(layer => {
@@ -209,9 +212,9 @@ class LayersWorker {
 
         newLayers[layerIndex] = b;
         newLayers[layerIndex+dir] = a;
-        // [newLayers[layerIndex], newLayers[layerIndex+1]] = [newLayers[layerIndex+1], newLayers[layerIndex]]
 
         this.setLayers(newLayers.filter(Boolean) as Layer[]);
+        this.layersEdited();
     }
     mergeVisibleLayers() {
         let layers = [...this.normalLayers];
@@ -227,8 +230,9 @@ class LayersWorker {
         }
 
         this.setLayers(putItemAt(layers.filter(l=> !l.visible), newLayer, this.Layers.value.findIndex(l=> l.id == visibleLayers.at(-1)?.id)));
-        this.rerenderLayersElements();
         this.CurrentLayerId.value = id;
+        this.rerenderLayersElements();
+        this.layersEdited();
     }
 
     layerPushToHistory(layerId: number) {
@@ -240,6 +244,11 @@ class LayersWorker {
     layersListPushToHistory() {
         EditorTriggers.History.trigger({
             type: HistoryItemType.LAYERS_LIST_EDITED
+        });
+    }
+    layersEdited() {
+        EditorTriggers.Edited.trigger({
+            type: EditorEditedType.LAYERS_EDITED
         });
     }
 
@@ -350,7 +359,7 @@ class LayersWorker {
         let loaded = 0;
         const layersLength = this.normalLayers.length;
 
-        async function makeDataUrl(dataUrl: string, resolve: (v: string)=> void) {
+        function makeDataUrl(dataUrl: string, resolve: (v: string)=> void) {
             const img = new Image();
             img.src = dataUrl;
             
@@ -394,24 +403,28 @@ class LayersWorker {
             }
         })
     }
-    setFromShortData(data: IShortLayerData[]) {
+    async setFromShortData(data: IShortLayerData[]) {
+        const res = await this.loadFromShortData(data)
+        this.setLayers(res);
+    }
+    loadFromShortData(data: IShortLayerData[]): Promise<Layer[]> {
         const layers: Layer[] = [];
-        
+            
         for (const item of data) {
             if (!(item as any).ghost) {
-            
                 const imageData = new ImageData(item.imageData.width, item.imageData.height);
                 imageData.data.set(new Uint8ClampedArray(item.imageData.data));
                 
-                const layer = new Layer(item.id, item.name, imageData);
+                const layer = new Layer(item.id, item.name, imageData).init();
                 layer.visible = item.visible;
                 layer.locked = item.locked;
                 layers.push(layer);
             }
         }
 
-        this.setLayers(layers);
-        this.rerenderLayersElements();
+        return new Promise((resolve)=> {
+            resolve(layers);
+        })
     }
     setDefaultLayers() {
         this.setLayers([ 
@@ -419,24 +432,16 @@ class LayersWorker {
         ], true);
     }
     setLayers(layers: Layer[], applyCurrent?: boolean) {
-        // ! CRUTCH
         
-        // const ul = await import("../layers/UILayer");
-        // const pl = await import("../layers/PreviewLayer");
-
         this.Layers.value = [
             ...layers,
             new UILayer().init(),
             new PreviewLayer().init()
-            // new ul.default().init(),
-            // new pl.default().init(),
         ]
 
         if (applyCurrent) {
             this.CurrentLayerId.value = this.Layers.value[0].id;
         }
-
-        this.rerenderLayersElements();
     }
     rerenderLayersElements() {
         App.canvasLayersElement.innerHTML = "";

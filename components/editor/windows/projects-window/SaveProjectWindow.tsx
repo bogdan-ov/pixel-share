@@ -50,6 +50,7 @@ const SaveProjectWindow: React.FC = ()=> {
         <BrowseProjectsWindow
             trigger={ EditorWindowType.SAVE_PROJECT_WINDOW }
 
+            title={ <span>Save or overwrite project</span> }
             active={ active }
             setActive={ setActive }
             
@@ -58,7 +59,7 @@ const SaveProjectWindow: React.FC = ()=> {
             setSelectedProjectId={ setSelectedProjectId }
         >
 
-            <FullWindowContent>
+            <FullWindowContent className="list gap-2">
                 { active && <ProjectsGrid
                     projects={ projects }
                     projectTitle="Double click to overwrite!"

@@ -3,12 +3,13 @@ import { EditorActionType, EditorTriggers, EditorWindowType } from "../../states
 import State, { state } from "../../states/State";
 import config from "../../utils/config";
 import { Anchor } from "../../utils/types";
+import { validateName } from "../../utils/utils";
 import App from "../App";
 import Layer from "../layers/Layer";
 import PaletteColor from "../renderer/PaletteColor";
 import { ToolType } from "../tools";
 import LayersWorker, { IShortLayerData } from "./LayersWorker";
-import PaletteWorker, { IShortPaletteColorData } from "./PaletteWorker";
+import PaletteWorker, { IShortPaletteColorData, PalettePreset } from "./PaletteWorker";
 import SelectionWorker from "./SelectionWorker";
 
 export interface IProjectData {
@@ -37,15 +38,13 @@ class ProjectWorker {
 
     init() {
         window.addEventListener("beforeunload", (e)=> {
-            if (!this.Saved.value) {
-                // ! aAAAAAA
+            if (!this.Saved.value && !config.DEBUG) {
                 e.preventDefault();
                 e.returnValue = "Close/reload page? You didn't save your changes";
             }
         });
         EditorTriggers.Edited.listen(()=> {
             this.Saved.value = false;
-            console.log("Not saved");
         })
     }
     
@@ -60,10 +59,10 @@ class ProjectWorker {
     }
     
     saveProject(name: string) {
-        const projectName = name.trim();
+        const projectName = validateName(name || this.Name.value);
         if (!projectName) return;
 
-        const storageProjectName = config.PROJECT_NAME_PREFIX + projectName.trim();
+        const storageProjectName = config.PROJECT_NAME_PREFIX + projectName;
         
         const data: IProjectData = {
             id: Date.now(),
@@ -82,15 +81,15 @@ class ProjectWorker {
 
         if (this.projectExists(projectName))
             // Save
-            EditorTriggers.Notification.trigger({
+            EditorTriggers.Notification1.trigger({
                 content: `💾 Project "${ projectName }" saved!`,
-                type: "success"
+                color: "blue"
             });
         else
             // Saved as new
-            EditorTriggers.Notification.trigger({
+            EditorTriggers.Notification1.trigger({
                 content: `💾 Project saved as "${ projectName }"!`,
-                type: "success"
+                color: "blue"
             });
 
         localStorage[storageProjectName] = JSON.stringify(data);
@@ -103,9 +102,8 @@ class ProjectWorker {
 
         if (this.projectExists(projectName))
             // Overwrite
-            EditorTriggers.Notification.trigger({
+            EditorTriggers.Notification1.trigger({
                 content: `💾 Project "${ projectName }" overwritten!`,
-                type: "success"
             });
         else
             // Save as new
@@ -115,18 +113,18 @@ class ProjectWorker {
         const storageProjectName = config.PROJECT_NAME_PREFIX + name.trim();
 
         if (!this.projectExists(name.trim())) {
-            EditorTriggers.Notification.trigger({
+            EditorTriggers.Notification1.trigger({
                 content: `😪 Can't find project with name "${ name.trim() }"...`,
-                type: "danger"
+                color: "red"
             });
             return;
         }
 
         const data: IProjectData | null = JSON.parse(localStorage[storageProjectName]) || null;
         if(!data) {
-            EditorTriggers.Notification.trigger({
+            EditorTriggers.Notification1.trigger({
                 content: `🤔 Something went wrong...`,
-                type: "danger"
+                color: "red"
             });
 
             return;
@@ -149,9 +147,9 @@ class ProjectWorker {
         EditorTriggers.Action.trigger({
             type: EditorActionType.START_APP
         })
-        EditorTriggers.Notification.trigger({
+        EditorTriggers.Notification1.trigger({
             content: `💾 "${ projectName }" opened!`,
-            type: "success"
+            color: "blue"
         });
     }
     deleteProject(name: string) {
@@ -160,9 +158,9 @@ class ProjectWorker {
         if (sure)
             localStorage.removeItem(config.PROJECT_NAME_PREFIX + name);
     }
-    newProject(canvasWidth?: number, canvasHeight?: number) {
+    newProject(canvasWidth?: number, canvasHeight?: number, palettePreset?: PalettePreset) {
         LayersWorker.setDefaultLayers();
-        PaletteWorker.setDefaultPalette();
+        PaletteWorker.setDefaultPalette(palettePreset);
         App.CurrentToolType.value = ToolType.PEN;
         SelectionWorker.selection.active = false;
 
@@ -178,9 +176,9 @@ class ProjectWorker {
         EditorTriggers.Action.trigger({
             type: EditorActionType.START_APP
         })
-        EditorTriggers.Notification.trigger({
+        EditorTriggers.Notification1.trigger({
             content: `💾 New project created!`,
-            type: "success"
+            color: "blue"
         });
     }
 

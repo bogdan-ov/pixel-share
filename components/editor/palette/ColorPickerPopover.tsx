@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import PaletteColor from "../../../editor/renderer/PaletteColor";
 import PaletteWorker from "../../../editor/workers/PaletteWorker";
-import { EditorWindowType } from "../../../states/editor-states";
+import { EditorTriggers, EditorWindowType } from "../../../states/editor-states";
 import { HSLA } from "../../../utils/types";
 import { hexToHsl, hslToHex } from "../../../utils/utils";
+import Button from "../../ui/buttons/Button";
 import ColorPicker from "../../ui/utils/ColorPicker";
 import Popover from "../../ui/windows/Popover";
 
@@ -39,7 +40,14 @@ const ColorPickerPopover: React.FC<IColorPickerPopover> = props=> {
             onActive={ onOpenHandler }
             className="flex flex-column gap-4"
         >
-            <span className="text-muted">(Dummy picker...)</span>
+            <div className="slot justify-between">
+                <Button
+                    text="Advanced"
+                    type="link"
+                    onClick={ ()=> EditorTriggers.Window.trigger({ type: EditorWindowType.PALETTE_WINDOW }) }
+                />
+                <span className="text-muted">(Dummy picker...)</span>
+            </div>
             {/* <div className="slot gap-2 clickable">
                 <span>Normal color picker</span>
                 <input type="color" value={ hslToHex(newColor) } onChange={ e=> setNewColor(hexToHsl(e.target.value)) } />
