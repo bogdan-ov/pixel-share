@@ -73,6 +73,7 @@ export interface IEditorContextMenuTrigger {
 export interface IEditorActionTrigger {
     type: EditorActionType
     targetId?: number
+    targetName?: string
 }
 export interface IEditorWrongActionTrigger {
     type: EditorWrongActionType
@@ -88,7 +89,7 @@ export const EditorTriggers = {
     Edited: trigger<IEditorEditedTrigger>("editor-edited"),
 
     // To call something
-    Notification1: trigger<IEditorNotification>("editor-notification"),
+    Notification: trigger<IEditorNotification>("editor-notification"),
     Window: trigger<IEditorWindowTrigger>("editor-window"),
     ContextMenu: trigger<IEditorContextMenuTrigger>("editor-context-menu"),
     History: trigger<IEditorHistoryTrigger>("editor-history"),

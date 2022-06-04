@@ -1,4 +1,4 @@
-import React, { createRef, useEffect } from "react";
+import React, { createRef, useEffect, useState } from "react";
 import ContextMenu from "../components/context-menu/ContextMenu";
 import Helper from "../components/editor/Helper";
 import LayersPanel from "../components/editor/layers/layer-panel/LayersPanel";
@@ -20,13 +20,13 @@ import Keyboard from "../editor/managers/Keyboard";
 import Mouse from "../editor/managers/Mouse";
 import PaletteWorker from "../editor/workers/PaletteWorker";
 import ProjectWorker from "../editor/workers/ProjectWorker";
-import { EditorStates, EditorTriggers, EditorWindowType } from "../states/editor-states";
+import { EditorActionType, EditorStates, EditorTriggers, EditorWindowType } from "../states/editor-states";
 import config from "../utils/config";
 import { clamp, Vector2 } from "../utils/math";
 import ArrayModifierWindow from "../components/ui/windows/modifiers/array/ArrayModifierWindow";
 import DecayModifierWindow from "../components/ui/windows/modifiers/decay/DecayModifierWindow";
 import StrokeModifierWindow from "../components/ui/windows/modifiers/stroke/StrokeModifierWindow";
-import WelcomeWindow from "../components/ui/windows/WelcomeWindow";
+import WelcomeWindow from "../components/editor/windows/welcome-window/WelcomeWindow";
 import PaletteWindow from "../components/editor/windows/palette/PaletteWindow";
 import EditorNotification from "../components/editor/notification/EditorNotification";
 
@@ -108,15 +108,20 @@ const Editor: React.FC = ()=> {
             updateCanvasTransform();
         }
         function updateCanvasTransform() {
-            if (layersRef.current)
-                layersRef.current.style.transform = `translate(calc(${ -App.pan.x }px), calc(${ -App.pan.y }px)) scale(${ App.zoom })`;
+            const layersNode = layersRef.current;
+            
+            if (!layersNode) return;
+
+
+            layersNode.style.transform = `translate(${ Math.floor(-App.pan.x) }px, ${ Math.floor(-App.pan.y) }px) scale(${ App.zoom })`;
+                // layersRef.current.style.transform = `translate(calc(${ -App.pan.x }px), calc(${ -App.pan.y }px)) scale(${ App.zoom })`;
         }
         
-        const removeWheelListener = Mouse.onWheel(onWheel);
-        const removeMoveListener = Mouse.onMove(onMouseMove, window);
+        const unlistenWheel = Mouse.onWheel(onWheel);
+        const unlistenMove = Mouse.onMove(onMouseMove, window);
         return ()=> {
-            removeWheelListener();
-            removeMoveListener();
+            unlistenWheel();
+            unlistenMove();
         }
     }, [workspaceRef, layersRef]);
     useEffect(()=> {
@@ -188,13 +193,31 @@ const Editor: React.FC = ()=> {
             <OpenProjectWindow />
             <SaveProjectWindow />
             <PaletteWindow />
-            
-            <ContextMenu />
 
             <WelcomeWindow />
+            
+            <ContextMenu />
             
         </Page>
     )
 };
 
-export default Editor;
+const EditorPage: React.FC = ()=> {
+    // const [welcomeActive, setWelcomeActive] = useState<boolean>(true);
+
+    // useEffect(()=> {
+    //     const unlistenWindow = EditorTriggers.Window.listen(window=> {
+    //         if (window.type == EditorWindowType.WELCOME_WINDOW) {
+    //             setWelcomeActive(true);
+    //         }
+    //     })
+
+    //     return ()=> unlistenWindow();
+    // }, []);
+    
+    return <Editor />
+    // return welcomeActive ? <WelcomeWindow active={ welcomeActive } setActive={ setWelcomeActive } /> : <Editor />
+};
+
+EditorPage.displayName = "EditorPage";
+export default EditorPage;

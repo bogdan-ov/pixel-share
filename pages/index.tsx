@@ -15,9 +15,8 @@ const Home: React.FC = ()=> {
 				<section className="section centered">
 
 					<div className="slot flex-column">
-						<div className="text-muted">Pixel share!</div>
 						<div className="slot flex-column gap-4">
-							<h1>Super pre-alpha-beta²!</h1>
+							<h1>Pixel share <span className="badge color-blue">Beta!</span></h1>
 							<div className="slot flex-column gap-2">
 								<button className="button color-blue">
 									<Link href="/editor">

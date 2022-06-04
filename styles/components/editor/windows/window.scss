@@ -6,7 +6,7 @@
     z-index: 888;
 
     &:focus .window {
-        border: 2px solid darken($blue, 8);
+        outline: 2px solid darken($blue, 8) !important;
         .window-header .button {
             opacity: 1;
         }
@@ -17,7 +17,7 @@
     min-width: 200px;
     padding: 4px;
 
-    border: 2px solid transparent;
+    outline: 2px solid transparent !important;
 
     .window-header {
         width: 100%;

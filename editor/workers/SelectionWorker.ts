@@ -204,7 +204,7 @@ class SelectionWorker {
         }
 
         function copyError() {
-            EditorTriggers.Notification1.trigger({
+            EditorTriggers.Notification.trigger({
                 content: "🤔 Can't copy image data...",
             })
         }
@@ -239,12 +239,12 @@ class SelectionWorker {
             EditorTriggers.Edited.trigger({
                 type: EditorEditedType.SELECTION_PASTE
             })
-            EditorTriggers.Notification1.trigger({
+            EditorTriggers.Notification.trigger({
                 content: "Image data pasted!",
             });
         }
         function pasteError() {
-            EditorTriggers.Notification1.trigger({
+            EditorTriggers.Notification.trigger({
                 content: "😦 Can't paste image data..."
             })
         }
@@ -266,7 +266,7 @@ class SelectionWorker {
             EditorTriggers.Edited.trigger({
                 type: EditorEditedType.SELECTION_CUT
             })
-            EditorTriggers.Notification1.trigger({
+            EditorTriggers.Notification.trigger({
                 content: "Image data cut!",
             });
         }
@@ -281,6 +281,15 @@ class SelectionWorker {
     pointInSelection(point: Vector2, allowBehind: boolean=false): boolean {
         const sel = this.getSelection();
         return !allowBehind ? pointInsideArea(point, sel.from, sel.width-1, sel.height-1) : true;
+    }
+
+    // Utils
+    clear() {
+        this.selection.active = false;
+        this.selection.from.set(0, 0);
+        this.selection.to.set(0, 0);
+        this.selection.startFrom.set(0, 0);
+        this.selection.startTo.set(0, 0);
     }
 }
 export default new SelectionWorker();

@@ -43,7 +43,7 @@ const ResizeCanvasWindow: React.FC<IWindowNeeds> = props=> {
             setAspect(finalWidth/finalHeight);
             setScale(1);
 
-            EditorTriggers.Notification1.trigger({
+            EditorTriggers.Notification.trigger({
                 content: `😃 Canvas resized! ${ width }px*${ height }px`,
             });
         }

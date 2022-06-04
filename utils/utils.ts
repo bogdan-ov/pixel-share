@@ -38,6 +38,9 @@ export function rgbToHsl(rgba: RGBA): HSLA {
 export function hslToHex(hsla: HSLA=[0, 0, 0, 1]): string {
     return "#" + converter.hsl.hex([hsla[0], hsla[1], hsla[2]]);
 }
+export function hslToRgb(hsla: HSLA=[0, 0, 0, 1]): RGBA {
+    return [...converter.hsl.rgb([hsla[0], hsla[1], hsla[2]]), 1];
+}
 export function hexToHsl(hex: string): HSLA {
     return [...converter.hex.hsl(hex.replace("#", "")), 1];
 }

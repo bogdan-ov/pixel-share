@@ -30,13 +30,19 @@ export interface IProjectData {
 class ProjectWorker {
     Name: State<string>
     Saved: State<boolean>
+
+    inited: boolean
     
     constructor() {
         this.Name = state<string>("", "project-name");
         this.Saved = state<boolean>(false, "project-saved");
+
+        this.inited = false;
     }
 
     init() {
+        if (this.inited) return;
+        
         window.addEventListener("beforeunload", (e)=> {
             if (!this.Saved.value && !config.DEBUG) {
                 e.preventDefault();
@@ -46,6 +52,8 @@ class ProjectWorker {
         EditorTriggers.Edited.listen(()=> {
             this.Saved.value = false;
         })
+        
+        this.inited = true;
     }
     
     tryToSave() {
@@ -81,13 +89,13 @@ class ProjectWorker {
 
         if (this.projectExists(projectName))
             // Save
-            EditorTriggers.Notification1.trigger({
+            EditorTriggers.Notification.trigger({
                 content: `💾 Project "${ projectName }" saved!`,
                 color: "blue"
             });
         else
             // Saved as new
-            EditorTriggers.Notification1.trigger({
+            EditorTriggers.Notification.trigger({
                 content: `💾 Project saved as "${ projectName }"!`,
                 color: "blue"
             });
@@ -102,7 +110,7 @@ class ProjectWorker {
 
         if (this.projectExists(projectName))
             // Overwrite
-            EditorTriggers.Notification1.trigger({
+            EditorTriggers.Notification.trigger({
                 content: `💾 Project "${ projectName }" overwritten!`,
             });
         else
@@ -113,7 +121,7 @@ class ProjectWorker {
         const storageProjectName = config.PROJECT_NAME_PREFIX + name.trim();
 
         if (!this.projectExists(name.trim())) {
-            EditorTriggers.Notification1.trigger({
+            EditorTriggers.Notification.trigger({
                 content: `😪 Can't find project with name "${ name.trim() }"...`,
                 color: "red"
             });
@@ -122,7 +130,7 @@ class ProjectWorker {
 
         const data: IProjectData | null = JSON.parse(localStorage[storageProjectName]) || null;
         if(!data) {
-            EditorTriggers.Notification1.trigger({
+            EditorTriggers.Notification.trigger({
                 content: `🤔 Something went wrong...`,
                 color: "red"
             });
@@ -132,22 +140,12 @@ class ProjectWorker {
         
         const projectName = data.name.trim();
 
-        LayersWorker.setFromShortData(data.layers);
-        PaletteWorker.setFromShortData(data.palette);
-        LayersWorker.CurrentLayerId.value = data.currentLayerId;
-        PaletteWorker.CurrentPaletteColorId.value = data.currentPaletteColorId;
-        PaletteWorker.LastPaletteColorId.value = data.lastPaletteColorId || data.palette[0].id;
-        App.resizeCanvas(data.canvasWidth, data.canvasHeight, Anchor.TOP_LEFT, false);
-
-        App.initHistory();
+        App.loadProjectData(data);
         
         this.Name.value = projectName;
         this.Saved.value = true;
         
-        EditorTriggers.Action.trigger({
-            type: EditorActionType.START_APP
-        })
-        EditorTriggers.Notification1.trigger({
+        EditorTriggers.Notification.trigger({
             content: `💾 "${ projectName }" opened!`,
             color: "blue"
         });
@@ -176,7 +174,7 @@ class ProjectWorker {
         EditorTriggers.Action.trigger({
             type: EditorActionType.START_APP
         })
-        EditorTriggers.Notification1.trigger({
+        EditorTriggers.Notification.trigger({
             content: `💾 New project created!`,
             color: "blue"
         });

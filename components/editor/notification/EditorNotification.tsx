@@ -44,7 +44,7 @@ const EditorNotification: React.FC = props=> {
     
     useEffect(()=> {
 
-        const unlistenNotif = EditorTriggers.Notification1.listen(notif=> {
+        const unlistenNotif = EditorTriggers.Notification.listen(notif=> {
             if (active)
                 animation.start("shake");
             setActive(true);

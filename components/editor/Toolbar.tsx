@@ -8,6 +8,7 @@ import Button from "../ui/buttons/Button";
 import { HotkeysBuilder, Key } from "../ui/Misc";
 import Tooltip from "../ui/windows/Tooltip";
 import Image from "next/image";
+import { EditorTriggers, EditorWindowType } from "../../states/editor-states";
 
 const Toolbar: React.FC = ()=> {
 
@@ -38,7 +39,7 @@ const Toolbar: React.FC = ()=> {
                         className="show-on-hover fw-500 text-muted mb-2"
                     >:D</Button>
                 </a>
-                <div className="logo small">
+                <div className="logo small clickable" onClick={ ()=> EditorTriggers.Window.trigger({ type: EditorWindowType.WELCOME_WINDOW }) }>
                     <Image alt="Logo" src="/img/logo.png" layout="fill" objectFit="cover" />
                 </div>
             </div>

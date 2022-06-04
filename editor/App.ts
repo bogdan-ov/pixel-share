@@ -13,7 +13,7 @@ import ActionWorker from "./workers/ActionWorker";
 import HotkeysWorker from "./workers/HotkeysWorker";
 import LayersWorker from "./workers/LayersWorker";
 import PaletteWorker from "./workers/PaletteWorker";
-import ProjectWorker from "./workers/ProjectWorker";
+import ProjectWorker, { IProjectData } from "./workers/ProjectWorker";
 import SelectionWorker from "./workers/SelectionWorker";
 import { Anchor } from "../utils/types";
 import ViewWorker from "./workers/ViewWorker";
@@ -85,12 +85,33 @@ export class Application {
         Mouse.init();
         Keyboard.init();
         this.initListeners();
+        this.initHistory();
+        this.initPan();
 
+        this.inited = true;
+    }
+    initPan() {
         this.zoom = innerHeight / this.CanvasHeight.value * .5;
         const workspaceBounds = this.workspaceElement.getBoundingClientRect();
         this.pan.set(-workspaceBounds.width/2, -workspaceBounds.height/2 + 20);
+    }
+    initHistory() {
+        HistoryWorker.Past.value = [];
+        HistoryWorker.Future.value = [];
+    }
+    
+    loadProjectData(data: IProjectData) {
+        LayersWorker.setFromShortData(data.layers);
+        PaletteWorker.setFromShortData(data.palette);
+        LayersWorker.CurrentLayerId.value = data.currentLayerId;
+        PaletteWorker.CurrentPaletteColorId.value = data.currentPaletteColorId;
+        PaletteWorker.LastPaletteColorId.value = data.lastPaletteColorId || data.palette[0].id;
+        this.resizeCanvas(data.canvasWidth, data.canvasHeight, Anchor.TOP_LEFT, false);
 
-        this.inited = true;
+        SelectionWorker.clear();
+        
+        this.initHistory();
+        this.initPan();
     }
 
     setCursor(type: keyof typeof cursors) {
@@ -143,6 +164,8 @@ export class Application {
     }
 
     initListeners() {
+        EditorTriggers.Action.listen(this.actionListener);
+        
         // Mouse listeners
         Mouse.onDown(()=> {
             const currentLayer = LayersWorker.currentLayer;
@@ -195,10 +218,10 @@ export class Application {
         EditorTriggers.Edited.trigger(true, "app");
         this.initHistory();
     }
-    initHistory() {
-        HistoryWorker.Past.value = [];
-        HistoryWorker.Future.value = [];
-        // HistoryWorker.pushToPast(HistoryItemType.ALL);
+    actionListener(action: IEditorActionTrigger) {
+        // if (action.type == EditorActionType.OPEN_PROJECT && action.targetName) {
+        //     ProjectWorker.openProject(action.targetName);
+        // }
     }
 
     // Tools

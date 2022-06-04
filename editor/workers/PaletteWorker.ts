@@ -115,7 +115,7 @@ class PaletteWorker {
             this.putPaletteColor(paletteColor);
             this.CurrentPaletteColorId.value = id;
 
-            EditorTriggers.Notification1.trigger({
+            EditorTriggers.Notification.trigger({
                 content: `<div class="color-bubble mr-1" style="background:${ useHex ? color : hslaToString(color as HSLA) };"></div> Added a new color to the palette!`
             });
         }
@@ -183,7 +183,7 @@ class PaletteWorker {
         const data = await navigator.clipboard.readText();
 
         if (!(data.indexOf("#") == 0 || data.indexOf("rgb") == 0 || data.indexOf("hsl") == 0)) {
-            EditorTriggers.Notification1.trigger({
+            EditorTriggers.Notification.trigger({
                 content: "🤷‍♂️ Cannot paste a color from clipboard (HEX, RGB or HSL)",
             })
             return;
@@ -203,7 +203,7 @@ class PaletteWorker {
             this.addPaletteColor(id, [ parseInt(hslStr[0]) || 0, parseInt(hslStr[1]) || 0, parseInt(hslStr[2]) || 0, 1 ]);
         }
 
-        EditorTriggers.Notification1.trigger({
+        EditorTriggers.Notification.trigger({
             content: `😎 Created a new color from clipboard! ${ data }`,
         });
 

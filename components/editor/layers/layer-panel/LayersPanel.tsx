@@ -62,13 +62,9 @@ const LayersList: React.FC<{ layers: Layer[] }> = props=> {
         <div
             className="layers-list ph-2 pb-2 flex flex-column"
         >
-            <AnimateSharedLayout>
-                { props.layers.filter(l=> !l.ghost).map(layer=>
-                    <motion.div layout key={ layer.id }>
-                        <LayerComponent value={ layer } { ...layer } />
-                    </motion.div>
-                ) }
-            </AnimateSharedLayout>
+            { props.layers.filter(l=> !l.ghost).map(layer=>
+                <LayerComponent key={ layer.id } value={ layer } { ...layer } />
+            ) }
         </div>
     );
 };

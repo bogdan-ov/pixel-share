@@ -3,7 +3,7 @@ import PaletteWorker from "../../../editor/workers/PaletteWorker";
 import useStateListener from "../../../src/hooks/useStateListener";
 import { clamp, vec, Vector2 } from "../../../utils/math";
 import { HSLA, ReactSimpleState, ReactState } from "../../../utils/types";
-import { hexToHsl, hslaToString, hslToHex, safeValue } from "../../../utils/utils";
+import { hexToHsl, hslaToString, hslToHex, hslToRgb, rgbToHsl, safeValue } from "../../../utils/utils";
 import { IPaletteColorComponent } from "../../editor/palette/PaletteColorComponent";
 import { PalettePanelContent } from "../../editor/palette/PalettePanel";
 import Input from "../inputs/Input";
@@ -27,9 +27,13 @@ const ColorPicker: React.FC<IColorPicker> = props=> {
     const cursorRef = createRef<HTMLDivElement>();
     
     const sizes = { width: props.size || DEFAULT_SIZE, height: props.size || DEFAULT_SIZE };
+    
+    // Hsl
     const hue = props.newColor[0];
     const saturation = props.newColor[1];
     const lightness = props.newColor[2];
+    // Rgb
+    const rgb = hslToRgb([hue, saturation, lightness, 1]);
 
     const [hex, setHex] = useState<string>("#000");
     const [palette, paletteState] = useStateListener(PaletteWorker.Palette);
@@ -52,7 +56,7 @@ const ColorPicker: React.FC<IColorPicker> = props=> {
         }
         function onPointerUp() {
             if (mouseDown) {
-                props.onPickEnd && props.onPickEnd(props.newColor);
+                pickEndHandler();
                 mouseDown = false;
             }
         }
@@ -77,7 +81,6 @@ const ColorPicker: React.FC<IColorPicker> = props=> {
     
             hsl[1] = pos.x / width * 100;
             hsl[2] = (50 - pos.y / height * 50) + (50 - pos.x / width * 50) * (1 - pos.y / height);
-            // hsl[2] = (50 - pos.y / height * 50) + (50 - pos.x / width * 50) * (1 - pos.y / height);
             
             setHsl([undefined, hsl[1], hsl[2]]);
         }
@@ -115,7 +118,7 @@ const ColorPicker: React.FC<IColorPicker> = props=> {
         const hsl = hexToHsl(hex.replace("#", ""));
 
         setHsl(hsl);
-        props.onPickEnd && props.onPickEnd(props.newColor);
+        pickEndHandler();
     }
 
     function setHsl(hsl: [number?, number?, number?, number?]) {
@@ -125,6 +128,21 @@ const ColorPicker: React.FC<IColorPicker> = props=> {
             safeValue(hsl[2], v[2]),
             safeValue(hsl[3], v[3]),
         ]);
+    }
+    function setRgb(rgb: [number?, number?, number?, number?]) {
+        props.setNewColor(v=> {
+            const _rgb = hslToRgb(v);
+            
+            return rgbToHsl([
+                safeValue(rgb[0], _rgb[0]), 
+                safeValue(rgb[1], _rgb[1]), 
+                safeValue(rgb[2], _rgb[2]), 
+                safeValue(rgb[3], 1)
+            ]);
+        });
+    }
+    function pickEndHandler() {
+        props.onPickEnd && props.onPickEnd(props.newColor);
     }
     // function setHslChanel(chanel: 0|1|2|3,  value: number) {
     //     props.setNewColor(v=> {
@@ -161,6 +179,7 @@ const ColorPicker: React.FC<IColorPicker> = props=> {
                 
                 {/* Inputs */}
                 <div className="list gap-2">
+                    {/* Hex */}
                     <Tooltip 
                         tooltip={ <span>Hex</span> }
                         placement="top"
@@ -179,6 +198,7 @@ const ColorPicker: React.FC<IColorPicker> = props=> {
                         />
                     </Tooltip>
 
+                    {/* Hsl */}
                     { !props.short && <div className="slot gap-2">
                         <Tooltip 
                             tooltip={ <span>Hue</span> }
@@ -192,7 +212,7 @@ const ColorPicker: React.FC<IColorPicker> = props=> {
                                     value={ hue.toFixed(0) }
                                     onSubmitChange={ v=> {
                                         setHsl([+(+v).toFixed(0) % 360])
-                                        props.onPickEnd && props.onPickEnd(props.newColor);
+                                        pickEndHandler();
                                     } }
 
                                     min={ 0 }
@@ -212,7 +232,7 @@ const ColorPicker: React.FC<IColorPicker> = props=> {
                                     value={ saturation.toFixed(0) }
                                     onSubmitChange={ v=> {
                                         setHsl([undefined, +(+v).toFixed(0)])
-                                        props.onPickEnd && props.onPickEnd(props.newColor);
+                                        pickEndHandler();
                                     } }
 
                                     min={ 0 }
@@ -232,11 +252,75 @@ const ColorPicker: React.FC<IColorPicker> = props=> {
                                     value={ lightness.toFixed(0) }
                                     onSubmitChange={ v=> {
                                         setHsl([undefined, undefined, +(+v).toFixed(0)])
-                                        props.onPickEnd && props.onPickEnd(props.newColor);
+                                        pickEndHandler();
                                     } }
 
                                     min={ 0 }
                                     max={ 100 }
+                                />
+                            </label>
+                        </Tooltip>
+                    </div> }
+
+                    {/* Rgb */}
+                    { !props.short && <div className="slot gap-2">
+                        <Tooltip 
+                            tooltip={ <span>Red</span> }
+                            placement="top"
+                        >
+                            <label className="slot gap-1">
+                                <span className="text-muted">R</span>
+                                <Input
+                                    type="number"
+                                    className="width-fill"
+                                    value={ rgb[0].toFixed(0) }
+                                    onSubmitChange={ v=> {
+                                        setRgb([+(+v).toFixed(0)])
+                                        pickEndHandler();
+                                    } }
+
+                                    min={ 0 }
+                                    max={ 255 }
+                                />
+                            </label>
+                        </Tooltip>
+                        <Tooltip 
+                            tooltip={ <span>Green</span> }
+                            placement="top"
+                        >
+                            <label className="slot gap-1">
+                                <span className="text-muted">G</span>
+                                <Input
+                                    type="number"
+                                    className="width-fill"
+                                    value={ rgb[1].toFixed(0) }
+                                    onSubmitChange={ v=> {
+                                        setRgb([undefined, +(+v).toFixed(0)])
+                                        pickEndHandler();
+                                    } }
+
+                                    min={ 0 }
+                                    max={ 255 }
+                                />
+                            </label>
+                        </Tooltip>
+                        <Tooltip 
+                            tooltip={ <span>Blue</span> }
+                            placement="top"
+                        >
+                            <label className="slot gap-1">
+                                <span className="text-muted">B</span>
+                                <Input
+                                    type="number"
+                                    className="width-fill"
+                                    value={ rgb[2].toFixed(0) }
+                                    onSubmitChange={ v=> {
+                                        setHsl([undefined, undefined, +(+v).toFixed(0)])
+                                        pickEndHandler();
+                                    } }
+
+                                    min={ 0 }
+                                    max={ 255 }
                                 />
                             </label>
                         </Tooltip>
@@ -270,7 +354,7 @@ const ColorPicker: React.FC<IColorPicker> = props=> {
                             key={ color.id }
                             onClick={ ()=> {
                                 setHsl([...color.hslaColor]);
-                                props.onPickEnd && props.onPickEnd(props.newColor);
+                                pickEndHandler();
                             } }
                             { ...color }
                         />

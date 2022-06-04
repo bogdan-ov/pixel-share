@@ -70,7 +70,7 @@ const PaletteWindow: React.FC = ()=> {
                             className="width-fill"
                         />
                         <Button 
-                            text="Apply as new"
+                            text="Insert new"
                             onClick={ applyNewHandler }
                             className="p-0 width-fill"
                         />

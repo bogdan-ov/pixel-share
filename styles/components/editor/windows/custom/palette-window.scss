@@ -29,6 +29,10 @@ $color-size: 38px;
             &.active {
                 outline: 4px solid #fff !important;
             }
+
+            &, * {
+                user-select: text !important;
+            }
         }
     }
 }

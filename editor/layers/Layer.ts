@@ -164,8 +164,8 @@ export default class Layer {
     resize(anchor: Anchor) {
         const dataUrl = this.getDataUrl();
         
-        this.canvas.style.width = App.CanvasWidth.value + "px";
-        this.canvas.style.height = App.CanvasHeight.value + "px";
+        // this.canvas.style.width = App.CanvasWidth.value + "px";
+        // this.canvas.style.height = App.CanvasHeight.value + "px";
 
         let x = 0;
         let y = 0;
@@ -306,7 +306,7 @@ export default class Layer {
             EditorTriggers.Edited.trigger({
                 type: EditorEditedType.LAYERS_EDITED
             })
-            EditorTriggers.Notification1.trigger({
+            EditorTriggers.Notification.trigger({
                 content: `Modifier ${ modifier.name } applied!`,
             });
         }

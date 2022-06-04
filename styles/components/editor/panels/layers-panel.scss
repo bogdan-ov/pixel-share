@@ -52,7 +52,7 @@ $layer-blob-size: 64px;
                 .layer-blob {
                     height: $layer-blob-size;
                     
-                    object-fit: cover;
+                    object-fit: contain;
                     image-rendering: pixelated;
                 }
             }

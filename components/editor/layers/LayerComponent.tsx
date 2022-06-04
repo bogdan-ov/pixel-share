@@ -68,16 +68,17 @@ const LayerComponent: React.FC<ILayerComponent> = props=> {
         let movementY = 0;
 
         function pointermove(e: PointerEvent) {
-            if (!pointerPressed || e.button != 0) return;
+            if (!pointerPressed) return;
+            
             movementY = e.movementY;
         }
-        function pointerup() {
+        function pointerup(e: PointerEvent) {
             // Move layer
             if (!pointerPressed) return;
 
-            if (movementY > 1) {
+            if ((e.movementY || movementY) > 1) {
                 move(1);
-            } else if (movementY < -1) {
+            } else if ((e.movementY || movementY) < -1) {
                 move(-1);
             }
             
