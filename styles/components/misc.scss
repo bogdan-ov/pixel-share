@@ -101,16 +101,19 @@
     }
     
 }
-
+// 8-982-838-11-56
 .badge {
-    padding: 4px 6px;
-    padding-top: 3px;
+    padding: .2em .4em;
+    padding-bottom: .3em;
 
     background: lighten($bg, 4);
-    border-radius: 20px;
+    border-radius: 100px;
 
     &.light {
         background: rgba(255, 255, 255, .2);
+    }
+    &.color-blue {
+        background: $blue;
     }
     
 }
